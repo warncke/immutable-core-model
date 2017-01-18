@@ -1,0 +1,28 @@
+{
+  "author": "Ersun Warncke <ersun.warncke@gmail.com>",
+  "dependencies": {
+    "bluebird": "^3.4.7",
+    "immutable-core": "^1.0.0"
+  },
+  "description": "Immutable model built on immutable-core",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-as-promised": "^6.0.0",
+    "immutable-database-mariasql": "^0.4.0",
+    "mocha": "^3.0.2"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "engines": {
+    "node": ">=7.0.0"
+  },
+  "license": "MIT",
+  "main": "lib/immutable-core-model.js",
+  "name": "immutable-core-model",
+  "repository": "warncke/immutable-core-model",
+  "scripts": {
+    "test": "mocha --harmony-async-await"
+  },
+  "version": "0.0.1"
+}
