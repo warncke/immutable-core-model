@@ -4,6 +4,7 @@
     "bluebird": "^3.4.7",
     "change-case": "^3.0.0",
     "debug": "^2.6.0",
+    "deep-equal": "^1.0.1",
     "immutable-core": "^1.0.2",
     "immutable-require-valid-optional-object": "^0.1.0",
     "lodash": "^4.17.4"

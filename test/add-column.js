@@ -6,7 +6,6 @@ const Promise = require('bluebird')
 const chai = require('chai')
 const immutable = require('immutable-core')
 
-
 const assert = chai.assert
 
 const dbHost = process.env.DB_HOST || 'localhost'
@@ -23,7 +22,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-model', function () {
+describe('immutable-model - add column', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -35,7 +34,7 @@ describe('immutable-model', function () {
         return database.query('DROP TABLE IF EXISTS foo')
     })
 
-    it('should create a new model instance', function () {
+    it('should add new columns', function () {
         // full table schema including all default columns
         var expectedSchema = {
             columns: {
@@ -85,33 +84,32 @@ describe('immutable-model', function () {
                     index: true
                 }
             },
-            indexes: [
-                {
-                    columns: ['bam','bar'],
-                    'unique': true
-                }
-            ]
+            indexes: []
         };
-        // create model
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                bam: 'boolean',
-                bar: 'string',
-                foo: 'number',
-            },
             database: database,
-            indexes: [
-                {
-                    columns: ['bam', 'bar'],
-                    unique: true,
-                },
-            ],
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    bam: 'boolean',
+                    bar: 'string',
+                    foo: 'number',
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
@@ -120,97 +118,34 @@ describe('immutable-model', function () {
         })
     })
 
-    it('should allow removing default columns', function () {
-        var expectedSchema = {
-            fooData: {
-                type: 'data',
-                null: false
-            },
-            fooId: {
-                type: 'id',
-                null: false,
-                primary: true
-            }
-        }
-        // create model
-        var fooModel = new ImmutableCoreModel({
-            columns: {
-                fooAccountId: false,
-                fooCreateTime: false,
-                fooOriginalId: false,
-                fooParentId: false,
-                fooSessionId: false,
-            },
-            database: database,
-            name: 'foo',
-        })
-        // sync with database
-        return fooModel.sync()
-        // get schema
-        .then(() => fooModel.schema())
-        // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns, expectedSchema)
-        })
-    })
-
-    it('should allow overriding default columns', function () {
-        var expectedSchema = {
-            fooData: {
-                type: 'string',
-                index: true,
-            },
-            fooId: {
-                type: 'id',
-                null: false,
-                primary: true
-            }
-        }
-        // create model
-        var fooModel = new ImmutableCoreModel({
-            columns: {
-                fooAccountId: false,
-                fooCreateTime: false,
-                fooData: {
-                    type: 'string',
-                    null: true,
-                    index: true,
-                },
-                fooOriginalId: false,
-                fooParentId: false,
-                fooSessionId: false,
-            },
-            database: database,
-            name: 'foo',
-        })
-        // sync with database
-        return fooModel.sync()
-        // get schema
-        .then(() => fooModel.schema())
-        // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns, expectedSchema)
-        })
-    })
-
-    it('should allow setting default value for string', function () {
+    it('should add new string column with default value', function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: 'TEST',
             type: 'string',
-        }
-        // create model
+        };
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
             database: database,
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    foo: fooSchema,
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
@@ -219,24 +154,34 @@ describe('immutable-model', function () {
         })
     })
 
-    it('should allow setting default value for number', function () {
+    it('should add new number column with default value', function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: '95.750000000',
             type: 'number',
         }
-        // create model
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
             database: database,
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    foo: fooSchema,
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
@@ -245,24 +190,34 @@ describe('immutable-model', function () {
         })
     })
 
-    it('should allow setting default false for boolean', function () {
+    it('should add new boolean column with default value', function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: false,
             type: 'boolean',
         }
-        // create model
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
             database: database,
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    foo: fooSchema,
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
@@ -271,50 +226,34 @@ describe('immutable-model', function () {
         })
     })
 
-    it('should allow setting default true for boolean', function () {
-        // expected schema for extra column foo
-        var fooSchema = {
-            default: true,
-            type: 'boolean',
-        }
-        // create model
-        var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
-            database: database,
-            name: 'foo',
-        })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
-        // sync with database
-        return fooModel.sync()
-        // get schema
-        .then(() => fooModel.schema())
-        // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
-    })
-
-    it('should allow creating non-unique column index', function () {
+    it('should add new column with non-unique index', function () {
         // expected schema for extra column foo
         var fooSchema = {
             index: true,
             type: 'string',
         }
-        // create model
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
             database: database,
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    foo: fooSchema,
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
@@ -323,24 +262,34 @@ describe('immutable-model', function () {
         })
     })
 
-    it('should allow creating unique column index', function () {
+    it('should add new column with unique index', function () {
         // expected schema for extra column foo
         var fooSchema = {
             type: 'string',
             unique: true,
         }
-        // create model
+        // create initial model
         var fooModel = new ImmutableCoreModel({
-            columns: {
-                foo: fooSchema
-            },
             database: database,
             name: 'foo',
         })
-        // check that immutable module created
-        assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
         return fooModel.sync()
+        // created updated schema
+        .then(() => {
+            // reset immutable module
+            immutable.reset()
+            // create updated model
+            var fooModel = new ImmutableCoreModel({
+                columns: {
+                    foo: fooSchema,
+                },
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            return fooModel.sync()
+        })
         // get schema
         .then(() => fooModel.schema())
         // test that schema matches spec
