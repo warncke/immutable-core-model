@@ -256,7 +256,7 @@ statements.
 ### Creating a new object instance
 
     var foo = await fooModel.create({
-        data: {foo: 'bar'},
+        data: {foo: 'foo'},
         session: session,
     })
 
@@ -273,3 +273,41 @@ originalId  | hash id of original object revision
 parentId    | hash id of parent object revision
 sessionId   | id of session that created object
 toJSON      | custom formater for JSON.stringify
+
+### Updating an object instance
+
+    foo = await foo.update({
+        data: {foo: 'bar'}
+    })
+
+When an object is updated the data object passed as an argument will be merged
+over the existing objet data using the lodash _.merge method.
+
+The update method returns the new object instance. Multiple attempts to
+update the same object will fail so the new object returned by update must
+always be captured if further updates will be performed.
+
+By default the updated instance inherits the session and accountId of the
+parent instance.
+
+The updated instance will always get the same originalId as the parent and
+the parentId for the updated instance will always be the id of the parent.
+
+### Updating the accountId on an object
+
+    foo = await foo.update({
+        accountId: '2222'
+    })
+
+By default an object will have the same accountId as its parent. The accountId
+must be passed as an argument to change it.
+
+### Changing the sessionId on an object
+
+    foo = await foo.update({
+        session: session
+    })
+
+Objects always get the sessionId of the session that created them. When an
+update is performed on an object it is assumed that this operation is
+occurring in the same session that the object was instantiated in.

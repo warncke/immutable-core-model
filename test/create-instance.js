@@ -56,15 +56,163 @@ describe('immutable-model - create instance', function () {
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.create({
-                data: {foo: 'bar'},
+                data: {foo: 'foo'},
                 session: session,
             })
             // check instance values
             assert.strictEqual(foo.accountId(), '1111')
-            assert.deepEqual(foo.data(), {foo: 'bar'})
+            assert.deepEqual(foo.data(), {foo: 'foo'})
             assert.strictEqual(foo.sessionId(), '2222')
             // id should match original id since this is first revision
             assert.strictEqual(foo.id(), foo.originalId())
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should update an object instance', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.create({
+                data: {foo: 'foo'},
+                session: session,
+            })
+            // get original id
+            var originalId = foo.originalId()
+            // update instance
+            foo = await foo.update({
+                data: {foo: 'bar'}
+            })
+            // check instance values
+            assert.deepEqual(foo.data(), {foo: 'bar'})
+            // should use session and account id from original if no session
+            assert.strictEqual(foo.accountId(), '1111')
+            assert.strictEqual(foo.sessionId(), '2222')
+            // id should have changed
+            assert.notEqual(foo.id(), originalId)
+            // original and parent id should both be the first id
+            assert.strictEqual(foo.originalId(), originalId)
+            assert.strictEqual(foo.parentId(), originalId)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should update accountId and sessionId on object', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.create({
+                data: {foo: 'foo'},
+                session: session,
+            })
+            // get original id
+            var originalId = foo.originalId()
+            // update instance
+            foo = await foo.update({
+                accountId: '2222',
+                session: {
+                    sessionId: '3333'
+                }
+            })
+            // should have updated accountId and sessionId
+            assert.strictEqual(foo.accountId(), '2222')
+            assert.strictEqual(foo.sessionId(), '3333')
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should empty object', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.create({
+                data: {foo: 'foo'},
+                session: session,
+            })
+            // get original id
+            var originalId = foo.originalId()
+            // update instance
+            foo = await foo.empty()
+            // should use session and account id from original if no session
+            assert.strictEqual(foo.accountId(), '1111')
+            assert.strictEqual(foo.sessionId(), '2222')
+            // id should have changed
+            assert.notEqual(foo.id(), originalId)
+            // original and parent id should both be the first id
+            assert.strictEqual(foo.originalId(), originalId)
+            assert.strictEqual(foo.parentId(), originalId)
+            // data should be empty
+            assert.deepEqual(foo.data(), {})
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should set accountId and sessionId while emptying object', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.create({
+                data: {foo: 'foo'},
+                session: session,
+            })
+            // get original id
+            var originalId = foo.originalId()
+            // update instance
+            foo = await foo.empty({
+                accountId: '2222',
+                session: {
+                    sessionId: '3333'
+                }
+            })
+            // should have updated accountId and sessionId
+            assert.strictEqual(foo.accountId(), '2222')
+            assert.strictEqual(foo.sessionId(), '3333')
+            // data should be empty
+            assert.deepEqual(foo.data(), {})
         }
         catch (err) {
             assert.ifError(err)
