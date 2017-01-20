@@ -91,7 +91,17 @@ describe('immutable-model', function () {
                     'unique': true
                 }
             ]
-        };
+        }
+        // default columns
+        var expectedDefaultColumns = {
+            fooAccountId: 'accountId',
+            fooCreateTime: 'createTime',
+            fooData: 'data',
+            fooId: 'id',
+            fooOriginalId: 'originalId',
+            fooParentId: 'parentId',
+            fooSessionId: 'sessionId',
+        }
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -110,6 +120,8 @@ describe('immutable-model', function () {
         })
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
+        // check default columns
+        assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
         // sync with database
         return fooModel.sync()
         // get schema
@@ -132,6 +144,11 @@ describe('immutable-model', function () {
                 primary: true
             }
         }
+        // default columns
+        var expectedDefaultColumns = {
+            fooData: 'data',
+            fooId: 'id',
+        }
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -144,6 +161,8 @@ describe('immutable-model', function () {
             database: database,
             name: 'foo',
         })
+        // check default columns
+        assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
         // sync with database
         return fooModel.sync()
         // get schema

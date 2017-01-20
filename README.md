@@ -26,6 +26,17 @@ allow anything besides INSERT and SELECT on the database.
 All models should be sync'd prior to deploying new code with specification
 changes that require creating or modifying tables.
 
+## Altering model tables, columns, and indexes
+
+Immutable Core Model only supports limited alterations to existing model
+tables:
+
+* Adding new columns
+* Adding new indexes to columns without indexes
+
+These operations are currently done as ALTER TABLE statements which may cause
+significant performance impacts with large tables in production envrionments.
+
 ## Schema
 
 For the simple example above the following schema will be created:
@@ -223,3 +234,42 @@ The indexes option can only be used for multi-column indexes and attempts to
 create single column indexes will result in an error.
 
 The unique flag controls whether or not the index is unique.
+
+## Working with models
+
+These examples will use async/await to demonstrate how new model instances
+can be created and queried. It is assumed that this code will execute inside
+an async function.
+
+All code with await statements must be executed inside of try/catch
+statements.
+
+### Creating a simple model with default options
+
+    var fooModel = new ImmutableCoreModel({
+        database: database,
+        name: 'foo',
+    })
+
+    await fooModel.sync()
+
+### Creating a new object instance
+
+    var foo = await fooModel.create({
+        data: {foo: 'bar'},
+        session: session,
+    })
+
+### Object instance accessor methods
+
+Method Name | Description
+-------------------------
+accountId   | id of account that object belongs to
+createTime  | object creation timestamp
+data        | object data as plain object
+id          | hash id of object
+inspect     | custom formater for console.log
+originalId  | hash id of original object revision
+parentId    | hash id of parent object revision
+sessionId   | id of session that created object
+toJSON      | custom formater for JSON.stringify
