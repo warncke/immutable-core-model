@@ -37,6 +37,18 @@ tables:
 These operations are currently done as ALTER TABLE statements which may cause
 significant performance impacts with large tables in production envrionments.
 
+## Compression
+
+By default Immutable Core Model compresses data records using Google's snappy compression algorithm.
+
+To disable compression create your model with:
+
+    new ImmutableCoreModel({compression: false})
+
+The same setting for compression must be used at all times. Uncompressed
+records cannot be read when compression is on and compressed records cannot
+be read when compression is off.
+
 ## Schema
 
 For the simple example above the following schema will be created:

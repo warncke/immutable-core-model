@@ -3,9 +3,9 @@
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
+const _ = require('lodash')
 const chai = require('chai')
 const immutable = require('immutable-core')
-
 
 const assert = chai.assert
 
@@ -27,6 +27,12 @@ describe('immutable-model', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
+
+    // fake session to use for testing
+    var session = {
+        accountId: '11111111111111111111111111111111',
+        sessionId: '22222222222222222222222222222222',
+    }
 
     beforeEach(function () {
         // reset immutable so that model modules are recreated with every test
@@ -366,6 +372,75 @@ describe('immutable-model', function () {
         .then(schema => {
             assert.deepEqual(schema.columns.foo, fooSchema)
         })
+    })
+
+    it('should compress large data objects', async function () {
+        try {
+            // create model
+            var fooModel = new ImmutableCoreModel({
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            await fooModel.sync()
+            // create big data object
+            var big = {foo: []}
+            // add 100 objects to foo
+            _.times(100, i => {
+                big.foo.push({bar: i})
+            })
+            // create object with lots of data
+            var origFoo = await fooModel.create({
+                data: big,
+                session: session,
+            })
+            // get back foo
+            var foo = await fooModel.query({
+                limit: 1,
+                session: session,
+                where: {id: origFoo.id()},
+            })
+            // compare results
+            assert.deepEqual(foo.raw, origFoo.raw)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it.only('should work with compression disabled', async function () {
+        try {
+            // create model
+            var fooModel = new ImmutableCoreModel({
+                compression: false,
+                database: database,
+                name: 'foo',
+            })
+            // sync with database
+            await fooModel.sync()
+            // create big data object
+            var big = {foo: []}
+            // add 100 objects to foo
+            _.times(100, i => {
+                big.foo.push({bar: i})
+            })
+            // create object with lots of data
+            var origFoo = await fooModel.create({
+                data: big,
+                session: session,
+            })
+            // get back foo
+            var foo = await fooModel.query({
+                limit: 1,
+                session: session,
+                where: {id: origFoo.id()},
+            })
+            // compare results
+            assert.deepEqual(foo.raw, origFoo.raw)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
     })
 
 })
