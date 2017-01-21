@@ -140,4 +140,61 @@ describe('immutable-core-model - query', function () {
         assert.deepEqual(bam.raw, origBam.raw)
     })
 
+    it('should query all', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                order: ['createTime'],
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // verify that objects match
+        assert.deepEqual(
+            [all[0].raw, all[1].raw, all[2].raw],
+            [origBam.raw, origBar.raw, origFoo.raw]
+        )
+    })
+
+    it('should order desc', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                order: ['createTime', 'desc'],
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // verify that objects match
+        assert.deepEqual(
+            [all[0].raw, all[1].raw, all[2].raw],
+            [origFoo.raw, origBar.raw, origBam.raw]
+        )
+    })
+
+    it('should order with multiple clauses', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                order: [
+                    ['sessionId', 'accountId', 'asc'],
+                    ['createTime', 'desc'],
+                ],
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // verify that objects match
+        assert.deepEqual(
+            [all[0].raw, all[1].raw, all[2].raw],
+            [origFoo.raw, origBar.raw, origBam.raw]
+        )
+    })
+
 })

@@ -408,7 +408,7 @@ describe('immutable-model', function () {
         }
     })
 
-    it.only('should work with compression disabled', async function () {
+    it('should work with compression disabled', async function () {
         try {
             // create model
             var fooModel = new ImmutableCoreModel({

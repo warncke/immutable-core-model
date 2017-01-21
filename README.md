@@ -438,3 +438,70 @@ to return a single result.
 #### select
 
     foo = await fooModel.select(['data']).by.id(objectId)
+
+### Querying all matching records
+
+When all is set to true all records matching the query will be returned
+immediately.
+
+In cases where the result set is small this is more efficient than using a
+response iterator but it is also more dangerous because significant
+performance impacts and even out-of-memory errors may occur if the result set
+is too large.
+
+It is recommended to use response iterators in most cases and only use query
+all when the record size is known and an appropriate limit is set.
+
+#### query
+
+    foo = await fooModel.query({
+        all: true,
+        limit: 100,
+        session: session,
+        where: {
+            foo: {like: '%bar%'}
+        }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying with order clauses
+
+#### query
+
+    foo = await fooModel.query({
+        all: true,
+        limit: 100,
+        order: ['foo', 'desc'],
+        session: session,
+        where: {
+            foo: {like: '%bar%'}
+        }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying with multiple order clauses
+
+#### query
+
+    foo = await fooModel.query({
+        all: true,
+        limit: 100,
+        order: [
+            ['foo', 'desc'],
+            ['bar', 'asc'],
+        ],
+        session: session,
+        where: {
+            foo: {like: '%bar%'}
+        }
+    })
+
+#### select
+
+*not yet supported*
