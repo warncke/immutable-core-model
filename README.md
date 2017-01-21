@@ -386,7 +386,7 @@ instance with a session context set.
 
 #### select without session context set
 
-    foo = await fooModel.session(session).select().by.id(objectId)
+    foo = await fooModel.session(session).select.by.id(objectId)
 
 In this example session is called first to return a local instance of fooModel
 with the session context set and then select is called on that instance.
@@ -399,4 +399,30 @@ with the session context set is being used.
 
 #### select with session context set
 
-    foo = await fooModel.select().by.id(objectId)
+    foo = await fooModel.select.by.id(objectId)
+
+When doing a select.by.id the limit for the query is automatically set to 1.
+
+#### select a single record
+
+    foo = await fooModel.select.one.by.foo('bar')
+
+When doing a select.by on any column other than id select.one must be used
+to return a single result.
+
+### Querying specific columns
+
+#### query
+
+    foo = await fooModel.query({
+        limit: 1,
+        select: ['data'],
+        session: session,
+        where: {
+            id: objectId
+        },
+    })
+
+#### select
+
+    foo = await fooModel.select(['data']).by.id(objectId)
