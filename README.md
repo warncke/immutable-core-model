@@ -384,7 +384,7 @@ examples of the same query being performed with each.
 Queries using the select method can only be performed on a local model
 instance with a session context set.
 
-### Query an object by id
+### Query a record by id
 
 #### query
 
@@ -422,7 +422,27 @@ When doing a select.by.id the limit for the query is automatically set to 1.
 When doing a select.by on any column other than id select.one must be used
 to return a single result.
 
-### Querying specific columns
+### Querying multiple records by id
+
+To do an exact match on a column with multiple values use an array instead of
+a string as the value to match against.
+
+This is equivalent to SQL SELECT WHERE IN (...).
+
+#### query
+
+    results = await fooModel.query({
+        session: session,
+        where: {
+            id: [objectId1, objectId2, objectId3]
+        },
+    })
+
+#### select
+
+*not yet supported*
+
+### Selecting specific columns
 
 #### query
 
@@ -438,6 +458,59 @@ to return a single result.
 #### select
 
     foo = await fooModel.select(['data']).by.id(objectId)
+
+### Querying multiple records with a results object
+
+If no limit is set or the limit is greater than 1 and the all option is not
+true then query will return a results object that is obtained by running the
+query and only selecting the ids of the objects that match.
+
+    results = await fooModel.query({
+        session: session,
+        where: {
+            foo: {like: '%bar%'}
+        }
+    })
+
+#### Results object properties
+
+Property Name | Description
+---------------------------
+model         | model used to perform queries
+ids           | array of record ids in result set
+session       | session used to perform queries
+length        | number of records in result set
+fetchNum      | number of records to fetch at a time
+fetched       | number of records fetched
+buffer        | array buffer of fetched records
+done          | boolean flag indicating if all records fetched
+
+#### Iterating over records with each
+
+Records are accessed with the each method which iterates over the records,
+fetching and buffering them when needed, and calls the provided callback
+function for each.
+
+    context = results.each(function callback (record, number, context) {
+
+    })
+
+The callback function passed to each will be called for each record with the
+record, the number of the record in the set starting at 0, and a context
+object which is passed to each callback and can be used to gather information
+across callbacks.
+
+If the callback function returns a promise this promise will be waited for
+before continuing to the next record.
+
+#### Calling each with a context object
+
+The context object that is passed to the callback function can be specified
+when calling each:
+
+    var context = {foo: 'foo'}
+
+    results.each(callbackFunction, callback)
 
 ### Querying all matching records
 
@@ -493,8 +566,8 @@ all when the record size is known and an appropriate limit is set.
         all: true,
         limit: 100,
         order: [
+            ['bam', 'bar', 'asc'],
             ['foo', 'desc'],
-            ['bar', 'asc'],
         ],
         session: session,
         where: {

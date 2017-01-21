@@ -89,137 +89,93 @@ describe('immutable-core-model - query', function () {
         }
     })
 
-    it('should do query by id', async function () {
+    it('should return result object when doing multi-record query', async function () {
         try {
-            var foo = await fooModel.query({
-                limit: 1,
+            var result = await fooModel.query({
                 session: session,
-                where: {
-                    id: origFoo.id()
-                },
             })
         }
         catch (err) {
             assert.ifError(err)
         }
-        // verify that objects match
-        assert.deepEqual(foo.raw, origFoo.raw)
+        // check that result has records
+        assert.strictEqual(result.length, 3)
     })
 
-    it('should do query by string column', async function () {
+    it('should iterate over rows with each', async function () {
         try {
-            var bar = await fooModel.query({
-                limit: 1,
+            // query all rows
+            var result = await fooModel.query({
                 session: session,
-                where: {
-                    foo: 'bar'
-                },
+            })
+            // set fetchNum to 1 so that it does a query for each iteration
+            result.fetchNum = 1
+            // iterate over records
+            var context = await result.each((record, number, context) => {
+                // check that number fetched matches loop
+                assert.strictEqual(result.fetched, number + 1)
+                // keep track of objects fetched in context
+                context[record.data().foo] = record.data().bar
+            })
+            // expect result iteration to be done
+            assert.isTrue(result.done)
+            // check that results fetched and context returned
+            assert.deepEqual(context, {
+                bam: '0.000000000',
+                bar: '1.000000000',
+                foo: '2.000000000',
             })
         }
         catch (err) {
             assert.ifError(err)
         }
-        // verify that objects match
-        assert.deepEqual(bar.raw, origBar.raw)
     })
 
-    it('should do query by number column', async function () {
+    it('should fetch multiple rows and buffer', async function () {
         try {
-            var bam = await fooModel.query({
-                limit: 1,
+            // query all rows
+            var result = await fooModel.query({
                 session: session,
-                where: {
-                    bar: 0
-                },
+            })
+            // iterate over records
+            var context = await result.each((record, number, context) => {
+                // all rows should be fetched before first call
+                assert.strictEqual(result.fetched, 3)
+                // keep track of objects fetched in context
+                context[record.data().foo] = record.data().bar
+            })
+            // expect result iteration to be done
+            assert.isTrue(result.done)
+            // check that results fetched and context returned
+            assert.deepEqual(context, {
+                bam: '0.000000000',
+                bar: '1.000000000',
+                foo: '2.000000000',
             })
         }
         catch (err) {
             assert.ifError(err)
         }
-        // verify that objects match
-        assert.deepEqual(bam.raw, origBam.raw)
     })
 
-    it('should query all', async function () {
+    it('should order iteration correctly', async function () {
         try {
-            var all = await fooModel.query({
-                all: true,
-                order: ['createTime'],
+            // query all rows
+            var result = await fooModel.query({
+                order: ['bar'],
                 session: session,
             })
+            // iterate over records
+            var context = await result.each((record, number, context) => {
+                // check that order is correct (0,1,2)
+                assert.strictEqual(parseInt(record.data().bar), number)
+            })
+            // expect result iteration to be done
+            assert.isTrue(result.done)
         }
         catch (err) {
             assert.ifError(err)
         }
-        // verify that objects match
-        assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origBam.raw, origBar.raw, origFoo.raw]
-        )
-    })
-
-    it('should order desc', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                order: ['createTime', 'desc'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // verify that objects match
-        assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origFoo.raw, origBar.raw, origBam.raw]
-        )
-    })
-
-    it('should order with multiple clauses', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                order: [
-                    ['sessionId', 'accountId', 'asc'],
-                    ['createTime', 'desc'],
-                ],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // verify that objects match
-        assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origFoo.raw, origBar.raw, origBam.raw]
-        )
-    })
-
-    it('should do in query', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-                where: {
-                    id: [
-                        origBam.id(),
-                        origBar.id(),
-                        origFoo.id(),
-                    ],
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // verify that objects match
-        assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origBam.raw, origBar.raw, origFoo.raw]
-        )
     })
 
 })
