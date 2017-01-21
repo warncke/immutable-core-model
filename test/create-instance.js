@@ -31,8 +31,8 @@ describe('immutable-model - create instance', function () {
 
     // fake session to use for testing
     var session = {
-        accountId: '1111',
-        sessionId: '2222',
+        accountId: '11111111111111111111111111111111',
+        sessionId: '22222222222222222222222222222222',
     }
 
     beforeEach(function () {
@@ -60,9 +60,9 @@ describe('immutable-model - create instance', function () {
                 session: session,
             })
             // check instance values
-            assert.strictEqual(foo.accountId(), '1111')
+            assert.strictEqual(foo.accountId(), '11111111111111111111111111111111')
             assert.deepEqual(foo.data(), {foo: 'foo'})
-            assert.strictEqual(foo.sessionId(), '2222')
+            assert.strictEqual(foo.sessionId(), '22222222222222222222222222222222')
             // id should match original id since this is first revision
             assert.strictEqual(foo.id(), foo.originalId())
         }
@@ -97,8 +97,8 @@ describe('immutable-model - create instance', function () {
             // check instance values
             assert.deepEqual(foo.data(), {foo: 'bar'})
             // should use session and account id from original if no session
-            assert.strictEqual(foo.accountId(), '1111')
-            assert.strictEqual(foo.sessionId(), '2222')
+            assert.strictEqual(foo.accountId(), '11111111111111111111111111111111')
+            assert.strictEqual(foo.sessionId(), '22222222222222222222222222222222')
             // id should have changed
             assert.notEqual(foo.id(), originalId)
             // original and parent id should both be the first id
@@ -131,14 +131,14 @@ describe('immutable-model - create instance', function () {
             var originalId = foo.originalId()
             // update instance
             foo = await foo.update({
-                accountId: '2222',
+                accountId: '22222222222222222222222222222222',
                 session: {
-                    sessionId: '3333'
+                    sessionId: '33333333333333333333333333333333'
                 }
             })
             // should have updated accountId and sessionId
-            assert.strictEqual(foo.accountId(), '2222')
-            assert.strictEqual(foo.sessionId(), '3333')
+            assert.strictEqual(foo.accountId(), '22222222222222222222222222222222')
+            assert.strictEqual(foo.sessionId(), '33333333333333333333333333333333')
         }
         catch (err) {
             assert.ifError(err)
@@ -167,8 +167,8 @@ describe('immutable-model - create instance', function () {
             // update instance
             foo = await foo.empty()
             // should use session and account id from original if no session
-            assert.strictEqual(foo.accountId(), '1111')
-            assert.strictEqual(foo.sessionId(), '2222')
+            assert.strictEqual(foo.accountId(), '11111111111111111111111111111111')
+            assert.strictEqual(foo.sessionId(), '22222222222222222222222222222222')
             // id should have changed
             assert.notEqual(foo.id(), originalId)
             // original and parent id should both be the first id
@@ -203,14 +203,14 @@ describe('immutable-model - create instance', function () {
             var originalId = foo.originalId()
             // update instance
             foo = await foo.empty({
-                accountId: '2222',
+                accountId: '22222222222222222222222222222222',
                 session: {
-                    sessionId: '3333'
+                    sessionId: '33333333333333333333333333333333'
                 }
             })
             // should have updated accountId and sessionId
-            assert.strictEqual(foo.accountId(), '2222')
-            assert.strictEqual(foo.sessionId(), '3333')
+            assert.strictEqual(foo.accountId(), '22222222222222222222222222222222')
+            assert.strictEqual(foo.sessionId(), '33333333333333333333333333333333')
             // data should be empty
             assert.deepEqual(foo.data(), {})
         }

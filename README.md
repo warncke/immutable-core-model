@@ -244,6 +244,27 @@ an async function.
 All code with await statements must be executed inside of try/catch
 statements.
 
+### Setting session context for queries
+
+    // foo model import
+    const globalFooModel = require('foo')
+
+    // function where queries are performed
+    async function () {
+        var fooModel = globalFooModel.session(session)
+    }
+
+Calls to create, query, and select require a session object which will change
+from one request to the next.
+
+To make model calls less verbose and eliminate the risk of forgetting to pass
+a session object with a call it is recommended to set the session context for
+an object before using it locally.
+
+If create, query, or select are called on a local instance of a model that has
+a session context set they do not need to have a session object passed as an
+argument but if one is passed it will override the session context.
+
 ### Creating a simple model with default options
 
     var fooModel = new ImmutableCoreModel({
@@ -273,6 +294,14 @@ originalId  | hash id of original object revision
 parentId    | hash id of parent object revision
 sessionId   | id of session that created object
 toJSON      | custom formater for JSON.stringify
+
+### Object instance properties
+
+Property Name | Description
+---------------------------
+model         | model instance was create from
+raw           | raw database record with data column decoded
+session       | session that instantiated instance
 
 ### Updating an object instance
 
@@ -308,6 +337,66 @@ must be passed as an argument to change it.
         session: session
     })
 
-Objects always get the sessionId of the session that created them. When an
-update is performed on an object it is assumed that this operation is
-occurring in the same session that the object was instantiated in.
+If a session is passed as an argument to the update method then that sessionId
+will be assigned to the new object revision. Otherwise the sessionId from the
+session that original instantiated the local instance of the object will be
+used.
+
+### Emptying object data
+
+    foo = await foo.empty()
+
+    foo = await foo.update({
+        data: null
+    })
+
+The empty method will create a new revision of the object with an empty data
+object.
+
+The empty method is an alias for calling update with a null data property and
+accepts the same arguments as update.
+
+## Querying data
+
+Immutable Core Model provides two methods for performing queries: query and
+select.
+
+The query method provides a raw low-level interface to all of the query
+functionality that Immutable Core Model provides while the select method
+provides shorthand helper methods that make common queries much simpler
+to read and write.
+
+This section demonstrates both query and select by providing side-by-side
+examples of the same query being performed with each.
+
+Queries using the select method can only be performed on a local model
+instance with a session context set.
+
+### Query an object by id
+
+#### query
+
+    foo = await fooModel.query({
+        limit: 1,
+        session: session,
+        where: {
+            id: objectId
+        },
+    })
+
+#### select without session context set
+
+    foo = await fooModel.session(session).select().by.id(objectId)
+
+In this example session is called first to return a local instance of fooModel
+with the session context set and then select is called on that instance.
+
+The select method is not defined on the global model instance so attempts to
+call it will result in an exception.
+
+All further examples of the select method assume that a local model instance
+with the session context set is being used.
+
+#### select with session context set
+
+    foo = await fooModel.select().by.id(objectId)
