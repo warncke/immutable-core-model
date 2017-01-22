@@ -38,7 +38,11 @@ describe('immutable-model', function () {
         // reset immutable so that model modules are recreated with every test
         immutable.reset()
         // drop any test tables if they exist
-        return database.query('DROP TABLE IF EXISTS foo')
+        return Promise.all([
+            database.query('DROP TABLE IF EXISTS foo'),
+            database.query('DROP TABLE IF EXISTS fooDelete'),
+            database.query('DROP TABLE IF EXISTS fooUnDelete'),
+        ])
     })
 
     it('should create a new model instance', function () {
@@ -158,11 +162,11 @@ describe('immutable-model', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
-                fooAccountId: false,
-                fooCreateTime: false,
-                fooOriginalId: false,
-                fooParentId: false,
-                fooSessionId: false,
+                accountId: false,
+                createTime: false,
+                originalId: false,
+                parentId: false,
+                sessionId: false,
             },
             database: database,
             name: 'foo',
@@ -443,7 +447,7 @@ describe('immutable-model', function () {
         }
     })
 
-    it.skip('create model with associated action', function () {
+    it('create model with associated action', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             actions: {
@@ -454,8 +458,120 @@ describe('immutable-model', function () {
         })
         // sync with database
         return fooModel.sync()
-        // test that schema matches spec
+        // test foo model has delete/un-delete action
         .then(() => {
+            assert.ok(fooModel.actions.delete)
+            assert.ok(fooModel.actions.delete.inverse)
+        })
+        // get schema for delete
+        .then(() => fooModel.actions.delete.model.schema())
+        // validate delete schema
+        .then(schema => {
+            assert.deepEqual(schema, {
+                columns: {
+                    fooDeleteCreateTime: { type: 'time', null: false, index: true },
+                    fooDeleteId: { type: 'id', null: false, primary: true },
+                    fooDeleteSessionId: { type: 'id', null: false, index: true },
+                    fooId: { type: 'id', index: true }
+                },
+                indexes: []
+            })
+        })
+        // get schema for un-delete
+        .then(() => fooModel.actions.delete.inverse.schema())
+        // validate un-delete schema
+        .then(schema => {
+            assert.deepEqual(schema, {
+                columns: {
+                    fooUnDeleteCreateTime: { type: 'time', null: false, index: true },
+                    fooUnDeleteId: { type: 'id', null: false, primary: true },
+                    fooUnDeleteSessionId: { type: 'id', null: false, index: true },
+                    fooDeleteId: { type: 'id', unique: true }
+                },
+                indexes: []
+            })
+        })
+    })
+
+    it('create model action with data', function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            actions: {
+                delete: {
+                    model: {
+                        columns: {
+                            data: {
+                                type: 'data'
+                            },
+                        },
+                    },
+                },
+            },
+            database: database,
+            name: 'foo',
+        })
+        // sync with database
+        return fooModel.sync()
+        // test foo model has delete/un-delete action
+        .then(() => {
+            assert.ok(fooModel.actions.delete)
+            assert.ok(fooModel.actions.delete.inverse)
+        })
+        // get schema for delete
+        .then(() => fooModel.actions.delete.model.schema())
+        // validate delete schema
+        .then(schema => {
+            assert.deepEqual(schema, {
+                columns: {
+                    fooDeleteCreateTime: { type: 'time', null: false, index: true },
+                    fooDeleteData: { type: 'data', null: false },
+                    fooDeleteId: { type: 'id', null: false, primary: true },
+                    fooDeleteSessionId: { type: 'id', null: false, index: true },
+                    fooId: { type: 'id', index: true }
+                },
+                indexes: []
+            })
+        })
+    })
+
+    it('create model inverse action with data', function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            actions: {
+                delete: {
+                    inverse: {
+                        columns: {
+                            data: {
+                                type: 'data'
+                            },
+                        },
+                    },
+                },
+            },
+            database: database,
+            name: 'foo',
+        })
+        // sync with database
+        return fooModel.sync()
+        // test foo model has delete/un-delete action
+        .then(() => {
+            assert.ok(fooModel.actions.delete)
+            assert.ok(fooModel.actions.delete.inverse)
+        })
+        // get schema for un-delete
+        .then(() => fooModel.actions.delete.inverse.schema())
+        // validate un-delete schema
+        .then(schema => {
+            assert.deepEqual(schema, {
+                columns: {
+                    fooUnDeleteCreateTime: { type: 'time', null: false, index: true },
+                    fooUnDeleteData: { type: 'data', null: false },
+                    fooUnDeleteId: { type: 'id', null: false, primary: true },
+                    fooUnDeleteSessionId: { type: 'id', null: false, index: true },
+                    fooDeleteId: { type: 'id', unique: true }
+                },
+                indexes: []
+            })
         })
     })
 
