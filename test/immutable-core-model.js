@@ -443,4 +443,20 @@ describe('immutable-model', function () {
         }
     })
 
+    it.skip('create model with associated action', function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            actions: {
+                delete: true,
+            },
+            database: database,
+            name: 'foo',
+        })
+        // sync with database
+        return fooModel.sync()
+        // test that schema matches spec
+        .then(() => {
+        })
+    })
+
 })
