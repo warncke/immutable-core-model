@@ -95,7 +95,7 @@ describe('immutable-core-model - query', function () {
                 limit: 1,
                 session: session,
                 where: {
-                    id: origFoo.id()
+                    id: origFoo.id
                 },
             })
         }
@@ -205,9 +205,9 @@ describe('immutable-core-model - query', function () {
                 session: session,
                 where: {
                     id: [
-                        origBam.id(),
-                        origBar.id(),
-                        origFoo.id(),
+                        origBam.id,
+                        origBar.id,
+                        origFoo.id,
                     ],
                 },
             })

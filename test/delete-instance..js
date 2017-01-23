@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - query', function () {
+describe('immutable-core-model - delete instance', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -39,6 +39,9 @@ describe('immutable-core-model - query', function () {
     immutable.reset().strictArgs(false)
     // create initial model
     var fooModel = new ImmutableCoreModel({
+        actions: {
+            delete: true,
+        },
         columns: {
             bar: 'number',
             foo: 'string',
@@ -56,7 +59,11 @@ describe('immutable-core-model - query', function () {
         // setup data to perform queries
         try {
             // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
+            await Promise.all([
+                database.query('DROP TABLE IF EXISTS foo'),
+                database.query('DROP TABLE IF EXISTS fooDelete'),
+                database.query('DROP TABLE IF EXISTS fooUnDelete'),
+            ])
             // sync with database
             await fooModel.sync()
             // create new bam instance
@@ -89,93 +96,81 @@ describe('immutable-core-model - query', function () {
         }
     })
 
-    it('should return result object when doing multi-record query', async function () {
+    it('should have action properties', async function () {
         try {
-            var result = await fooModel.query({
+            var foo = await fooModel.query({
+                limit: 1,
                 session: session,
+                where: {
+                    id: origFoo.id
+                },
             })
         }
         catch (err) {
             assert.ifError(err)
         }
-        // check that result has records
-        assert.strictEqual(result.length, 3)
+        // foo should have action properties
+        assert.isFalse(foo.isDeleted)
+        assert.isFalse(foo.wasDeleted)
     })
 
-    it('should iterate over rows with each', async function () {
+    it('should have action methods', async function () {
         try {
-            // query all rows
-            var result = await fooModel.query({
+            var foo = await fooModel.query({
+                limit: 1,
                 session: session,
-            })
-            // set fetchNum to 1 so that it does a query for each iteration
-            result.fetchNum = 1
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // check that number fetched matches loop
-                assert.strictEqual(result.fetched, number + 1)
-                // keep track of objects fetched in context
-                context[record.data.foo] = record.data.bar
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
-            // check that results fetched and context returned
-            assert.deepEqual(context, {
-                bam: '0.000000000',
-                bar: '1.000000000',
-                foo: '2.000000000',
+                where: {
+                    id: origFoo.id
+                },
             })
         }
         catch (err) {
             assert.ifError(err)
         }
+        // foo should have action methods
+        assert.strictEqual(typeof foo.delete, 'function')
+        assert.strictEqual(typeof foo.unDelete, 'function')
     })
 
-    it('should fetch multiple rows and buffer', async function () {
+    it('should delete instance', async function () {
         try {
-            // query all rows
-            var result = await fooModel.query({
+            var foo = await fooModel.query({
+                limit: 1,
                 session: session,
+                where: {
+                    id: origFoo.id
+                },
             })
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // all rows should be fetched before first call
-                assert.strictEqual(result.fetched, 3)
-                // keep track of objects fetched in context
-                context[record.data.foo] = record.data.bar
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
-            // check that results fetched and context returned
-            assert.deepEqual(context, {
-                bam: '0.000000000',
-                bar: '1.000000000',
-                foo: '2.000000000',
-            })
+            // delete foo
+            foo = await foo.delete()
         }
         catch (err) {
             assert.ifError(err)
         }
+        // foo should be deleted
+        assert.isTrue(foo.isDeleted)
     })
 
-    it('should order iteration correctly', async function () {
+    it('should un-delete instance', async function () {
         try {
-            // query all rows
-            var result = await fooModel.query({
-                order: ['bar'],
+            var foo = await fooModel.query({
+                limit: 1,
                 session: session,
+                where: {
+                    id: origFoo.id
+                },
             })
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // check that order is correct (0,1,2)
-                assert.strictEqual(parseInt(record.data.bar), number)
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
+            // foo should be deleted
+            assert.isTrue(foo.isDeleted)
+            // delete foo
+            foo = await foo.unDelete()
         }
         catch (err) {
             assert.ifError(err)
         }
+        // foo should not be deleted
+        assert.isFalse(foo.isDeleted)
+        // foo should have been deleted before
+        assert.isTrue(foo.wasDeleted)
     })
-
 })

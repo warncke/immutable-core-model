@@ -97,7 +97,7 @@ describe('immutable-core-model - query', function () {
             session: session,
         })
         // select foo by id
-        var foo = await select.by.id(origFoo.id())
+        var foo = await select.by.id(origFoo.id)
         // check that return matches original
         assert.deepEqual(foo.raw, origFoo.raw)
     })
@@ -121,7 +121,7 @@ describe('immutable-core-model - query', function () {
             session: session,
         })
         // select foo by id
-        var foo = await select(['data']).by.id(origFoo.id())
+        var foo = await select(['data']).by.id(origFoo.id)
         // check result
         assert.deepEqual(foo.raw, {
             fooData: { bar: '2.000000000', foo: 'foo' }

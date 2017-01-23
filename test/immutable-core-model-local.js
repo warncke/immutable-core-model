@@ -95,7 +95,7 @@ describe('immutable-core-model-local', function () {
         var foo = await fooModel.query({
             limit: 1,
             where: {
-                id: origFoo.id()
+                id: origFoo.id
             }
         })
         // check that model matches
@@ -105,7 +105,7 @@ describe('immutable-core-model-local', function () {
     it('should do select with local model', async function () {
         var fooModel = globalFooModel.session(session)
         // do query
-        var bar = await fooModel.select.by.id(origBar.id())
+        var bar = await fooModel.select.by.id(origBar.id)
         // check that model matches
         assert.deepEqual(bar.raw, origBar.raw)
     })

@@ -293,27 +293,56 @@ argument but if one is passed it will override the session context.
         session: session,
     })
 
-### Object instance accessor methods
+### Instance methods and properties
+
+    foo = await fooModel.select.by.id(fooId)
+
+    /* access properties */
+
+    foo.data  // foo data object
+    foo.id    // foo id
+
+    /* call methods */
+
+    foo.update(...)
+    foo.empty()
+
+Instance objects follow a strict paradigm of accessing data via properties and
+performing actions by calling methods.
+
+Methods for custom actions such as delete will be added to instance objects
+when they are specified on the model.
+
+
+Instance objects also include toJSON and inspect methods to customize the
+output provided when serializing and console.log'ing objects.
+
+### Common instance methods
 
 Method Name | Description
 -------------------------
-accountId   | id of account that object belongs to
-createTime  | object creation timestamp
-data        | object data as plain object
-id          | hash id of object
 inspect     | custom formater for console.log
-originalId  | hash id of original object revision
-parentId    | hash id of parent object revision
-sessionId   | id of session that created object
 toJSON      | custom formater for JSON.stringify
 
-### Object instance properties
+### Common instance properties
 
 Property Name | Description
 ---------------------------
 model         | model instance was create from
 raw           | raw database record with data column decoded
 session       | session that instantiated instance
+
+### Default data instance properties
+
+Property Name | Description
+---------------------------
+accountId     | id of account that object belongs to
+createTime    | object creation timestamp
+data          | object data as plain object
+id            | hash id of object
+originalId    | hash id of original object revision
+parentId      | hash id of parent object revision
+sessionId     | id of session that created object
 
 ### Updating an object instance
 

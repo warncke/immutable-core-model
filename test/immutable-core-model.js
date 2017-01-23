@@ -402,7 +402,7 @@ describe('immutable-model', function () {
             var foo = await fooModel.query({
                 limit: 1,
                 session: session,
-                where: {id: origFoo.id()},
+                where: {id: origFoo.id},
             })
             // compare results
             assert.deepEqual(foo.raw, origFoo.raw)
@@ -437,7 +437,7 @@ describe('immutable-model', function () {
             var foo = await fooModel.query({
                 limit: 1,
                 session: session,
-                where: {id: origFoo.id()},
+                where: {id: origFoo.id},
             })
             // compare results
             assert.deepEqual(foo.raw, origFoo.raw)
