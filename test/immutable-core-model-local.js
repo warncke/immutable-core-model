@@ -99,7 +99,7 @@ describe('immutable-core-model-local', function () {
             }
         })
         // check that model matches
-        assert.deepEqual(foo.raw, origFoo.raw)
+        assert.deepEqual(foo.data, origFoo.data)
     })
 
     it('should do select with local model', async function () {
@@ -107,7 +107,7 @@ describe('immutable-core-model-local', function () {
         // do query
         var bar = await fooModel.select.by.id(origBar.id)
         // check that model matches
-        assert.deepEqual(bar.raw, origBar.raw)
+        assert.deepEqual(bar.data, origBar.data)
     })
 
 })

@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.only('immutable-core-model - query', function () {
+describe('immutable-core-model - unique index', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)

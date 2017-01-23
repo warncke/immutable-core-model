@@ -405,7 +405,7 @@ describe('immutable-model', function () {
                 where: {id: origFoo.id},
             })
             // compare results
-            assert.deepEqual(foo.raw, origFoo.raw)
+            assert.deepEqual(foo.data, origFoo.data)
         }
         catch (err) {
             assert.ifError(err)
@@ -440,7 +440,7 @@ describe('immutable-model', function () {
                 where: {id: origFoo.id},
             })
             // compare results
-            assert.deepEqual(foo.raw, origFoo.raw)
+            assert.deepEqual(foo.data, origFoo.data)
         }
         catch (err) {
             assert.ifError(err)

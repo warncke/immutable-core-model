@@ -462,6 +462,36 @@ object.
 The empty method is an alias for calling update with a null data property and
 accepts the same arguments as update.
 
+## Working with revisions
+
+Immutable Core Model stores every revision to an object as another row in the
+same table which exposes the revision history of an object to the client.
+
+When doing a query on anything other than the id of an object on the current
+revisions of the object will be retured.
+
+When querying an object by id the revision matching the queried id will be
+returned.
+
+### Checking in an object is current
+
+    foo = await foo.select.by.id(objectId)
+
+    if (foo.isCurrent) {
+        ...
+    }
+
+### Getting the current revision of an object
+
+    foo = await foo.select.by.id(objectId)
+
+    if (!foo.isCurrent) {
+        foo = await foo.current()
+    }
+
+The current method will always query the database for the most recent revision
+of the current object.
+
 ## Querying data
 
 Immutable Core Model provides two methods for performing queries: query and
@@ -725,3 +755,20 @@ return all objects whether or not they have been deleted.
 #### select
 
 *not yet supported*
+
+### Querying the current version of an object by id
+
+#### query
+
+    foo = await fooModel.query({
+        current: true,
+        limit: 1,
+        session: session,
+        where: {
+            id: fooId
+        }
+    })
+
+#### select
+
+    foo = fooModel.select.current.by.id(fooId)

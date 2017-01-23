@@ -25,7 +25,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - query', function () {
+describe('immutable-core-model-select', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -91,7 +91,7 @@ describe('immutable-core-model - query', function () {
     })
 
     it('should select by id', async function () {
-        // great new query builder
+        // create new query builder
         var select = new ImmutableCoreModelSelect({
             model: fooModel,
             session: session,
@@ -99,11 +99,11 @@ describe('immutable-core-model - query', function () {
         // select foo by id
         var foo = await select.by.id(origFoo.id)
         // check that return matches original
-        assert.deepEqual(foo.raw, origFoo.raw)
+        assert.deepEqual(foo.data, origFoo.data)
     })
 
     it('should select one by column', async function () {
-        // great new query builder
+        // create new query builder
         var select = new ImmutableCoreModelSelect({
             model: fooModel,
             session: session,
@@ -111,11 +111,11 @@ describe('immutable-core-model - query', function () {
         // select foo by id
         var foo = await select.one.by.foo('bar')
         // check that return matches original
-        assert.deepEqual(foo.raw, origBar.raw)
+        assert.deepEqual(foo.data, origBar.data)
     })
 
     it('should select specific columns', async function () {
-        // great new query builder
+        // create new query builder
         var select = new ImmutableCoreModelSelect({
             model: fooModel,
             session: session,
@@ -123,9 +123,7 @@ describe('immutable-core-model - query', function () {
         // select foo by id
         var foo = await select(['data']).by.id(origFoo.id)
         // check result
-        assert.deepEqual(foo.raw, {
-            fooData: { bar: '2.000000000', foo: 'foo' }
-        })
+        assert.deepEqual(foo.data, { bar: '2.000000000', foo: 'foo' })
     })
 
 })

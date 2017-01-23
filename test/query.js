@@ -103,7 +103,7 @@ describe('immutable-core-model - query', function () {
             assert.ifError(err)
         }
         // verify that objects match
-        assert.deepEqual(foo.raw, origFoo.raw)
+        assert.deepEqual(foo.data, origFoo.data)
     })
 
     it('should do query by string column', async function () {
@@ -120,7 +120,7 @@ describe('immutable-core-model - query', function () {
             assert.ifError(err)
         }
         // verify that objects match
-        assert.deepEqual(bar.raw, origBar.raw)
+        assert.deepEqual(bar.data, origBar.data)
     })
 
     it('should do query by number column', async function () {
@@ -137,7 +137,7 @@ describe('immutable-core-model - query', function () {
             assert.ifError(err)
         }
         // verify that objects match
-        assert.deepEqual(bam.raw, origBam.raw)
+        assert.deepEqual(bam.data, origBam.data)
     })
 
     it('should query all', async function () {
@@ -153,8 +153,8 @@ describe('immutable-core-model - query', function () {
         }
         // verify that objects match
         assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origBam.raw, origBar.raw, origFoo.raw]
+            [all[0].data, all[1].data, all[2].data],
+            [origBam.data, origBar.data, origFoo.data]
         )
     })
 
@@ -171,8 +171,8 @@ describe('immutable-core-model - query', function () {
         }
         // verify that objects match
         assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origFoo.raw, origBar.raw, origBam.raw]
+            [all[0].data, all[1].data, all[2].data],
+            [origFoo.data, origBar.data, origBam.data]
         )
     })
 
@@ -192,8 +192,8 @@ describe('immutable-core-model - query', function () {
         }
         // verify that objects match
         assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origFoo.raw, origBar.raw, origBam.raw]
+            [all[0].data, all[1].data, all[2].data],
+            [origFoo.data, origBar.data, origBam.data]
         )
     })
 
@@ -217,8 +217,8 @@ describe('immutable-core-model - query', function () {
         }
         // verify that objects match
         assert.deepEqual(
-            [all[0].raw, all[1].raw, all[2].raw],
-            [origBam.raw, origBar.raw, origFoo.raw]
+            [all[0].data, all[1].data, all[2].data],
+            [origBam.data, origBar.data, origFoo.data]
         )
     })
 
