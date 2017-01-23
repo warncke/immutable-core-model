@@ -191,7 +191,7 @@ number         | DECIMAL(36,9)
 string         | VARCHAR(255)
 time           | DATETIME(6)
 
-## Creating a queryable column with non-default options
+### Creating a queryable column with non-default options
 
     var fooModel = new ImmutableCoreModel({
         columns: {
@@ -212,6 +212,37 @@ type and all other configuration options are set to defaults.
 When a columen is created with an object value then non-default configuration
 options can be set.
 
+### Create a column with a unique index
+
+    var accountModel = new ImmutableCoreModel({
+        columns: {
+            email: {
+                type: 'string',
+                unique: true,
+            },
+        },
+        name: 'account',
+    })
+
+Suppose you are creating an account model where you would like to have an
+email column that is unique so that only one account can exist per email
+address.
+
+Because Immutable Core Model stores all the revisions of a model in the same
+table a unique index on a column would not allow revisions of an object to be
+inserted if the indexed value did not change.
+
+When the unique: true flag is set the firstOnly option will also be set by
+default.
+
+With the firstOnly flag set the value will only be inserted into the unique
+indexed column when the first revision of the object is created or if the
+indexed value changes.
+
+To override this behavior you must set the firstOnly option to false.
+
+With firstOnly true null must also be true.
+
 ### Column options
 
 Option Name | Default   | Description
@@ -223,6 +254,7 @@ path        | undefined | path to get value from object (uses lodash _.get)
 primary     | false     | column is primary key
 type        | undefined | data type (boolean|number|string)
 unique      | false     | create index as unique
+firstOnly   | true      | only apply unique index to original object instance
 
 ## Creating multi-column indexes
 
