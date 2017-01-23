@@ -173,4 +173,38 @@ describe('immutable-core-model - delete instance', function () {
         // foo should have been deleted before
         assert.isTrue(foo.wasDeleted)
     })
+
+    it('should delete instance again', async function () {
+        try {
+            var foo = await fooModel.query({
+                limit: 1,
+                session: session,
+                where: {
+                    id: origFoo.id
+                },
+            })
+            // delete foo
+            foo = await foo.delete()
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // foo should be deleted
+        assert.isTrue(foo.isDeleted)
+    })
+
+    it('should not return deleted records in queries', async function () {
+        try {
+            var foos = await fooModel.query({
+                all: true,
+                order: ['createTime'],
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // results should not include deleted record
+
+    })
 })
