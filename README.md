@@ -247,6 +247,39 @@ create single column indexes will result in an error.
 
 The unique flag controls whether or not the index is unique.
 
+## Creating a model with actions
+
+    var fooModel = new ImmutableCoreModel({
+        actions: {
+            delete: true,
+        },
+        database: database,
+        name: 'foo',
+    })
+
+Immutable Core Models can have associate actions such as delete, publish,
+cancel, etc.
+
+When the action is created with a boolean value this value determine whether
+or not an inverse action is created.
+
+In this case where the action delete: true is specified the inverse action
+unDelete will also be created.
+
+Actions have their own models with their own tables for storing data.
+
+By default action models have only an id, createTime, sessionId and id column
+that references the parent model or the parent action in the case of an 
+inverse action.
+
+When an Immutable Core Model Instance is created for the example model it will
+have isDeleted and wasDelete properties and delete and unDelete methods added
+to it.
+
+The delete action as a default defaultWhere: false parameter so that by
+default queries will not return deleted instances if a model has a delete
+action added to it.
+
 ## Working with models
 
 These examples will use async/await to demonstrate how new model instances
@@ -603,6 +636,59 @@ all when the record size is known and an appropriate limit is set.
             foo: {like: '%bar%'}
         }
     })
+
+#### select
+
+*not yet supported*
+
+### Querying objects where action has been performed
+
+#### query
+
+    foo = await fooModel.query({
+        session: session,
+        where: {
+            isDeleted: true
+        }
+    })
+
+This query will return all objects that have been deleted.
+
+#### select
+
+*not yet supported*
+
+### Querying objects where an action has not been performed
+
+#### query
+
+    foo = await fooModel.query({
+        session: session,
+        where: {
+            isDeleted: false
+        }
+    })
+
+This query will return all objects that have not been deleted.
+
+#### select
+
+*not yet supported*
+
+### Querying objects where an action either has or has not been performed
+
+#### query
+
+    foo = await fooModel.query({
+        session: session,
+        where: {
+            isDeleted: null
+        }
+    })
+
+In the case of the delete action where by default queries return only
+isDeleted: false records the isDeleted: null where query can be added to
+return all objects whether or not they have been deleted.
 
 #### select
 

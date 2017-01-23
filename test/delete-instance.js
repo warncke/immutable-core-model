@@ -157,7 +157,8 @@ describe('immutable-core-model - delete instance', function () {
                 limit: 1,
                 session: session,
                 where: {
-                    id: origFoo.id
+                    id: origFoo.id,
+                    isDeleted: true,
                 },
             })
             // foo should be deleted
@@ -174,23 +175,23 @@ describe('immutable-core-model - delete instance', function () {
         assert.isTrue(foo.wasDeleted)
     })
 
-    it('should delete instance again', async function () {
+    it('delete another instance', async function () {
         try {
-            var foo = await fooModel.query({
+            var bar = await fooModel.query({
                 limit: 1,
                 session: session,
                 where: {
-                    id: origFoo.id
+                    id: origBar.id
                 },
             })
-            // delete foo
-            foo = await foo.delete()
+            // delete bar
+            bar = await bar.delete()
         }
         catch (err) {
             assert.ifError(err)
         }
-        // foo should be deleted
-        assert.isTrue(foo.isDeleted)
+        // bar should be deleted
+        assert.isTrue(bar.isDeleted)
     })
 
     it('should not return deleted records in queries', async function () {
@@ -205,6 +206,8 @@ describe('immutable-core-model - delete instance', function () {
             assert.ifError(err)
         }
         // results should not include deleted record
-
+        assert.strictEqual(foos.length, 2)
+        assert.deepEqual(foos[0].data, origBam.data)
+        assert.deepEqual(foos[1].data, origFoo.data)
     })
 })

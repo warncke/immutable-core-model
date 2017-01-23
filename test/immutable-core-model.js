@@ -472,7 +472,7 @@ describe('immutable-model', function () {
                     fooDeleteCreateTime: { type: 'time', null: false, index: true },
                     fooDeleteId: { type: 'id', null: false, primary: true },
                     fooDeleteSessionId: { type: 'id', null: false, index: true },
-                    fooId: { type: 'id', index: true }
+                    fooId: { type: 'id', unique: true }
                 },
                 indexes: []
             })
@@ -527,7 +527,7 @@ describe('immutable-model', function () {
                     fooDeleteData: { type: 'data', null: false },
                     fooDeleteId: { type: 'id', null: false, primary: true },
                     fooDeleteSessionId: { type: 'id', null: false, index: true },
-                    fooId: { type: 'id', index: true }
+                    fooId: { type: 'id', unique: true }
                 },
                 indexes: []
             })
