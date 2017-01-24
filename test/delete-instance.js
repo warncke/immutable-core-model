@@ -175,6 +175,31 @@ describe('immutable-core-model - delete instance', function () {
         assert.isTrue(foo.wasDeleted)
     })
 
+    it('should have delete and undelete data properties', async function () {
+        try {
+            var foo = await fooModel.query({
+                limit: 1,
+                session: session,
+                where: {
+                    id: origFoo.id,
+                },
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check that action data is set
+        assert.property(foo, 'actions')
+        assert.property(foo.actions, 'delete')
+        assert.property(foo.actions, 'unDelete')
+        assert.property(foo.actions.delete, 'createTime')
+        assert.property(foo.actions.delete, 'id')
+        assert.property(foo.actions.delete, 'sessionId')
+        assert.property(foo.actions.unDelete, 'createTime')
+        assert.property(foo.actions.unDelete, 'id')
+        assert.property(foo.actions.unDelete, 'sessionId')
+    })
+
     it('delete another instance', async function () {
         try {
             var bar = await fooModel.query({
