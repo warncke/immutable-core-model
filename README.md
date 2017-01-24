@@ -115,12 +115,12 @@ instance.
 
 #### fooId, fooOriginalId, fooParentId Example
 
-Revision | fooId | fooOriginalId | fooParentId
-----------------------------------------------
-1st      | 1111  | 1111          | NULL
-2nd      | 2222  | 1111          | 1111
-3rd      | 3333  | 1111          | 2222
-4th      | 4444  | 1111          | 3333
+Revision | fooId | fooOriginalId | fooParentId |
+---------|-------|---------------|-------------
+1st      | 1111  | 1111          | NULL        |
+2nd      | 2222  | 1111          | 1111        |
+3rd      | 3333  | 1111          | 2222        |
+4th      | 4444  | 1111          | 3333        |
 
 #### Distributed Concurrency Control
 
@@ -182,14 +182,14 @@ time must be string that can be interpreted by MySQL as DATETIME.
 
 ### MySQL data type equivalents
 
-Immutable Type | MySQL Type
-----------------------------
-boolean        | TINYINT(1)
-data           | MEDIUMBLOB
-id             | BINARY(16)
-number         | DECIMAL(36,9)
-string         | VARCHAR(255)
-time           | DATETIME(6)
+Immutable Type | MySQL Type     |
+---------------|----------------|
+boolean        | TINYINT(1)     |
+data           | MEDIUMBLOB     |
+id             | BINARY(16)     |
+number         | DECIMAL(36,9)  |
+string         | VARCHAR(255)   |
+time           | DATETIME(6)    |
 
 ### Creating a queryable column with non-default options
 
@@ -245,16 +245,16 @@ With firstOnly true null must also be true.
 
 ### Column options
 
-Option Name | Default   | Description
-----------------------------------------
-default     | null      | default value for column
-index       | true      | create index for column
-null        | true      | allow null values
-path        | undefined | path to get value from object (uses lodash _.get)
-primary     | false     | column is primary key
-type        | undefined | data type (boolean|number|string)
-unique      | false     | create index as unique
-firstOnly   | true      | only apply unique index to original object instance
+Option Name | Default   | Description                                         |
+------------|-----------|-----------------------------------------------------|
+default     | null      | default value for column                            |
+index       | true      | create index for column                             |
+null        | true      | allow null values                                   |
+path        | undefined | path to get value from object (uses lodash _.get)   |
+primary     | false     | column is primary key                               |
+type        | undefined | data type (boolean|number|string)                   |
+unique      | false     | create index as unique                              |
+firstOnly   | true      | only apply unique index to original object instance |
 
 ## Creating multi-column indexes
 
@@ -384,10 +384,10 @@ output provided when serializing and console.log'ing objects.
 
 ### Common instance methods
 
-Method Name | Description
--------------------------
-inspect     | custom formater for console.log
-toJSON      | custom formater for JSON.stringify
+Method Name | Description                           |
+------------|---------------------------------------|
+inspect     | custom formater for console.log       |
+toJSON      | custom formater for JSON.stringify    |
 
 ### Common instance properties
 
@@ -399,15 +399,15 @@ session       | session that instantiated instance
 
 ### Default data instance properties
 
-Property Name | Description
----------------------------
-accountId     | id of account that object belongs to
-createTime    | object creation timestamp
-data          | object data as plain object
-id            | hash id of object
-originalId    | hash id of original object revision
-parentId      | hash id of parent object revision
-sessionId     | id of session that created object
+Property Name | Description                             |
+--------------|-----------------------------------------|
+accountId     | id of account that object belongs to    |
+createTime    | object creation timestamp               |
+data          | object data as plain object             |
+id            | hash id of object                       |
+originalId    | hash id of original object revision     |
+parentId      | hash id of parent object revision       |
+sessionId     | id of session that created object       |
 
 ### Updating an object instance
 
@@ -586,16 +586,16 @@ query and only selecting the ids of the objects that match.
 
 #### Results object properties
 
-Property Name | Description
----------------------------
-model         | model used to perform queries
-ids           | array of record ids in result set
-session       | session used to perform queries
-length        | number of records in result set
-fetchNum      | number of records to fetch at a time
-fetched       | number of records fetched
-buffer        | array buffer of fetched records
-done          | boolean flag indicating if all records fetched
+Property Name | Description                                     |
+--------------|-------------------------------------------------|
+model         | model used to perform queries                   |
+ids           | array of record ids in result set               |
+session       | session used to perform queries                 |
+length        | number of records in result set                 |
+fetchNum      | number of records to fetch at a time            |
+fetched       | number of records fetched                       |
+buffer        | array buffer of fetched records                 |
+done          | boolean flag indicating if all records fetched  |
 
 #### Iterating over records with each
 
