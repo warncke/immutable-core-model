@@ -394,7 +394,7 @@ describe('immutable-model', function () {
                 big.foo.push({bar: i})
             })
             // create object with lots of data
-            var origFoo = await fooModel.create({
+            var origFoo = await fooModel.createMeta({
                 data: big,
                 session: session,
             })
@@ -429,7 +429,7 @@ describe('immutable-model', function () {
                 big.foo.push({bar: i})
             })
             // create object with lots of data
-            var origFoo = await fooModel.create({
+            var origFoo = await fooModel.createMeta({
                 data: big,
                 session: session,
             })

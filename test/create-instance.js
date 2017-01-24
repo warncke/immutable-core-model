@@ -55,7 +55,7 @@ describe('immutable-model - create instance', function () {
             // sync with database
             await fooModel.sync()
             // create new foo instance
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
@@ -84,16 +84,14 @@ describe('immutable-model - create instance', function () {
             // sync with database
             await fooModel.sync()
             // create new foo instance
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
             // get original id
             var originalId = foo.originalId
             // update instance
-            foo = await foo.update({
-                data: {foo: 'bar'}
-            })
+            foo = await foo.update({foo: 'bar'})
             // check instance values
             assert.deepEqual(foo.data, {foo: 'bar'})
             // should use session and account id from original if no session
@@ -123,14 +121,14 @@ describe('immutable-model - create instance', function () {
             // sync with database
             await fooModel.sync()
             // create new foo instance
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
             // get original id
             var originalId = foo.originalId
             // update instance
-            foo = await foo.update({
+            foo = await foo.updateMeta({
                 accountId: '22222222222222222222222222222222',
                 session: {
                     sessionId: '33333333333333333333333333333333'
@@ -158,7 +156,7 @@ describe('immutable-model - create instance', function () {
             // sync with database
             await fooModel.sync()
             // create new foo instance
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
@@ -195,7 +193,7 @@ describe('immutable-model - create instance', function () {
             // sync with database
             await fooModel.sync()
             // create new foo instance
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })

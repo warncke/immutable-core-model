@@ -71,21 +71,17 @@ describe('immutable-core-model-local', function () {
 
     it('should create instance with local model', async function () {
         var fooModel = globalFooModel.session(session)
-        // create new bar instance
+        // create new bar instance with create
         origBar = await fooModel.create({
-            data: {
-                bar: "1.000000000",
-                foo: 'bar',
-            },
-            session: session,
+            bar: "1.000000000",
+            foo: 'bar',
         })
-        // create new foo instance
-        origFoo = await fooModel.create({
+        // create new foo instance with createMeta
+        origFoo = await fooModel.createMeta({
             data: {
                 bar: "2.000000000",
                 foo: 'foo',
             },
-            session: session,
         })
     })
 

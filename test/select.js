@@ -63,21 +63,21 @@ describe('immutable-core-model - select', function () {
             // sync with database
             await glboalFooModel.sync()
             // create instances with different data values for testing
-            origBam = await glboalFooModel.create({
+            origBam = await glboalFooModel.createMeta({
                 data: {
                     bar: "0.000000000",
                     foo: 'bam',
                 },
                 session: session,
             })
-            origBar = await glboalFooModel.create({
+            origBar = await glboalFooModel.createMeta({
                 data: {
                     bar: "1.000000000",
                     foo: 'bar',
                 },
                 session: session,
             })
-            origFoo = await glboalFooModel.create({
+            origFoo = await glboalFooModel.createMeta({
                 data: {
                     bar: "2.000000000",
                     foo: 'foo',
@@ -461,7 +461,7 @@ describe('immutable-core-model - select', function () {
     it('should do where null', async function () {
         try {
             // create new foo instance with null foo property
-            origGrr = await fooModel.create({
+            origGrr = await fooModel.createMeta({
                 data: {
                     bar: "3.000000000",
                 },

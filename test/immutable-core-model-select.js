@@ -61,7 +61,7 @@ describe('immutable-core-model-select', function () {
             // sync with database
             await fooModel.sync()
             // create new bam instance
-            origBam = await fooModel.create({
+            origBam = await fooModel.createMeta({
                 data: {
                     bar: "0.000000000",
                     foo: 'bam',
@@ -69,7 +69,7 @@ describe('immutable-core-model-select', function () {
                 session: session,
             })
             // create new bar instance
-            origBar = await fooModel.create({
+            origBar = await fooModel.createMeta({
                 data: {
                     bar: "1.000000000",
                     foo: 'bar',
@@ -77,7 +77,7 @@ describe('immutable-core-model-select', function () {
                 session: session,
             })
             // create new foo instance
-            origFoo = await fooModel.create({
+            origFoo = await fooModel.createMeta({
                 data: {
                     bar: "2.000000000",
                     foo: 'foo',

@@ -55,15 +55,15 @@ describe('immutable-core-model - revisions', function () {
             // sync with database
             await globalFooModel.sync()
             // insert first record
-            foo1 = await fooModel.create({
+            foo1 = await fooModel.createMeta({
                 data: {foo: 'foo'}
             })
             // create revision
-            foo2 = await foo1.update({
+            foo2 = await foo1.updateMeta({
                 data: {foo: 'bar'}
             })
             // create another revision
-            foo3 = await foo2.update({
+            foo3 = await foo2.updateMeta({
                 data: {foo: 'bam'}
             })
         }

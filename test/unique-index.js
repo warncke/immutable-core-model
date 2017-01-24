@@ -64,7 +64,7 @@ describe('immutable-core-model - unique index', function () {
     it('should not create two objects with the same unique value', async function () {
         // insert first record
         try {
-            await fooModel.create({
+            await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
@@ -74,7 +74,7 @@ describe('immutable-core-model - unique index', function () {
         }
         // inserting second record should throw error
         try {
-            await fooModel.create({
+            await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
@@ -88,12 +88,12 @@ describe('immutable-core-model - unique index', function () {
     it('should create revision with the same unique value', async function () {
         try {
             // insert first record
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
             // create new revision with same foo value
-            foo = await foo.update({
+            foo = await foo.updateMeta({
                 data: {bar: 'bar'},
                 session: session,
             })
@@ -110,17 +110,17 @@ describe('immutable-core-model - unique index', function () {
     it('should update unique value if data changes', async function () {
         try {
             // insert first record
-            var foo = await fooModel.create({
+            var foo = await fooModel.createMeta({
                 data: {foo: 'foo'},
                 session: session,
             })
             // create new revision with same foo value
-            foo = await foo.update({
+            foo = await foo.updateMeta({
                 data: {bar: 'bar'},
                 session: session,
             })
             // create new revision with new foo value
-            foo = await foo.update({
+            foo = await foo.updateMeta({
                 data: {foo: 'foo2'},
                 session: session,
             })

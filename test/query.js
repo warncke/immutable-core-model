@@ -61,21 +61,21 @@ describe('immutable-core-model - query', function () {
             // sync with database
             await fooModel.sync()
             // create instances with different data values for testing
-            origBam = await fooModel.create({
+            origBam = await fooModel.createMeta({
                 data: {
                     bar: "0.000000000",
                     foo: 'bam',
                 },
                 session: session,
             })
-            origBar = await fooModel.create({
+            origBar = await fooModel.createMeta({
                 data: {
                     bar: "1.000000000",
                     foo: 'bar',
                 },
                 session: session,
             })
-            origFoo = await fooModel.create({
+            origFoo = await fooModel.createMeta({
                 data: {
                     bar: "2.000000000",
                     foo: 'foo',
@@ -470,7 +470,7 @@ describe('immutable-core-model - query', function () {
     it('should do where null', async function () {
         try {
             // create new foo instance with null foo property
-            origGrr = await fooModel.create({
+            origGrr = await fooModel.createMeta({
                 data: {
                     bar: "3.000000000",
                 },
@@ -499,7 +499,7 @@ describe('immutable-core-model - query', function () {
     it('should do not null', async function () {
         try {
             // create new foo instance with null foo property
-            origGrr = await fooModel.create({
+            origGrr = await fooModel.createMeta({
                 data: {
                     bar: "3.000000000",
                 },

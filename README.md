@@ -321,7 +321,7 @@ an async function.
 All code with await statements must be executed inside of try/catch
 statements.
 
-### Setting session context for queries
+### Creating a local model instance with fixes session context
 
     // foo model import
     const globalFooModel = require('foo')
@@ -353,10 +353,32 @@ argument but if one is passed it will override the session context.
 
 ### Creating a new object instance
 
-    var foo = await fooModel.create({
+    var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
         session: session,
     })
+
+To create an object instance with the global fooModel instance you must use the
+createMeta method and include the session for the object being created.
+
+The createMeta method can also be used for manually setting default columns like
+accountId, createTime, and parentId.
+
+### Creating a new object instance with a local foo model
+
+    var fooModel = globalFooModel.session(session)
+
+    fooModel.create({
+        foo: 'foo'
+    })
+
+The local fooModel instance has a create method that takes only the instance
+data as an argument.
+
+This is the prefered way to create model instances.
+
+The local fooModel instance also has the createMeta method which can be used
+for any advanced create operations that require it.
 
 ### Instance methods and properties
 
@@ -411,12 +433,10 @@ sessionId     | id of session that created object       |
 
 ### Updating an object instance
 
-    foo = await foo.update({
-        data: {foo: 'bar'}
-    })
+    foo = await foo.update({foo: 'bar'})
 
 When an object is updated the data object passed as an argument will be merged
-over the existing objet data using the lodash _.merge method.
+over the existing data using the lodash _.merge method.
 
 The update method returns the new object instance. Multiple attempts to
 update the same object will fail so the new object returned by update must
@@ -430,7 +450,7 @@ the parentId for the updated instance will always be the id of the parent.
 
 ### Updating the accountId on an object
 
-    foo = await foo.update({
+    foo = await foo.updateMeta({
         accountId: '2222'
     })
 
@@ -439,7 +459,7 @@ must be passed as an argument to change it.
 
 ### Changing the sessionId on an object
 
-    foo = await foo.update({
+    foo = await foo.updateMeta({
         session: session
     })
 
@@ -452,22 +472,22 @@ used.
 
     foo = await foo.empty()
 
-    foo = await foo.update({
+    foo = await foo.updateMeta({
         data: null
     })
 
 The empty method will create a new revision of the object with an empty data
 object.
 
-The empty method is an alias for calling update with a null data property and
-accepts the same arguments as update.
+The empty method is an alias for calling updateMeta with a null data property
+and accepts the same arguments as updateMeta.
 
 ## Working with revisions
 
 Immutable Core Model stores every revision to an object as another row in the
 same table which exposes the revision history of an object to the client.
 
-When doing a query on anything other than the id of an object on the current
+When doing a query on anything other than the id of an object only the current
 revisions of the object will be retured.
 
 When querying an object by id the revision matching the queried id will be
@@ -603,7 +623,7 @@ Records are accessed with the each method which iterates over the records,
 fetching and buffering them when needed, and calls the provided callback
 function for each.
 
-    context = results.each(function callback (record, number, context) {
+    context = await results.each(function callback (record, number, context) {
 
     })
 
@@ -622,7 +642,9 @@ when calling each:
 
     var context = {foo: 'foo'}
 
-    results.each(callbackFunction, callback)
+    await results.each(callbackFunction, context)
+
+Now context will be passed to callbackFunction with each iteration.
 
 ### Querying all matching records
 
@@ -636,6 +658,8 @@ is too large.
 
 It is recommended to use response iterators in most cases and only use query
 all when the record size is known and an appropriate limit is set.
+
+Query all must not be set to true if limit is set to 1.
 
 #### query
 
