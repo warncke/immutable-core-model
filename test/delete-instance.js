@@ -54,6 +54,7 @@ describe('immutable-core-model - delete instance', function () {
     var origBam
     var origBar
     var origFoo
+    var origGrr
 
     before(async function () {
         // setup data to perform queries
@@ -90,6 +91,16 @@ describe('immutable-core-model - delete instance', function () {
                 },
                 session: session,
             })
+            // create new grr instance
+            origGrr = await fooModel.create({
+                data: {
+                    bar: "3.000000000",
+                    foo: 'grr',
+                },
+                session: session,
+            })
+            // delete grr
+            origGrr.delete()
         }
         catch (err) {
             throw err
@@ -130,6 +141,115 @@ describe('immutable-core-model - delete instance', function () {
         // foo should have action methods
         assert.strictEqual(typeof foo.delete, 'function')
         assert.strictEqual(typeof foo.unDelete, 'function')
+    })
+
+    it('should query deleted instance', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                session: session,
+                where: {
+                    isDeleted: true,
+                },
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 1)
+        assert.deepEqual(all[0].data, origGrr.data)
+    })
+
+    it('should query not-deleted instances', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                order: ['createTime'],
+                session: session,
+                where: {
+                    isDeleted: false,
+                },
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 3)
+        assert.deepEqual(
+            [all[0].data, all[1].data, all[2].data],
+            [origBam.data, origBar.data, origFoo.data]
+        )
+    })
+
+    it('should query both deleted and not-deleted instances', async function () {
+        try {
+            var all = await fooModel.query({
+                all: true,
+                order: ['createTime'],
+                session: session,
+                where: {
+                    isDeleted: null,
+                },
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 4)
+        assert.deepEqual(
+            [all[0].data, all[1].data, all[2].data, all[3].data],
+            [origBam.data, origBar.data, origFoo.data, origGrr.data]
+        )
+    })
+
+    it('should select deleted instance', async function () {
+        try {
+            var all = await fooModel.session(session).select.all
+                .where.isDeleted(true).query()
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 1)
+        assert.deepEqual(all[0].data, origGrr.data)
+    })
+
+    it('should select not-deleted instances', async function () {
+        try {
+            var all = await fooModel.session(session).select.all
+                .where.isDeleted(false)
+                .order.by.createTime.query()
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 3)
+        assert.deepEqual(
+            [all[0].data, all[1].data, all[2].data],
+            [origBam.data, origBar.data, origFoo.data]
+        )
+    })
+
+    it('should query both deleted and not-deleted instances', async function () {
+        try {
+            var all = await fooModel.session(session).select.all
+                .where.isDeleted(null)
+                .order.by.createTime.query()
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 4)
+        assert.deepEqual(
+            [all[0].data, all[1].data, all[2].data, all[3].data],
+            [origBam.data, origBar.data, origFoo.data, origGrr.data]
+        )
     })
 
     it('should delete instance', async function () {

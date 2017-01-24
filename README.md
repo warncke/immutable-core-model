@@ -647,7 +647,7 @@ all when the record size is known and an appropriate limit is set.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.all.where.foo.like('%bar%').limit(100)
 
 ### Querying with order clauses
 
@@ -659,7 +659,11 @@ all when the record size is known and an appropriate limit is set.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.order.by.foo.desc.query()
+    foo = await fooModel.select.order.foo.desc.query()
+
+The by keyword in order selects is optional and query will be performed the
+same with or without it.
 
 ### Querying with multiple order clauses
 
@@ -674,7 +678,9 @@ all when the record size is known and an appropriate limit is set.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.order.by.bam.bar.asc.foo.desc.query()
+
+The asc/desc keywords split up column groups for order selects.
 
 ### Querying objects where action has been performed
 
@@ -688,7 +694,7 @@ This query will return all objects that have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.isDeleted(true).query()
 
 ### Querying objects where an action has not been performed
 
@@ -702,7 +708,7 @@ This query will return all objects that have not been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.isDeleted(false).query()
 
 ### Querying objects where an action either has or has not been performed
 
@@ -718,7 +724,7 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.isDeleted(false).query()
 
 ### Querying the current version of an object by id
 
@@ -744,7 +750,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.foo.is.null.query()
+    foo = await fooModel.select.where.foo.null.query()
 
 ### Querying where column is not null
 
@@ -756,7 +763,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.foo.is.not.null.query()
+    foo = await fooModel.select.where.foo.not.null.query()
 
 ### Querying where column greater than value
 
@@ -768,7 +776,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.gt(5).query()
+    foo = await fooModel.select.where.bar.gt(5).query()
 
 ### Querying where column greater than or equal to value
 
@@ -780,7 +789,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.gte(5).query()
+    foo = await fooModel.select.where.bar.gte(5).query()
 
 ### Querying where column is less than value
 
@@ -792,7 +802,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.lt(5).query()
+    foo = await fooModel.select.where.bar.lt(5).query()
 
 ### Querying where column is less than or equal to value
 
@@ -804,7 +815,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.lte(5).query()
+    foo = await fooModel.select.where.bar.lte(5).query()
 
 ### Querying where column equals a value
 
@@ -816,7 +828,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.eq(5).query()
+    foo = await fooModel.select.where.bar.eq(5).query()
 
 ### Querying where column does not equal a value
 
@@ -828,4 +841,5 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-*not yet supported*
+    foo = await fooModel.select.where.bar.is.not.eq(5).query()
+    foo = await fooModel.select.where.bar.not.eq(5).query()
