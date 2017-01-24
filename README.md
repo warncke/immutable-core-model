@@ -514,10 +514,7 @@ instance with a session context set.
 
     foo = await fooModel.query({
         limit: 1,
-        session: session,
-        where: {
-            id: objectId
-        },
+        where: { id: objectId },
     })
 
 #### select without session context set
@@ -556,10 +553,7 @@ This is equivalent to SQL SELECT WHERE IN (...).
 #### query
 
     results = await fooModel.query({
-        session: session,
-        where: {
-            id: [objectId1, objectId2, objectId3]
-        },
+        where: { id: [objectId1, objectId2, objectId3] }
     })
 
 #### select
@@ -573,10 +567,7 @@ This is equivalent to SQL SELECT WHERE IN (...).
     foo = await fooModel.query({
         limit: 1,
         select: ['data'],
-        session: session,
-        where: {
-            id: objectId
-        },
+        where: { id: objectId },
     })
 
 #### select
@@ -590,10 +581,7 @@ true then query will return a results object that is obtained by running the
 query and only selecting the ids of the objects that match.
 
     results = await fooModel.query({
-        session: session,
-        where: {
-            foo: {like: '%bar%'}
-        }
+        where: { foo: { like: '%bar%' } }
     })
 
 #### Results object properties
@@ -654,10 +642,7 @@ all when the record size is known and an appropriate limit is set.
     foo = await fooModel.query({
         all: true,
         limit: 100,
-        session: session,
-        where: {
-            foo: {like: '%bar%'}
-        }
+        where: { foo: { like: '%bar%' } },
     })
 
 #### select
@@ -669,13 +654,7 @@ all when the record size is known and an appropriate limit is set.
 #### query
 
     foo = await fooModel.query({
-        all: true,
-        limit: 100,
-        order: ['foo', 'desc'],
-        session: session,
-        where: {
-            foo: {like: '%bar%'}
-        }
+        order: ['foo', 'desc']
     })
 
 #### select
@@ -687,16 +666,10 @@ all when the record size is known and an appropriate limit is set.
 #### query
 
     foo = await fooModel.query({
-        all: true,
-        limit: 100,
         order: [
             ['bam', 'bar', 'asc'],
             ['foo', 'desc'],
-        ],
-        session: session,
-        where: {
-            foo: {like: '%bar%'}
-        }
+        ]
     })
 
 #### select
@@ -708,10 +681,7 @@ all when the record size is known and an appropriate limit is set.
 #### query
 
     foo = await fooModel.query({
-        session: session,
-        where: {
-            isDeleted: true
-        }
+        where: { isDeleted: true }
     })
 
 This query will return all objects that have been deleted.
@@ -725,10 +695,7 @@ This query will return all objects that have been deleted.
 #### query
 
     foo = await fooModel.query({
-        session: session,
-        where: {
-            isDeleted: false
-        }
+        where: { isDeleted: false }
     })
 
 This query will return all objects that have not been deleted.
@@ -742,10 +709,7 @@ This query will return all objects that have not been deleted.
 #### query
 
     foo = await fooModel.query({
-        session: session,
-        where: {
-            isDeleted: null
-        }
+        where: { isDeleted: null }
     })
 
 In the case of the delete action where by default queries return only
@@ -763,12 +727,105 @@ return all objects whether or not they have been deleted.
     foo = await fooModel.query({
         current: true,
         limit: 1,
-        session: session,
-        where: {
-            id: fooId
-        }
+        where: { id: fooId }
     })
 
 #### select
 
     foo = fooModel.select.current.by.id(fooId)
+
+### Querying where column is null
+
+#### query
+
+    foo = await fooModel.query({
+        where: { foo: null }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column is not null
+
+#### query
+
+    foo = await fooModel.query({
+        where: { foo: { not: null } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column greater than value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { gt: 5 } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column greater than or equal to value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { gte: 5 } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column is less than value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { lt: 5 } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column is less than or equal to value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { lte: 5 } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column equals a value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { eq: 5 } }
+    })
+
+#### select
+
+*not yet supported*
+
+### Querying where column does not equal a value
+
+#### query
+
+    foo = await fooModel.query({
+        where: { bar: { not: { eq: 5 } } }
+    })
+
+#### select
+
+*not yet supported*
