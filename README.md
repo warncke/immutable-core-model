@@ -391,11 +391,11 @@ toJSON      | custom formater for JSON.stringify    |
 
 ### Common instance properties
 
-Property Name | Description
----------------------------
-model         | model instance was create from
-raw           | raw database record with data column decoded
-session       | session that instantiated instance
+Property Name | Description                                     |
+--------------|--------------------------------------------------
+model         | model instance was create from                  |
+raw           | raw database record with data column decoded    |
+session       | session that instantiated instance              |
 
 ### Default data instance properties
 
