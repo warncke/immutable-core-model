@@ -71,6 +71,32 @@ describe('immutable-model - create instance', function () {
         }
     })
 
+    it('should create a new object instance and not return response when flag set', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                response: false,
+                session: session,
+            })
+            // response should be undefined but no error thrown
+            assert.strictEqual(foo, undefined)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
     it('should update an object instance', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
@@ -215,6 +241,123 @@ describe('immutable-model - create instance', function () {
         catch (err) {
             assert.ifError(err)
         }
+    })
+
+    it('should set id based on data only if idDataOnly flag set', async function () {
+        var sessionA = {
+            accountId: '11111111111111111111111111111111',
+            sessionId: '22222222222222222222222222222222',
+        }
+        var sessionB = {
+            accountId: '22222222222222222222222222222222',
+            sessionId: '33333333333333333333333333333333'
+        }
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            idDataOnly: true,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: sessionA,
+            })
+            // create second foo instance with different session but same
+            // data - should throw duplicate key error
+            await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: sessionB,
+            })
+
+        }
+        catch (err) {
+            var threwErr = err
+        }
+
+        assert.match(threwErr.message, /Duplicate entry/)
+    })
+
+    it('should ignore duplicate key errors on create when flag set', async function () {
+        var sessionA = {
+            accountId: '11111111111111111111111111111111',
+            sessionId: '22222222222222222222222222222222',
+        }
+        var sessionB = {
+            accountId: '22222222222222222222222222222222',
+            sessionId: '33333333333333333333333333333333'
+        }
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            idDataOnly: true,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: sessionA,
+            })
+            // create second foo instance with different session but same
+            // data - should throw duplicate key error
+            foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                duplicate: true,
+                session: sessionB,
+            })
+
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check data
+        assert.deepEqual(foo.data, {foo: 'foo'})
+    })
+
+    it('should ignore duplicate key errors and not return response when flag set', async function () {
+        var sessionA = {
+            accountId: '11111111111111111111111111111111',
+            sessionId: '22222222222222222222222222222222',
+        }
+        var sessionB = {
+            accountId: '22222222222222222222222222222222',
+            sessionId: '33333333333333333333333333333333'
+        }
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            idDataOnly: true,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: sessionA,
+            })
+            // create second foo instance with different session but same
+            // data - should throw duplicate key error
+            foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                duplicate: true,
+                response: false,
+                session: sessionB,
+            })
+
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check data
+        assert.strictEqual(foo, undefined)
     })
 
 })

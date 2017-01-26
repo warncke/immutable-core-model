@@ -4,7 +4,9 @@ Immutable Core Model builds on Immutable Core to persist immutable data to a
 MySQL database.
 
 Immutable Core Model is not an ORM in the traditional sense because it makes
-no attempt to map objects to a relational schema.
+no attempt to map objects to a relational schema. Instead Immutable Core Model
+stores JSON serialized objects directly and then maps properties of those
+objects to columns where needed for querying.
 
 Immutable Core Model uses native async/await and requires Node v7+ with
 the --harmony-async-await flag as well as immutable-core v1+ and
@@ -279,13 +281,31 @@ create single column indexes will result in an error.
 
 The unique flag controls whether or not the index is unique.
 
+## Creating a model with unique id based on data only
+
+    var fooModel = new ImmutableCoreModel({
+        columns: {
+            accountId: false,
+            originalId: false,
+            parentId: false,
+        }
+        idDataOnly: true,
+        name: 'foo',
+    })
+
+When the idDataOnly flag is set then only the data values for an object will be
+used to calculate the id for the object.
+
+When creating models where the instance is based only on the data values it will
+usually not make sense to have instances owned by individual accounts or to have
+an originalId and parentId for revision tracking.
+
 ## Creating a model with actions
 
     var fooModel = new ImmutableCoreModel({
         actions: {
             delete: true,
         },
-        database: database,
         name: 'foo',
     })
 
@@ -368,9 +388,7 @@ accountId, createTime, and parentId.
 
     var fooModel = globalFooModel.session(session)
 
-    fooModel.create({
-        foo: 'foo'
-    })
+    fooModel.create({foo: 'foo'})
 
 The local fooModel instance has a create method that takes only the instance
 data as an argument.
@@ -379,6 +397,40 @@ This is the prefered way to create model instances.
 
 The local fooModel instance also has the createMeta method which can be used
 for any advanced create operations that require it.
+
+### Creating a new object while ignoring duplicate key errors
+
+    var foo = await globalFooModel.createMeta({
+        data: {foo: 'foo'},
+        duplicate: true,
+        session: session,
+    })
+
+To ignore duplicate key errors when creating an object set the duplicate option
+to true.
+
+### Creating a new object while ignoring the response
+
+    var foo = await globalFooModel.createMeta({
+        data: {foo: 'foo'},
+        duplicate: true,
+        response: false,
+        session: session,
+    })
+
+Set the response: false flag to not return a response. This is typically used
+together with duplicate: true because if a duplicate key error is returned the
+response may not be valid anyway since it is based on the input not what is in
+the database.
+
+### Persisting data with a local foo model
+
+    var fooModel = globalFooModel.session(session)
+
+    fooModel.persist({foo: 'foo'})
+
+The persist method is available on local fooModel instances and is equivalent
+to calling createMeta with duplicate: true and response: false set.
 
 ### Instance methods and properties
 
