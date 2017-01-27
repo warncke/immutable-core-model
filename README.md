@@ -423,14 +423,29 @@ together with duplicate: true because if a duplicate key error is returned the
 response may not be valid anyway since it is based on the input not what is in
 the database.
 
+### Creating a new object and responding with id only
+
+    var foo = await globalFooModel.createMeta({
+        data: {foo: 'foo'},
+        duplicate: true,
+        responseIdOnly: true,
+        session: session,
+    })
+
 ### Persisting data with a local foo model
 
     var fooModel = globalFooModel.session(session)
 
-    fooModel.persist({foo: 'foo'})
+    var fooId = await fooModel.persist({foo: 'foo'})
 
 The persist method is available on local fooModel instances and is equivalent
-to calling createMeta with duplicate: true and response: false set.
+to calling createMeta with duplicate: true and responseIdOnly: true set.
+
+Calling persist will return a promise that resolves with the id of the persisted
+object as a string.
+
+response: false overrides responseIdOnly so if response: false is set nothing
+will be returned.
 
 ### Instance methods and properties
 

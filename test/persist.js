@@ -96,16 +96,18 @@ describe('immutable-core-model-local - persist', function () {
 
     it('should not throw error when persisting data twice', async function () {
         try {
-            // persist data first time
-            var foo = await fooModel.persist({foo: 'foo'})
-            // persist data second time
-            foo = await fooModel.persist({foo: 'foo'})
+            // create first data entry and catpure value
+            var foo = await fooModel.create({foo: 'foo'})
+            // persist foo which should be duplicate
+            var fooId = await fooModel.persist({foo: 'foo'})
         }
         catch (err) {
             assert.ifError(err)
         }
-        // persist should resolve undfeind
-        assert.strictEqual(foo, undefined)
+        // persist should resolve with string id
+        assert.isString(fooId)
+        // id should match original
+        assert.strictEqual(foo.id, fooId)
     })
 
 });
