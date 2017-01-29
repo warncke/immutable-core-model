@@ -575,4 +575,32 @@ describe('immutable-model', function () {
         })
     })
 
+    it('should create non-unique multi column index', function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                bam: 'boolean',
+                bar: 'string',
+                foo: 'number',
+            },
+            database: database,
+            indexes: [
+                {
+                    columns: ['bam', 'bar'],
+                },
+            ],
+            name: 'foo',
+        })
+        // sync with database
+        return fooModel.sync()
+        // get schema
+        .then(() => fooModel.schema())
+        // test that schema matches spec
+        .then(schema => {
+            assert.deepEqual(schema.indexes, [{
+                columns: ['bam', 'bar'],
+            }])
+        })
+    })
+
 })
