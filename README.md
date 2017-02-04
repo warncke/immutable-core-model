@@ -934,3 +934,73 @@ return all objects whether or not they have been deleted.
 
     foo = await fooModel.select.where.bar.is.not.eq(5).query()
     foo = await fooModel.select.where.bar.not.eq(5).query()
+
+## Model Views
+
+Immutable Core Model uses Model Views to provide reusable and compositable
+methods for formatting and summarizing model data.
+
+Model views created with immutable-core-model-view can be included in the
+model definition, in which case they will be available for use with every
+query, or ad-hoc model views can be used with specific query instances.
+
+### Creating a model with a model view
+
+    var FooModelView = require('foo-model-view')
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        views: {
+            default: ['foo'],
+            foo: FooModelView(),
+        },
+    })
+
+In this example the FooModelView is created as a named view `foo` for the
+model. Additionally foo is added as a default view.
+
+Now on every query foo model view will be applied to the result records.
+
+Any number of named views can be to a model and each naned view can be either
+a single model view object or an array of model view objects or model view
+names.
+
+Model view names will first be resolved against the model's views but if a
+name is not specifically defined for the model it will be resolved against
+the global model view register instead.
+
+### Creating a model with a globally registered model view
+
+    require('foo-model-view')
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        views: {
+            default: ['foo'],
+        },
+    })
+
+This example will yield the same result as the first one. The name `foo` will
+be used to find FooModelView in the global model view register and a new
+instance of FooModelView will be created and used as the default view.
+
+### Creating a model with multiple model views
+
+    require('bam-model-view')
+    require('bar-model-view')
+    require('foo-model-view')
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        views: {
+            default: ['viewA'],
+            viewA: ['bam', 'bar'],
+            viewB: ['bar', 'foo'],
+        },
+    })
+
+In this example two named views are defined both of them applied two model
+views. Then one of these named views is made the default view for the model.
+
+Whenever records are queried from fooModel viewA will be applied by default
+which means that the bam and bar views will be applied.
