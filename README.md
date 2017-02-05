@@ -1004,3 +1004,39 @@ views. Then one of these named views is made the default view for the model.
 
 Whenever records are queried from fooModel viewA will be applied by default
 which means that the bam and bar views will be applied.
+
+### Querying views
+
+    var foo = fooModel.query({
+        view: 'foo'
+    })
+
+    var foo = fooModel.query({
+        view: ['foo', 'bar']
+    })
+
+Either one or more views can be specified with the view param on a query.
+
+### Selecting views
+
+    fooModel.select.view('foo')
+
+    fooModel.select.view('foo', 'bar')
+
+    fooModel.select.view(['foo', 'bar'])
+
+The view method on a select acts the same as query. view must be called at
+the end of the select and the query will be executed with the specified
+view(s).
+
+The arguments to view can be either a single array or any number of strings.
+
+### Selecting by id with views
+
+    fooModel.select.one.where.id.eq(fooId).view(false)
+
+It is not possible to specify a view when doing a select.by.id so the default
+view will always be applied to select.by.id.
+
+If a non-default view is needed for select.by.id the long form 
+select.one.where approach must be used.
