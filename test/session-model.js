@@ -62,7 +62,10 @@ describe('immutable-core-model - session model', function () {
             // sync with database
             await globalSessionModel.sync()
             // insert first record
-            foo1 = await sessionModel.create({id: '00'})
+            foo1 = await globalSessionModel.createMeta({
+                id: '01000000000000000000000000000000',
+                session: session,
+            })
         }
         catch (err) {
             throw err
@@ -77,6 +80,7 @@ describe('immutable-core-model - session model', function () {
             assert.ifError(err)
         }
         // check data
+        assert.isDefined(session)
         assert.strictEqual(session.id, foo1.id)
     })
 
