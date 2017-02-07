@@ -97,6 +97,123 @@ describe('immutable-model - create instance', function () {
         }
     })
 
+    it('should create a new object instance and return id only when flag set', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                responseIdOnly: true,
+                session: session,
+            })
+            // response should be undefined but no error thrown
+            assert.match(foo, /^[A-Z0-9]{32}$/)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should create a new object instance with no wait', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: session,
+                wait: false,
+            })
+            // should have promise that will be resolved once insert completes
+            assert.isDefined(foo.promise)
+            // check instance values
+            assert.strictEqual(foo.accountId, '11111111111111111111111111111111')
+            assert.deepEqual(foo.data, {foo: 'foo'})
+            assert.strictEqual(foo.sessionId, '22222222222222222222222222222222')
+            // id should match original id since this is first revision
+            assert.strictEqual(foo.id, foo.originalId)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // wait for insert promise to complete
+        return foo.promise.then(function (res) {
+            assert.strictEqual(res.info.affectedRows, '1')
+        })
+    })
+
+    it('should create a new object instance and not return response when flag set and not waiting', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                response: false,
+                session: session,
+                wait: false,
+            })
+            // response should be undefined but no error thrown
+            assert.strictEqual(foo, undefined)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should create a new object instance and return id only when flag set and not waiting', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                responseIdOnly: true,
+                session: session,
+                wait: false,
+            })
+            // response should be undefined but no error thrown
+            assert.match(foo, /^[A-Z0-9]{32}$/)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+
     it('should update an object instance', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({

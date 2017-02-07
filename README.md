@@ -118,7 +118,7 @@ instance.
 #### fooId, fooOriginalId, fooParentId Example
 
 Revision | fooId | fooOriginalId | fooParentId |
----------|-------|---------------|-------------
+---------|-------|---------------|-------------|
 1st      | 1111  | 1111          | NULL        |
 2nd      | 2222  | 1111          | 1111        |
 3rd      | 3333  | 1111          | 2222        |
@@ -341,7 +341,7 @@ an async function.
 All code with await statements must be executed inside of try/catch
 statements.
 
-### Creating a local model instance with fixes session context
+### Creating a local model instance with session context
 
     // foo model import
     const globalFooModel = require('foo')
@@ -431,6 +431,25 @@ the database.
         responseIdOnly: true,
         session: session,
     })
+
+### Creating a new object without waiting for insert to complete
+
+    var foo = await globalFooModel.createMeta({
+        data: {foo: 'foo'},
+        session: session,
+        wait: false,
+    })
+
+    foo.promise.then( ... )
+
+When createMeta is called with wait:false the response will be returned
+immediately without waiting for the insert query to complete.
+
+When wait:false is used the inser promise will be added to the model instance
+object that is returned.
+
+Errors will be caught be default when wait:false is used. To prevent errors from
+being caught catch:false must be used with wait:false.
 
 ### Persisting data with a local foo model
 
