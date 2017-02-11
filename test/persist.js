@@ -35,23 +35,25 @@ describe('immutable-core-model-local - persist', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated with every test
-    immutable.reset().strictArgs(false)
-    // create initial model
-    var glboalFooModel = new ImmutableCoreModel({
-        columns: {
-            accountId: false,
-            originalId: false,
-            parentId: false,
-        },
-        database: database,
-        idDataOnly: true,
-        name: 'foo',
-    })
-    // create local foo model with session for select queries
-    var fooModel = glboalFooModel.session(session)
+    var glboalFooModel, fooModel
 
     beforeEach(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create initial model
+        glboalFooModel = new ImmutableCoreModel({
+            columns: {
+                accountId: false,
+                originalId: false,
+                parentId: false,
+            },
+            database: database,
+            idDataOnly: true,
+            name: 'foo',
+        })
+        // create local foo model with session for select queries
+        fooModel = glboalFooModel.session(session)
         // setup data to perform queries
         try {
             // drop any test tables if they exist

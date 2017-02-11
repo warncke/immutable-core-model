@@ -24,14 +24,15 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-model - alter column', function () {
+describe('immutable-core-model - alter column', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
 
     beforeEach(function () {
-        // reset immutable so that model modules are recreated with every test
+        // reset global data
         immutable.reset()
+        ImmutableCoreModel.reset()
         // drop any test tables if they exist
         return database.query('DROP TABLE IF EXISTS foo')
     })
@@ -51,8 +52,9 @@ describe('immutable-model - alter column', function () {
         return fooModel.sync()
         // created updated schema
         .then(() => {
-            // reset immutable module
+            // reset global data
             immutable.reset()
+            ImmutableCoreModel.reset()
             // create updated model
             var fooModel = new ImmutableCoreModel({
                 columns: {
@@ -93,8 +95,9 @@ describe('immutable-model - alter column', function () {
         return fooModel.sync()
         // created updated schema
         .then(() => {
-            // reset immutable module
+            // reset global data
             immutable.reset()
+            ImmutableCoreModel.reset()
             // create updated model
             var fooModel = new ImmutableCoreModel({
                 columns: {
@@ -135,8 +138,9 @@ describe('immutable-model - alter column', function () {
         return fooModel.sync()
         // created updated schema
         .then(() => {
-            // reset immutable module
+            // reset global data
             immutable.reset()
+            ImmutableCoreModel.reset()
             // create updated model
             var fooModel = new ImmutableCoreModel({
                 columns: {
@@ -168,8 +172,9 @@ describe('immutable-model - alter column', function () {
         return fooModel.sync()
         // created updated schema
         .then(() => {
-            // reset immutable module
+            // reset global data
             immutable.reset()
+            ImmutableCoreModel.reset()
             // create updated model
             var fooModel = new ImmutableCoreModel({
                 columns: {
@@ -202,8 +207,9 @@ describe('immutable-model - alter column', function () {
         return fooModel.sync()
         // created updated schema
         .then(() => {
-            // reset immutable module
+            // reset global data
             immutable.reset()
+            ImmutableCoreModel.reset()
             // create updated model
             var fooModel = new ImmutableCoreModel({
                 columns: {

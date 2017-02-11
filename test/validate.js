@@ -33,21 +33,18 @@ describe('immutable-core-model - validate', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated
-    immutable.reset().strictArgs(false)
-    // create foo with no columns
-    var fooModel = new ImmutableCoreModel({
-        database: database,
-        name: 'foo',
-    })
-
     // variable to populate in before
-    var origBam
-    var origBar
-    var origFoo
-    var origGrr
+    var fooModel, origBam, origBar, origFoo, origGrr
 
     before(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create foo with no columns
+        fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
         // catch async errors
         try {
             // drop any test tables if they exist
@@ -94,7 +91,8 @@ describe('immutable-core-model - validate', function () {
 
     it('should validate column data when adding column', async function () {
         // reset immutable so that model modules are recreated
-        immutable.reset().strictArgs(false)
+        immutable.reset()
+        ImmutableCoreModel.reset()
         // create updated foo model with columns
         fooModel = new ImmutableCoreModel({
             columns: {
@@ -122,7 +120,8 @@ describe('immutable-core-model - validate', function () {
 
     it('should not validate when schema has not changed', async function () {
         // reset immutable so that model modules are recreated
-        immutable.reset().strictArgs(false)
+        immutable.reset()
+        ImmutableCoreModel.reset()
         // create updated foo model with columns
         fooModel = new ImmutableCoreModel({
             columns: {
@@ -147,7 +146,8 @@ describe('immutable-core-model - validate', function () {
 
     it('should not update when validate called and data correct', async function () {
         // reset immutable so that model modules are recreated
-        immutable.reset().strictArgs(false)
+        immutable.reset()
+        ImmutableCoreModel.reset()
         // create updated foo model with columns
         fooModel = new ImmutableCoreModel({
             columns: {

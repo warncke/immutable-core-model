@@ -39,8 +39,9 @@ describe('immutable-core-model - views', function () {
     var origBam, origBar, origFoo, origRecords
 
     before(async function () {
-        // reset immutable global data
-        immutable.reset().strictArgs(false)
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
         // create initial model
         var glboalFooModel = new ImmutableCoreModel({
             database: database,
@@ -83,10 +84,10 @@ describe('immutable-core-model - views', function () {
     })
 
     beforeEach(async function () {
-        // reset immutable global data
-        immutable.reset().strictArgs(false)
-        // reset global model view register
+        // reset global data
+        immutable.reset()
         ImmutableCoreModelView.reset()
+        ImmutableCoreModel.reset()
         // create collection model view
         new ImmutableCoreModelView({
             each: function (modelView, record, number, context) {

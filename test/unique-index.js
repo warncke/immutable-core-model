@@ -35,21 +35,24 @@ describe('immutable-core-model - unique index', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated with every test
-    immutable.reset().strictArgs(false)
-    // create initial model
-    var fooModel = new ImmutableCoreModel({
-        columns: {
-            foo: {
-                type: 'string',
-                unique: true,
-            }
-        },
-        database: database,
-        name: 'foo',
-    })
+    var fooModel
 
     beforeEach(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create initial model
+        fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    type: 'string',
+                    unique: true,
+                }
+            },
+            database: database,
+            name: 'foo',
+        })
+        // setup database
         try {
             // drop any test tables if they exist
             await database.query('DROP TABLE IF EXISTS foo')

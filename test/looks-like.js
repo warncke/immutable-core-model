@@ -9,8 +9,9 @@ const assert = chai.assert
 describe('immutable-core-model - looksLike', function () {
 
     before(function () {
-        // reset global module namespace
+        // reset globals
         immutable.reset()
+        ImmutableCoreModel.reset()
     })
 
     it('should expose looksLike method', function () {

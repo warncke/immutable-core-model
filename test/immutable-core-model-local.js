@@ -36,19 +36,18 @@ describe('immutable-core-model-local', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated with every test
-    immutable.reset().strictArgs(false)
-    // create global model instance
-    var globalFooModel = new ImmutableCoreModel({
-        database: database,
-        name: 'foo',
-    })
-
-    // variables to populate in tests
-    var origBar
-    var origFoo
+    // variables to populate
+    var globalFooModel, origBar, origFoo
 
     before(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create global model instance
+        globalFooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
         // setup data to perform queries
         try {
             // drop any test tables if they exist

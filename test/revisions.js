@@ -35,20 +35,20 @@ describe('immutable-core-model - revisions', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated with every test
-    immutable.reset().strictArgs(false)
-    // create initial model
-    var globalFooModel = new ImmutableCoreModel({
-        database: database,
-        name: 'foo',
-    })
-    // create local model with session
-    var fooModel = globalFooModel.session(session)
-
     // will be pouplated in before
-    var foo1, foo2, foo3
+    var foo1, foo2, foo3, globalFooModel, fooModel
 
     before(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create initial model
+        globalFooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // create local model with session
+        fooModel = globalFooModel.session(session)
         try {
             // drop any test tables if they exist
             await database.query('DROP TABLE IF EXISTS foo')

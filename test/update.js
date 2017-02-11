@@ -37,8 +37,9 @@ describe('immutable-core-model - update', function () {
 
     beforeEach(async function () {
         try {
-            // reset immutable
-            immutable.reset().strictArgs(false)
+            // reset global data
+            immutable.reset()
+            ImmutableCoreModel.reset()
             // drop any test tables if they exist
             await database.query('DROP TABLE IF EXISTS foo')
         }

@@ -142,6 +142,54 @@ retry.
 
 The sessionId of the session that created the foo object.
 
+## Creating a model with a JSON schema
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        properties: {
+            foo: {
+                type: 'string',
+            },
+        },
+        required: 'foo'
+    })
+
+The properties object is a list of [JSON Schema](https://spacetelescope.github.io/understanding-json-schema/index.html)
+properties for the instance data.
+
+The schema specified here will be built into a schema for the complete object
+including meta data columns (id, createTime, etc).
+
+## Disabling schema validation at the model level
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        validate: false,
+    })
+
+JSON schema validation is enabled by default. To disable JSON schema validation
+set the validate:false flag.
+
+JSON schema validation can also be enabled and disabled for individual created
+and update calls.
+
+Even if validation is disabled the schema and metaSchema properties of the model
+will still be created.
+
+## Disabling schema validation on create
+
+    fooModel.createMeta({
+        data: {foo: 'bar'},
+        validate: false,
+    })
+
+## Disabling schema validation on update
+
+    foo.updateMeta({
+        data: {foo: 'bar'},
+        validate: false,
+    })
+
 ## Creating a model with queryable columns
 
     var fooModel = new ImmutableCoreModel({

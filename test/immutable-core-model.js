@@ -23,7 +23,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-model', function () {
+describe('immutable-core-model', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -35,8 +35,9 @@ describe('immutable-model', function () {
     }
 
     beforeEach(function () {
-        // reset immutable so that model modules are recreated with every test
+        // reset global data
         immutable.reset()
+        ImmutableCoreModel.reset()
         // drop any test tables if they exist
         return Promise.all([
             database.query('DROP TABLE IF EXISTS foo'),

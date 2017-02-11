@@ -36,24 +36,26 @@ describe('immutable-core-model-select', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    // reset immutable so that model modules are recreated with every test
-    immutable.reset().strictArgs(false)
-    // create initial model
-    var fooModel = new ImmutableCoreModel({
-        columns: {
-            bar: 'number',
-            foo: 'string',
-        },
-        database: database,
-        name: 'foo',
-    })
+    // variable to populate in before
+    var fooModel, origBam, origBar, origFoo
 
-    // variables to populate in before
-    var origBam
-    var origBar
-    var origFoo
+    // reset global data
+    immutable.reset()
+    ImmutableCoreModel.reset()
 
     before(async function () {
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create initial model
+        fooModel = new ImmutableCoreModel({
+            columns: {
+                bar: 'number',
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+        })
         // setup data to perform queries
         try {
             // drop any test tables if they exist
