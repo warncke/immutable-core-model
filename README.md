@@ -251,6 +251,7 @@ Option Name | Default   | Description                                         |
 ------------|-----------|-----------------------------------------------------|
 default     | null      | default value for column                            |
 index       | true      | create index for column                             |
+immutable   | false     | value cannot be changed after creation              |
 null        | true      | allow null values                                   |
 path        | undefined | path to get value from object (uses lodash _.get)   |
 primary     | false     | column is primary key                               |
