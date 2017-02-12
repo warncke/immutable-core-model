@@ -107,6 +107,115 @@ describe('immutable-core-model - schema', function () {
         assert.strictEqual(foo.data.foo, 'foo')
     })
 
+    it('should coerce scalar values', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            properties: {
+                foo: {
+                    type: 'string'
+                },
+            },
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 0},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // validate data
+        assert.strictEqual(foo.data.foo, '0')
+    })
+
+    it('should coerce arrays', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            properties: {
+                foo: {
+                    type: 'array'
+                },
+            },
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 0},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // validate data
+        assert.deepEqual(foo.data.foo, [0])
+    })
+
+    it('should not remove extra properties', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            properties: {
+                foo: {
+                    type: 'array'
+                },
+            },
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {bar: 'bar'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // validate data
+        assert.strictEqual(foo.data.bar, 'bar')
+    })
+
+    it('should remove extra properties when additionalProperties:false', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            additionalProperties: false,
+            properties: {
+                foo: {
+                    type: 'array'
+                },
+            },
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {bar: 'bar'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // validate data
+        assert.isUndefined(foo.data.bar)
+    })
+
     it('should update a model instance that matches schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
@@ -148,13 +257,14 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            required: 'foo'
         })
         try {
             // sync with database
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
-                data: {foo: false},
+                data: {bar: 'bar'},
                 session: session,
             })
         }
@@ -298,7 +408,7 @@ describe('immutable-core-model - schema', function () {
         }
     })
 
-    it('should throw error when creating instance that does not match schema', async function () {
+    it('should throw error when updating an instance that does not match schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             database: database,
@@ -308,6 +418,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            required: 'foo',
         })
         try {
             // sync with database
@@ -319,7 +430,7 @@ describe('immutable-core-model - schema', function () {
             })
             // update
             foo = await foo.update({
-                foo: false,
+                foo: undefined,
             })
         }
         catch (err) {
@@ -358,6 +469,36 @@ describe('immutable-core-model - schema', function () {
         catch (err) {
             assert.ifError(err)
         }
+    })
+
+    it('should not throw error when missing required property that has default', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            properties: {
+                foo: {
+                    type: 'string',
+                    default: 'foo',
+                },
+            },
+            required: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {bar: 'bar'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+
+        // check that default value set
+        assert.strictEqual(foo.data.foo, 'foo')
     })
 
 })

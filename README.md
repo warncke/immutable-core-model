@@ -145,10 +145,12 @@ The sessionId of the session that created the foo object.
 ## Creating a model with a JSON schema
 
     var fooModel = new ImmutableCoreModel({
+        additionalProperties: false,
         name: 'foo',
         properties: {
             foo: {
                 type: 'string',
+                default: 'foo',
             },
         },
         required: 'foo'
@@ -159,6 +161,23 @@ properties for the instance data.
 
 The schema specified here will be built into a schema for the complete object
 including meta data columns (id, createTime, etc).
+
+Properties with default:true set will be added to the data.
+
+Data type coercion will be performed so that numbers are converted to strings,
+single element arrays are converted to scalar values, scalars are converted to
+single element arrays, etc.
+
+When additionalProperties:false is set any properties not in the schema will be
+removed without throwing an error.
+
+Immutable Core Model uses [ajv](https://www.npmjs.com/package/ajv) with the
+following options to perform JSON schema validation:
+
+    coerceTypes: 'array'
+    removeAdditional: true
+    useDefaults: true
+    v5: true
 
 ## Disabling schema validation at the model level
 
