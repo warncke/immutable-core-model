@@ -622,6 +622,25 @@ will be assigned to the new object revision. Otherwise the sessionId from the
 session that original instantiated the local instance of the object will be
 used.
 
+### Forcing an update on an old instance
+
+    await foo.update({foo: 'bam'})
+
+    await foo.updateMeta({
+        data: {foo: 'bar'},
+        force: true,
+    })
+
+By default calling update twice on the same object will result in a unique
+index conflict on the parentId column for the instance.
+
+When updateMeta is called with force:true the update will be retried up to 3
+times if an index conflict on the parentId column occurs.
+
+Each time the update operation is retried the current instance of the object
+will be fetched and the data passed to the update statement will be re-merged
+against the current state of the data.
+
 ### Emptying object data
 
     foo = await foo.empty()

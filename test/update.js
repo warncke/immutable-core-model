@@ -86,4 +86,74 @@ describe('immutable-core-model - update', function () {
         assert.strictEqual(threw.message, '[immutable.model.foo] cannot modify immutable property foo')
     })
 
+    it('should throw error when updating old instance', async function () {
+        try {
+            // create foo model with immutable property
+            var fooModel = new ImmutableCoreModel({
+                database: database,
+                name: 'foo',
+            })
+            // sync model
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'bar'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+
+        try {
+            // first update should succeed
+            var updateFoo = await foo.update({foo: 'bam'})
+            // second update should throw error
+            await foo.update({foo: 'bar'})
+        }
+        catch (err) {
+            var threw = err
+        }
+        // check that first update succeeded
+        assert.deepEqual(updateFoo.data, {foo: 'bam'})
+        // check that error thrown on second update
+        assert.isDefined(threw)
+        assert.strictEqual(threw.code, 1062)
+    })
+
+    it('should force update old instance', async function () {
+        try {
+            // create foo model with immutable property
+            var fooModel = new ImmutableCoreModel({
+                database: database,
+                name: 'foo',
+            })
+            // sync model
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'bar'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+
+        try {
+            // first update should succeed
+            var updateFoo = await foo.update({foo: 'bam'})
+            // second update should succeed with force
+            updateFoo = await foo.updateMeta({
+                data: {foo: 'bar'},
+                force: true,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check that first update succeeded
+        assert.deepEqual(updateFoo.data, {foo: 'bar'})
+    })
+
 })
