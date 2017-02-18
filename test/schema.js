@@ -522,4 +522,19 @@ describe('immutable-core-model - schema', function () {
         assert.strictEqual(foo.data.foo, 'foo')
     })
 
+    it('should require not null default columns', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            required: 'foo',
+        })
+        // get global validator
+        var validator = fooModel.global().validator
+        // validate data - should be false
+        assert.isFalse(validator.validate(fooModel.schemaId, {}))
+        // there should be 5 missing required coluns
+        assert.strictEqual(validator.errors.length, 5)
+    })
+
 })

@@ -174,6 +174,7 @@ removed without throwing an error.
 Immutable Core Model uses [ajv](https://www.npmjs.com/package/ajv) with the
 following options to perform JSON schema validation:
 
+    allErrors: true
     coerceTypes: 'array'
     removeAdditional: true
     useDefaults: true
