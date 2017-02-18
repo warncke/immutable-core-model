@@ -56,13 +56,15 @@ describe('immutable-core-model - schema', function () {
         })
         // get schema
         var schema = fooModel.global().validator.getSchema(fooModel.schemaId)
+        var schemaData = fooModel.global().validator.getSchema(fooModel.schemaDataId)
         // schema should be a function
         assert.isFunction(schema)
+        assert.isFunction(schemaData)
     })
 
     it('should throw error on invalid schema', function () {
         try {
-            // create model with back schema
+            // create model with schema
             var fooModel = new ImmutableCoreModel({
                 database: database,
                 name: 'foo',
@@ -105,6 +107,25 @@ describe('immutable-core-model - schema', function () {
         }
         // validate data
         assert.strictEqual(foo.data.foo, 'foo')
+    })
+
+    it('should validate data schema', async function () {
+        // create model with schema
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            properties: {
+                foo: {
+                    type: 'string'
+                },
+            },
+        })
+        // get schema validator
+        var schemaData = fooModel.global().validator.getSchema(fooModel.schemaDataId)
+        // schema should be a function
+        assert.isFunction(schemaData)
+        // schema should validate
+        assert.isTrue(schemaData({foo: 'foo'}))
     })
 
     it('should coerce scalar values', async function () {
