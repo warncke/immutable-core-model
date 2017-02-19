@@ -249,6 +249,26 @@ describe('immutable-core-model - delete instance', function () {
         )
     })
 
+    it('should have result sets with both deleted and not-deleted instances', async function () {
+        try {
+            // get result set
+            var result = await fooModel.session(session).select
+                .where.isDeleted(null)
+                .order.by.createTime.query()
+            // get records
+            var all = await result.fetch(4)
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check return
+        assert.strictEqual(all.length, 4)
+        assert.deepEqual(
+            [all[0].data, all[1].data, all[2].data, all[3].data],
+            [origBam.data, origBar.data, origFoo.data, origGrr.data]
+        )
+    })
+
     it('should delete instance', async function () {
         try {
             var foo = await fooModel.query({
