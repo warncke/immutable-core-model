@@ -8,9 +8,10 @@ no attempt to map objects to a relational schema. Instead Immutable Core Model
 stores JSON serialized objects directly and then maps properties of those
 objects to columns where needed for querying.
 
-Immutable Core Model uses native async/await and requires Node v7+ with
-the --harmony-async-await flag as well as immutable-core v1+ and
-immutable-database-mariasql v1+.
+## Native async/await
+
+Immutable Core Model requires Node.js v7.6.0 or greater with native async/await
+support.
 
 ## Creating a new model
 

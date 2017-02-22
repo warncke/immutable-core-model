@@ -1,18 +1,18 @@
 {
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
-    "ajv": "4.11.2",
+    "ajv": "4.11.3",
     "bluebird": "3.4.7",
     "change-case": "3.0.1",
     "debug": "2.6.1",
     "deep-equal": "1.0.1",
     "deep-extend": "^0.4.1",
-    "immutable-core": "1.1.3",
-    "immutable-core-model-view": "0.1.2",
-    "immutable-require-valid-optional-object": "0.1.0",
+    "immutable-core": "1.2.0",
+    "immutable-core-model-view": "0.2.0",
+    "immutable-require-valid-optional-object": "0.1.1",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.0",
+    "micro-timestamp": "0.1.1",
     "snappy": "5.0.5"
   },
   "description": "Immutable model built on immutable-core",
@@ -20,21 +20,21 @@
     "chai": "3.5.0",
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.4.0",
-    "immutable-database-mariasql": "1.1.0",
+    "immutable-database-mariasql": "1.2.0",
     "mocha": "3.2.0"
   },
   "directories": {
     "test": "test"
   },
   "engines": {
-    "node": ">=7.0.0"
+    "node": ">=7.6.0"
   },
   "license": "MIT",
   "main": "lib/immutable-core-model.js",
   "name": "immutable-core-model",
   "repository": "warncke/immutable-core-model",
   "scripts": {
-    "test": "mocha --harmony-async-await"
+    "test": "mocha"
   },
-  "version": "1.2.2"
+  "version": "1.3.0"
 }
