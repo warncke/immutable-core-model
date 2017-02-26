@@ -176,4 +176,52 @@ describe('immutable-core-model-result', function () {
         }
     })
 
+    it('should fetch records with limit', async function () {
+        try {
+            // query all rows
+            var result = await fooModel.query({
+                order: 'createTime',
+
+                session: session,
+            })
+            // fetch 2 records
+            var records = await result.fetch(2)
+            // validate records
+            assert.deepEqual(records[0].data, {
+                bar: "0.000000000",
+                foo: 'bam',
+            })
+            assert.deepEqual(records[1].data, {
+                bar: "1.000000000",
+                foo: 'bar',
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
+    it('should fetch records with limit and offset', async function () {
+        try {
+            // query all rows
+            var result = await fooModel.query({
+                order: 'createTime',
+
+                session: session,
+            })
+            // fetch max 2 records, starting with 3rd record
+            var records = await result.fetch(2, 2)
+            // should get 1
+            assert.strictEqual(records.length, 1)
+            // validate records
+            assert.deepEqual(records[0].data, {
+                bar: "2.000000000",
+                foo: 'foo',
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+    })
+
 })
