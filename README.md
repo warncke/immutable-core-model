@@ -370,7 +370,7 @@ When creating models where the instance is based only on the data values it will
 usually not make sense to have instances owned by individual accounts or to have
 an originalId and parentId for revision tracking.
 
-## Creating a model with actions
+## Creating models with actions
 
     var fooModel = new ImmutableCoreModel({
         actions: {
@@ -401,6 +401,117 @@ to it.
 The delete action as a default defaultWhere: false parameter so that by
 default queries will not return deleted instances if a model has a delete
 action added to it.
+
+## Creating models with relations
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        relations: {
+            bar: {},
+        },
+    })
+
+    var barModel = new ImmutableCoreModel({
+        columns: {
+            fooId: {
+                index: true,
+                type: 'id',
+            },
+        },
+        name: 'bar',
+    })
+
+Relations allow linked models to be created and queried from model instances.
+
+In this example foo is related to bar.
+
+The bar model must have either a fooId or fooOriginalId column.
+
+For cases where the relation should apply to all revisions of a record the
+originalId should be used. For cases where the relation only applies to a
+specific revision the id should be used.
+
+Relations are resolved at runtime which allows models to be defined in any
+order.
+
+### Creating models with relations linked via an intermediary table
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        relations: {
+            bar: {via: 'bam'},
+        },
+    })
+
+    var bamModel = new ImmutableCoreModel({
+        columns: {
+            barId: {
+                index: true,
+                null: false,
+                type: 'id',
+            },
+            fooId: {
+                index: true,
+                null: false,
+                type: 'id',
+            },
+            data: false,
+            originalId: false,
+            parentId: false,
+        },
+        name: 'bam',
+    })
+
+    var barModel = new ImmutableCoreModel({
+        name: 'bar',
+    })
+
+The via option can be used to link two models via a third table.
+
+The linking table should have either an id or originalId column from each of
+the two table being linked.
+
+### Creating a new related model
+
+    var foo = fooModel.create(...)
+
+    foo.create('bar', {foo: 'foo'})
+
+Calling the create method on a model instance with the name of the related
+model.
+
+If the related model is linked via a third table the linking record will be
+also be created.
+
+### Creating a new related model with meta options
+
+    foo.createMeta({
+        data: {foo: 'foo'},
+        relation: 'bar',
+        session: session,
+    })
+
+The createMeta method can be used to set meta options for the create method.
+
+### Selecting related records
+
+    foo.select('bar')
+
+The select method takes the name of a relation and queries all records related
+to the instance.
+
+The select method always returns a results object which must be used to fetch
+or iterate over the related records.
+
+### Querying related records
+
+    foo.query({
+        order: ['createTime'],
+        relation: 'bar',
+    })
+
+The query method allows setting any of the options that are available with a
+normal model query.
 
 ## Working with models
 
