@@ -513,6 +513,24 @@ or iterate over the related records.
 The query method allows setting any of the options that are available with a
 normal model query.
 
+### Loading related records with query
+
+    fooModel.query({
+        limit: 1,
+        where: {id: fooId},
+        with: {
+            bar: {
+                order: ['createTime'],
+            },
+        },
+    })
+
+When doing a query for a single record by id related records can be loaded by
+specifying the with option.
+
+All records will be loaded so caution must be taken to make sure that this does
+not become a performance and memory usage issue.
+
 ## Working with models
 
 These examples will use async/await to demonstrate how new model instances
