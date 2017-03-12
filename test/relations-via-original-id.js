@@ -157,6 +157,8 @@ describe('immutable-core-model - relations via original id', function () {
         try {
             // create foo instance
             var foo = await fooModel.create({foo: 'foo'})
+            // create revision of foo
+            foo = await foo.update({foo: 'bar'})
             // create related
             await foo.create('bar', {foo: 'bam'})
             await foo.create('bar', {foo: 'bar'})
@@ -167,14 +169,14 @@ describe('immutable-core-model - relations via original id', function () {
                 relation: 'bar',
             })
             // fetch results
-            var desc = await result.fetch(3)
+            var desc = await result.fetch(6)
             // load related asc
             var result = await foo.query({
                 order: ['createTime'],
                 relation: 'bar',
             })
             // fetch results
-            var asc = await result.fetch(3)
+            var asc = await result.fetch(6)
         }
         catch (err) {
             assert.ifError(err)
