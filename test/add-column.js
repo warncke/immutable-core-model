@@ -38,6 +38,7 @@ describe('immutable-core-model - add column', function () {
     it('should add new columns', function () {
         // full table schema including all default columns
         var expectedSchema = {
+            charset: 'utf8',
             columns: {
                 fooAccountId: {
                     type: 'id',
@@ -85,7 +86,8 @@ describe('immutable-core-model - add column', function () {
                     index: true
                 }
             },
-            indexes: []
+            engine: 'InnoDB',
+            indexes: [],
         };
         // create initial model
         var fooModel = new ImmutableCoreModel({

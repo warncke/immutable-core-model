@@ -143,6 +143,52 @@ retry.
 
 The sessionId of the session that created the foo object.
 
+## Setting the database engine for models
+
+The database engine can be set either globally or on an individual model.
+
+If the engine is specified on a model this will override any global value.
+
+The database engine will not be changed or checked after the initial sync.
+
+### Setting the database engine globally
+
+    ImmutableCoreModel.defaultEngine('MyISAM')
+
+When setting the defaultEngine the ImmutableCoreModel class object is returned
+so that global configuration methods can be chained.
+
+### Getting the global default database engine
+
+    var defaultEngine = ImmutableCoreModel.defaultEngine()
+
+### Setting the database engine on a model
+
+    new ImmutableCoreModel({engine: 'MyISAM'})
+
+## Setting the charset for models
+
+The charset can be set either globally or on an individual model.
+
+If the charset is specified on a model this will override any global value.
+
+The charset will not be changed or checked after the initial sync.
+
+### Setting the charset globally
+
+    ImmutableCoreModel.defaultCharset('latin1')
+
+When setting the defaultCharset the ImmutableCoreModel class object is returned
+so that global configuration methods can be chained.
+
+### Getting the global default charset
+
+    var defaultCharset = ImmutableCoreModel.defaultCharset()
+
+### Setting the charset on a model
+
+    new ImmutableCoreModel({engine: 'MyISAM'})
+
 ## Creating a model with a JSON schema
 
     var fooModel = new ImmutableCoreModel({
@@ -644,7 +690,7 @@ the database.
 When createMeta is called with wait:false the response will be returned
 immediately without waiting for the insert query to complete.
 
-When wait:false is used the inser promise will be added to the model instance
+When wait:false is used the insert promise will be added to the model instance
 object that is returned.
 
 Errors will be caught be default when wait:false is used. To prevent errors from

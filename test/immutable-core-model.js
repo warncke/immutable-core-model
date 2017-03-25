@@ -101,7 +101,9 @@ describe('immutable-core-model', function () {
                     columns: ['bam','bar'],
                     'unique': true
                 }
-            ]
+            ],
+            charset: 'utf8',
+            engine: 'InnoDB',
         }
         // default columns
         var expectedDefaultColumns = {
@@ -475,7 +477,9 @@ describe('immutable-core-model', function () {
                     fooDeleteSessionId: { type: 'id', null: false, index: true },
                     fooId: { type: 'id', unique: true }
                 },
-                indexes: []
+                indexes: [],
+                charset: 'utf8',
+                engine: 'InnoDB',
             })
         })
         // get schema for un-delete
@@ -489,7 +493,9 @@ describe('immutable-core-model', function () {
                     fooUnDeleteSessionId: { type: 'id', null: false, index: true },
                     fooDeleteId: { type: 'id', unique: true }
                 },
-                indexes: []
+                indexes: [],
+                charset: 'utf8',
+                engine: 'InnoDB',
             })
         })
     })
@@ -530,7 +536,9 @@ describe('immutable-core-model', function () {
                     fooDeleteSessionId: { type: 'id', null: false, index: true },
                     fooId: { type: 'id', unique: true }
                 },
-                indexes: []
+                indexes: [],
+                charset: 'utf8',
+                engine: 'InnoDB',
             })
         })
     })
@@ -571,7 +579,9 @@ describe('immutable-core-model', function () {
                     fooUnDeleteSessionId: { type: 'id', null: false, index: true },
                     fooDeleteId: { type: 'id', unique: true }
                 },
-                indexes: []
+                indexes: [],
+                charset: 'utf8',
+                engine: 'InnoDB',
             })
         })
     })
