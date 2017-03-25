@@ -151,6 +151,10 @@ If the engine is specified on a model this will override any global value.
 
 The database engine will not be changed or checked after the initial sync.
 
+### Setting the database engine from the ENV
+
+    DEFAULT_ENGINE=MyISAM node app.js
+
 ### Setting the database engine globally
 
     ImmutableCoreModel.defaultEngine('MyISAM')
@@ -173,6 +177,10 @@ The charset can be set either globally or on an individual model.
 If the charset is specified on a model this will override any global value.
 
 The charset will not be changed or checked after the initial sync.
+
+### Setting the charset from the ENV
+
+    DEFAULT_CHARSET=latin1 node app.js
 
 ### Setting the charset globally
 

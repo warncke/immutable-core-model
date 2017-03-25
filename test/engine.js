@@ -44,6 +44,12 @@ describe('immutable-core-model - engine and charset', function () {
         ])
     })
 
+    afterEach(function () {
+        // clear env vars
+        delete process.env.DEFAULT_CHARSET
+        delete process.env.DEFAULT_ENGINE
+    })
+
     it('should use default engine and charset', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
@@ -88,6 +94,26 @@ describe('immutable-core-model - engine and charset', function () {
             charset: 'latin1',
             database: database,
             engine: 'MyISAM',
+            name: 'foo',
+        })
+        // sync with database
+        return fooModel.sync()
+        // get schema
+        .then(() => fooModel.schema())
+        // test that schema matches spec
+        .then(schema => {
+            assert.strictEqual(schema.engine, 'MyISAM')
+            assert.strictEqual(schema.charset, 'latin1')
+        })
+    })
+
+    it('should set engine and charset from env', function () {
+        // set global engine and charset
+        process.env.DEFAULT_CHARSET = 'latin1'
+        process.env.DEFAULT_ENGINE = 'MyISAM'
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
             name: 'foo',
         })
         // sync with database
