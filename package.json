@@ -7,12 +7,12 @@
     "debug": "2.6.3",
     "deep-equal": "1.0.1",
     "deep-extend": "0.4.1",
-    "immutable-core": "1.2.0",
-    "immutable-core-model-view": "0.2.0",
+    "immutable-core": "1.2.10",
+    "immutable-core-model-view": "0.2.6",
     "immutable-require-valid-optional-object": "^0.1.1",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.1",
+    "micro-timestamp": "0.1.10",
     "snappy": "5.0.5"
   },
   "description": "Immutable model built on immutable-core",
@@ -20,7 +20,7 @@
     "chai": "3.5.0",
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.5.0",
-    "immutable-database-mariasql": "1.2.0",
+    "immutable-database-mariasql": "1.2.10",
     "mocha": "3.2.0"
   },
   "directories": {
@@ -36,5 +36,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.5.9"
+  "version": "1.5.10"
 }
