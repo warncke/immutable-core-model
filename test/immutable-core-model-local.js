@@ -105,4 +105,11 @@ describe('immutable-core-model-local', function () {
         assert.deepEqual(bar.data, origBar.data)
     })
 
+    it('should have class properties', async function () {
+        var fooModel = globalFooModel.session(session)
+        // check for class properties
+        assert.isTrue(fooModel.ImmutableCoreModelLocal)
+        assert.strictEqual(fooModel.class, 'ImmutableCoreModelLocal')
+    })
+
 })

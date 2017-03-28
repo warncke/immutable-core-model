@@ -614,4 +614,14 @@ describe('immutable-core-model', function () {
         })
     })
 
+    it('should have class properties on model', function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            name: 'foo',
+        })
+        // check for class properties
+        assert.isTrue(fooModel.ImmutableCoreModel)
+        assert.strictEqual(fooModel.class, 'ImmutableCoreModel')
+    })
+
 })

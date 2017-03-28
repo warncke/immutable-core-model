@@ -181,7 +181,6 @@ describe('immutable-core-model-result', function () {
             // query all rows
             var result = await fooModel.query({
                 order: 'createTime',
-
                 session: session,
             })
             // fetch 2 records
@@ -206,7 +205,6 @@ describe('immutable-core-model-result', function () {
             // query all rows
             var result = await fooModel.query({
                 order: 'createTime',
-
                 session: session,
             })
             // fetch max 2 records, starting with 3rd record
@@ -222,6 +220,22 @@ describe('immutable-core-model-result', function () {
         catch (err) {
             assert.ifError(err)
         }
+    })
+
+    it('should have class properties', async function () {
+        try {
+            // query all rows
+            var result = await fooModel.query({
+                order: 'createTime',
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check for class properties
+        assert.isTrue(result.ImmutableCoreModelResult)
+        assert.strictEqual(result.class, 'ImmutableCoreModelResult')
     })
 
 })

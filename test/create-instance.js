@@ -478,4 +478,27 @@ describe('immutable-core-model - create instance', function () {
         assert.strictEqual(foo, undefined)
     })
 
+    it('should have class properties on instance', async function () {
+        // create initial model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync with database
+            await fooModel.sync()
+            // create new foo instance
+            var foo = await fooModel.createMeta({
+                data: {foo: 'foo'},
+                session: session,
+            })
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check for class properties
+        assert.isTrue(foo.ImmutableCoreModelInstance)
+        assert.strictEqual(foo.class, 'ImmutableCoreModelInstance')
+    })
+
 })

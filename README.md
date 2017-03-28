@@ -195,7 +195,7 @@ so that global configuration methods can be chained.
 
 ### Setting the charset on a model
 
-    new ImmutableCoreModel({engine: 'MyISAM'})
+    new ImmutableCoreModel({charset: 'latin1'})
 
 ## Creating a model with a JSON schema
 
@@ -851,7 +851,7 @@ revisions of the object will be retured.
 When querying an object by id the revision matching the queried id will be
 returned.
 
-### Checking in an object is current
+### Checking if an object is current
 
     foo = await foo.select.by.id(objectId)
 
@@ -1331,3 +1331,165 @@ view will always be applied to select.by.id.
 
 If a non-default view is needed for select.by.id the long form 
 select.one.where approach must be used.
+
+## Using Elasticsearch
+
+Immutable Core Model allows using
+[Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+in addition to MySQL.
+
+When the `elasticsearch` parameter is set for a model then the current revision
+of each model instance will be stored in Elasticsearch as well as MySQL.
+
+Immutable Core Model updates the document in Elasticsearch whenever instance
+updates are made.
+
+Elasticsearch storage is asynchronous and unreliable in the sense that if an
+insert or update to Elasticsearch fails this is not treated as a fatal error.
+
+The Elasticsearch index for a model will be created when model sync is called.
+
+For an intro to Elasticsearch terminology used here see
+[Elasticsearch Basic Concepts]https://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html
+
+## Adding Elasticsearch support to a model
+
+    const elasticsearch = require('elasticsearch')
+
+    const elasticsearchClient = new elistasticsearch.Client({
+        host: 'localhost:9200',
+    })
+
+    // create model with elasticsearch client set as parameter
+    var fooModel = new ImmutableCoreModel({
+        elasticsearch: elasticsearchClient,
+        name: 'foo',
+    })
+
+Passing an elasticsearch client at model creation will enable elasticsearch
+
+    // create a model with elasticsearch enabled to set client later
+    var barModel = new ImmutableCoreModel({
+        elasticsearch: true,
+        name: 'foo',
+    })
+
+    // set elastic search client
+    barModel.elasticsearch(elasticsearchClient)
+
+If elasticsearch is set to true and a sync is attempted without a client set
+this will result in an exception.
+
+All elasticsearch errors, including a missing client, are ignored for record
+create.
+
+## Setting the Elasticsearch client globally
+
+    var barModel = new ImmutableCoreModel({
+        elasticsearch: true,
+        name: 'foo',
+    })
+
+    ImmutableCoreModel.elasticsearch(elasticsearchClient)
+
+When the the elasticsearch client is set globally it will be used for all models
+where the elasticsearch property is set to true. It will not be used for models
+where an elasticsearch client instance has been set.
+
+If a model is create after the client is set globally then the global
+elasticsearch client will be set on the model when it is created.
+
+If the global elasticsearch client is set after the model is created then it will
+be set on the model the first time the model needs to use the elasticsearch
+client.
+
+## Adding an optional Elasticsearch client to a model
+
+    var barModel = new ImmutableCoreModel({
+        name: 'foo',
+    })
+
+    // set elastic search client
+    barModel.elasticsearch(elasticsearchClient)
+
+An elasticsearch client can be added to any model even if the model does not
+require elasticsearch.
+
+## Setting the Elasticsearch index name
+
+    var fooModel = new ImmutableCoreModel({
+        elasticsearch: client,
+        esIndex: 'notFoo',
+        name: 'foo',
+    })
+
+By default the model path (name converted to foo-bar-bam style) will be used as
+the Elasticsearch index name. The esIndex property can be used to set a custom
+name.
+
+Elasticsearch does not allow capital letters in index names.
+
+## Setting the Elasticsearch document type
+
+    var fooModel = new ImmutableCoreModel({
+        elasticsearch: client,
+        esType: 'bar.bam',
+        name: 'foo',
+    })
+
+    // 'baz' will be come the elasticsearch document type
+    fooModel.createMeta({
+        data: {
+            bar: { bam: 'baz' }
+        },
+        session: session,
+    })
+
+The value of the esType property is used with lodash _.get to retrieve a value
+from the instance data which is used as the document type.
+
+If no esType property is set or the data is missing the property then the model
+name will be used as the default type.
+
+A JSON schema can be used to make the esType property required and define
+allowed values for it.
+
+## Performing a search
+
+    var barModel = new ImmutableCoreModel({
+        elasticsearch: true,
+        name: 'foo',
+    })
+
+    varModel.search({
+        query: { ... },
+        raw: true,
+        session: session,
+    })
+
+The search method args are passed directly to the
+[elasticsearch](https://www.npmjs.com/package/elasticsearch) 
+[search](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search)
+method so any params accepted by that method can be passed to the model search
+method.
+
+The index for the search will be set to the index for the model by default.
+
+When the raw property is set the raw results of the elasticsearch api query are
+returned. Only raw mode is currently supported.
+
+## Storing action data
+
+Whenever an action is performed on an instance the Elasticsearch document will
+be updated with the results of that action.
+
+Because actions are linked to specific instances any time an instance is updated
+the new revision will have no actions performed on it.
+
+## Handling deleted records
+
+If a model has a delete action it will be deleted from Elasticsearch if a
+delete is performed.
+
+If a model has an unDelete action it will be added back to Elasticsearch if the
+unDelete action is performed.
