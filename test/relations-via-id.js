@@ -153,6 +153,22 @@ describe('immutable-core-model - relations via id', function () {
         assert.strictEqual(result.length, 2)
     })
 
+    it('should select inverse related models', async function () {
+        try {
+            // create foo instance
+            var foo = await fooModel.create({foo: 'foo'})
+            // create related
+            var bar = await foo.create('bar', {foo: 'bam'})
+            // load related
+            var result = await bar.select('foo')
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check result
+        assert.strictEqual(result.length, 1)
+    })
+
     it('should query related models', async function () {
         try {
             // create foo instance
