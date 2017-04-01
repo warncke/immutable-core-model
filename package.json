@@ -7,7 +7,7 @@
     "debug": "2.6.3",
     "deep-equal": "1.0.1",
     "deep-extend": "0.4.1",
-    "immutable-core": "1.2.13",
+    "immutable-core": "1.2.14",
     "immutable-core-model-view": "0.2.9",
     "immutable-require-valid-optional-object": "^0.1.1",
     "json-stable-stringify": "1.0.1",
@@ -38,5 +38,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.6.2"
+  "version": "1.6.3"
 }
