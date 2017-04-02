@@ -9,7 +9,7 @@
     "deep-extend": "0.4.1",
     "immutable-core": "1.2.14",
     "immutable-core-model-view": "0.2.10",
-    "immutable-require-valid-optional-object": "^0.1.1",
+    "immutable-require-valid-optional-object": "0.1.1",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
     "micro-timestamp": "0.1.12",
@@ -38,5 +38,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.6.5"
+  "version": "1.6.6"
 }
