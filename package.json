@@ -21,7 +21,7 @@
     "chai": "3.5.0",
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.5.0",
-    "elasticsearch": "12.1.3",
+    "elasticsearch": "13.0.0-rc2",
     "immutable-database-mariasql": "1.2.14",
     "mocha": "3.2.0"
   },
@@ -38,5 +38,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.6.8"
+  "version": "1.6.9"
 }
