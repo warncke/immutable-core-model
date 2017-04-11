@@ -585,6 +585,130 @@ specifying the with option.
 All records will be loaded so caution must be taken to make sure that this does
 not become a performance and memory usage issue.
 
+## Access control for models
+
+Immutable Core Model integrates with
+[immutable-access-control](https://www.npmjs.com/package/immutable-access-control)
+to control access to records.
+
+Access control rules should typically be configured independently from model
+specifications.
+
+Simple access control rules can be specified with the model. This is primarily
+useful for setting default rules to deny access to a model so that access must
+be specifically granted in order to use the model.
+
+### Setting the Immutable Access Control provider
+
+    var foo = new ImmutableCoreModel({
+        accessControl: new ImmutableAccessControl(),
+        name: 'foo',
+    })
+
+The access control provider for a model can be set via the accessControl
+parameter when the model is created.
+
+Since Immutable Access Control uses a global singleton instance this will only
+be needed if a custom access control provider is used.
+
+### Deny access for all actions
+
+    var foo = new ImmutableCoreModel({
+        accessControlRules: ['0'],
+        name: 'foo',
+    })
+
+Immutable Access Control is permissive by default. To deny access to all model
+actions set the accessControlRules to an array with a single string as 0.
+
+This is equivalent to calling Immutable Access Control with:
+
+    accessControl.setRule(['all', 'model:foo:0'])
+
+### Allowing access to specific actions
+
+    var foo = new ImmutableCoreModel({
+        accessControlRules: [
+            '0',
+            'create:1',
+            'list:any:1',
+            'read:any:1',
+            'update:own:1',
+        ],
+        name: 'foo',
+    })
+
+All access control rules must be in the same form allowed by Immutable Access
+Control except that they will have `model:<modelName>:` prepended to them.
+
+These rules are equivalent to calling Immutable Access Control with:
+
+    accessControl.setRules([
+        ['all', 'model:foo:0'],
+        ['all', 'model:foo:create:1'],
+        ['all', 'model:foo:list:any:1'],
+        ['all', 'model:foo:read:any:1'],
+        ['all', 'model:foo:update:own:1'],
+    ])
+
+### Allowing access for specific roles
+
+    var foo = new ImmutableCoreModel({
+        accessControlRules: [
+            '0',
+            ['authenticated', 'list:any:1']
+            ['authenticated', 'read:any:1']
+        ],
+        name: 'foo',
+    })
+
+These rules will allowed `authenticated` (i.e. logged in) sessions to list and
+read records.
+
+To specify roles(s) the access control rule must be passed as an array instead
+of a string and one or more role must be specified prior to the rule.
+
+These rules are equivalent to calling Immutable Access Control with:
+
+    accessControl.setRules([
+        ['all', 'model:foo:0'],
+        ['authenticated', 'model:foo:list:any:1']
+        ['authenticated', 'model:foo:read:any:1']
+    ])
+
+### Denying access
+
+Access is checked before performing any action. If access is denied an error
+will be thrown using
+[immutable-app-http-error](https://www.npmjs.com/package/immutable-app-http-error)
+which will generate a 403 Access Denied error when used with the Immutable App
+framework.
+
+### Setting a custom column for defining ownership
+
+    var fooModel = new ImmutableCoreModel({
+        accessIdName: 'barId',
+        columns: {
+            barId: {
+                index: true,
+                null: false,
+                type: 'id',
+            },
+        },
+        name: 'foo',
+    })
+
+By default the accountId on a record is used to determine the ownership of a
+record.
+
+The accessIdName parameter can be used to specify a different column/property
+to use for determining ownership of records.
+
+This column should typically be of the `id` type and be indexed.
+
+When a custom accessId property is used that property must be set on the session
+in order for access to be granted based on ownership.
+
 ## Working with models
 
 These examples will use async/await to demonstrate how new model instances
