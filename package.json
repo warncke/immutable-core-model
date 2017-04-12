@@ -9,12 +9,12 @@
     "deep-extend": "0.4.1",
     "immutable-access-control": "0.2.0",
     "immutable-app-http-error": "^0.1.1",
-    "immutable-core": "1.2.15",
-    "immutable-core-model-view": "0.2.11",
+    "immutable-core": "1.2.17",
+    "immutable-core-model-view": "0.2.13",
     "immutable-require-valid-optional-object": "0.1.1",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.12",
+    "micro-timestamp": "0.1.13",
     "null-function": "1.0.0",
     "snappy": "6.0.0"
   },
@@ -24,7 +24,7 @@
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.5.0",
     "elasticsearch": "13.0.0-rc2",
-    "immutable-database-mariasql": "1.2.14",
+    "immutable-database-mariasql": "1.2.16",
     "mocha": "3.2.0"
   },
   "directories": {
@@ -40,5 +40,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.7.1"
+  "version": "1.7.2"
 }
