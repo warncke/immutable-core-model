@@ -709,6 +709,19 @@ This column should typically be of the `id` type and be indexed.
 When a custom accessId property is used that property must be set on the session
 in order for access to be granted based on ownership.
 
+### Allowing access for queries
+
+    var fooModel = new ImmutableCoreModel({
+        name: foo,
+    })
+
+    var res = fooModel.query({
+        allow: true,
+    })
+
+Access controls can not and do not provide security in the local context. Local
+code can override access controls by passing the allow:true argument.
+
 ## Working with models
 
 These examples will use async/await to demonstrate how new model instances

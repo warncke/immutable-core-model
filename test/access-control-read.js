@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.only('immutable-core-model - access control read', function () {
+describe('immutable-core-model - access control read', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -109,7 +109,7 @@ describe.only('immutable-core-model - access control read', function () {
         assert.strictEqual(error.code, 403)
     })
 
-    it('should allow access to list own', async function () {
+    it('should allow access to read own', async function () {
         try {
             // get own record
             var res = await fooModel.query({
@@ -125,7 +125,7 @@ describe.only('immutable-core-model - access control read', function () {
         assert.strictEqual(res.id, bam.id)
     })
 
-    it('should not return other record with only own access', async function () {
+    it('should not read other record with only own access', async function () {
         try {
             // get other record
             var res = await fooModel.query({
@@ -141,7 +141,7 @@ describe.only('immutable-core-model - access control read', function () {
         assert.isUndefined(res)
     })
 
-    it('should allow access to list any', async function () {
+    it('should allow access to read any', async function () {
         try {
             // get other record
             var res = await fooModel.query({

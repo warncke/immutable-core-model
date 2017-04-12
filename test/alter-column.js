@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
@@ -33,6 +34,7 @@ describe('immutable-core-model - alter column', function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
         // drop any test tables if they exist
         return database.query('DROP TABLE IF EXISTS foo')
     })

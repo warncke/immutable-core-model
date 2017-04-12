@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
@@ -32,6 +33,7 @@ describe('immutable-core-model - create instance', function () {
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
+        roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
 
@@ -39,6 +41,7 @@ describe('immutable-core-model - create instance', function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
         // drop any test tables if they exist
         return database.query('DROP TABLE IF EXISTS foo')
     })
@@ -275,6 +278,7 @@ describe('immutable-core-model - create instance', function () {
             foo = await foo.updateMeta({
                 accountId: '22222222222222222222222222222222',
                 session: {
+                    roles: [],
                     sessionId: '33333333333333333333333333333333'
                 }
             })
@@ -347,7 +351,8 @@ describe('immutable-core-model - create instance', function () {
             foo = await foo.empty({
                 accountId: '22222222222222222222222222222222',
                 session: {
-                    sessionId: '33333333333333333333333333333333'
+                    roles: [],
+                    sessionId: '33333333333333333333333333333333',
                 }
             })
             // should have updated accountId and sessionId
@@ -364,11 +369,13 @@ describe('immutable-core-model - create instance', function () {
     it('should set id based on data only if idDataOnly flag set', async function () {
         var sessionA = {
             accountId: '11111111111111111111111111111111',
+            roles: [],
             sessionId: '22222222222222222222222222222222',
         }
         var sessionB = {
             accountId: '22222222222222222222222222222222',
-            sessionId: '33333333333333333333333333333333'
+            roles: [],
+            sessionId: '33333333333333333333333333333333',
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({
@@ -402,11 +409,13 @@ describe('immutable-core-model - create instance', function () {
     it('should ignore duplicate key errors on create when flag set', async function () {
         var sessionA = {
             accountId: '11111111111111111111111111111111',
+            roles: [],
             sessionId: '22222222222222222222222222222222',
         }
         var sessionB = {
             accountId: '22222222222222222222222222222222',
-            sessionId: '33333333333333333333333333333333'
+            roles: [],
+            sessionId: '33333333333333333333333333333333',
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({
@@ -441,11 +450,13 @@ describe('immutable-core-model - create instance', function () {
     it('should ignore duplicate key errors and not return response when flag set', async function () {
         var sessionA = {
             accountId: '11111111111111111111111111111111',
+            roles: [],
             sessionId: '22222222222222222222222222222222',
         }
         var sessionB = {
             accountId: '22222222222222222222222222222222',
-            sessionId: '33333333333333333333333333333333'
+            roles: [],
+            sessionId: '33333333333333333333333333333333',
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({

@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - access control list', function () {
+describe('immutable-core-model - access control update', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -51,7 +51,7 @@ describe('immutable-core-model - access control list', function () {
     // record instances
     var bam, bar, baz
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
@@ -64,9 +64,11 @@ describe('immutable-core-model - access control list', function () {
             accessControlRules: [
                 '0',
                 'create:1',
-                ['foo', 'list:own:1'],
-                ['foo', 'read:own:1'],
-                ['bar', 'list:any:1'],
+                'list:any:1',
+                'read:any:1',
+                ['foo', 'update:own:1'],
+                ['foo', 'chown:own:1'],
+                ['bar', 'update:any:1'],
             ],
             actions: {
                 delete: false,
@@ -91,14 +93,12 @@ describe('immutable-core-model - access control list', function () {
         })
     })
 
-    it('should deny access to list', async function () {
+    it('should deny access to update', async function () {
         // capture error
         var error
         try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session3,
-            })
+            // attempt to update - should be denied
+            await baz.update({foo: 'bar'})
         }
         catch (err) {
             error = err
@@ -108,35 +108,82 @@ describe('immutable-core-model - access control list', function () {
         assert.strictEqual(error.code, 403)
     })
 
-    it('should allow access to list own', async function () {
+    it('should allow access to update own', async function () {
         try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session1,
-            })
-            // get record
-            var foos = await res.fetch(1)
+            // get own record
+            var res = await bam.update({foo: 'bar'})
         }
         catch (err) {
             assert.ifError(err)
         }
-        // should only return own record
-        assert.strictEqual(res.length, 1)
-        assert.strictEqual(foos[0].accountId, session1.accountId)
+        // check record
+        assert.strictEqual(res.data.foo, 'bar')
     })
 
-    it('should allow access to list any', async function () {
+    it('should deny access to chown even when update allowed', async function () {
+        // capture error
+        var error
         try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session2,
-            })
+            // attempt to update - should be denied
+            await bar.updateMeta({accountId: '11111111111111111111111111111111'})
+        }
+        catch (err) {
+            error = err
+        }
+        // test error
+        assert.isDefined(error)
+        assert.strictEqual(error.code, 403)
+    })
+
+    it('should allow access to chown', async function () {
+        try {
+            // get own record
+            var res = await bam.updateMeta({accountId: '33333333333333333333333333333333'})
         }
         catch (err) {
             assert.ifError(err)
         }
-        // should return all records
-        assert.strictEqual(res.length, 3)
+        // check record
+        assert.strictEqual(res.accountId, '33333333333333333333333333333333')
+    })
+
+    it('should not update other record with only own access', async function () {
+        // capture error
+        var error
+        try {
+            // get other record
+            var res = await fooModel.query({
+                limit: 1,
+                where: {id: bar.id},
+                session: session1,
+            })
+            // update - should fail
+            await res.update({foo: 'bar'})
+        }
+        catch (err) {
+            error = err
+        }
+        // test error
+        assert.isDefined(error)
+        assert.strictEqual(error.code, 403)
+    })
+
+    it('should update other record', async function () {
+        try {
+            // get other record
+            var res = await fooModel.query({
+                limit: 1,
+                where: {id: baz.id},
+                session: session2,
+            })
+            // update - should succeed
+            res = await res.update({foo: 'bar'})
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check record
+        assert.strictEqual(res.data.foo, 'bar')
     })
 
 })

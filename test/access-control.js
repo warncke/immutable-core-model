@@ -32,6 +32,7 @@ describe('immutable-core-model - access control', function () {
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
+        roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
 

@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableCoreModelSelect = require('../lib/immutable-core-model-select')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
@@ -33,6 +34,7 @@ describe('immutable-core-model - query with relations', function () {
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
+        roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
 
@@ -45,6 +47,7 @@ describe('immutable-core-model - query with relations', function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
         // create foo model
         fooModelGlobal = new ImmutableCoreModel({
             database: database,

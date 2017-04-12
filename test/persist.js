@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
@@ -32,6 +33,7 @@ describe('immutable-core-model-local - persist', function () {
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
+        roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
 
@@ -41,6 +43,7 @@ describe('immutable-core-model-local - persist', function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
         // create initial model
         glboalFooModel = new ImmutableCoreModel({
             columns: {
@@ -69,11 +72,13 @@ describe('immutable-core-model-local - persist', function () {
     it('should throw duplicate key error when creating same data twice', async function () {
         var sessionA = {
             accountId: '11111111111111111111111111111111',
+            roles: ['all', 'authenticated'],
             sessionId: '22222222222222222222222222222222',
         }
         var sessionB = {
             accountId: '22222222222222222222222222222222',
-            sessionId: '33333333333333333333333333333333'
+            roles: ['all', 'authenticated'],
+            sessionId: '33333333333333333333333333333333',
         }
         try {
             // create new foo instance

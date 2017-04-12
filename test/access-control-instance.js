@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - access control list', function () {
+describe('immutable-core-model - access control instance', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -35,41 +35,37 @@ describe('immutable-core-model - access control list', function () {
         roles: ['all', 'authenticated', 'foo'],
         sessionId: '22222222222222222222222222222222',
     }
-    var session2 = {
-        accountId: '33333333333333333333333333333333',
-        roles: ['all', 'authenticated', 'bar'],
-        sessionId: '44444444444444444444444444444444',
-    }
-    var session3 = {
-        accountId: '55555555555555555555555555555555',
-        roles: ['all', 'authenticated'],
-        sessionId: '66666666666666666666666666666666',
-    }
 
     // model instance
     var fooModel
     // record instances
     var bam, bar, baz
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
+        await database.query('DROP TABLE IF EXISTS fooFlag')
+        await database.query('DROP TABLE IF EXISTS fooPublish')
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
                 '0',
                 'create:1',
-                ['foo', 'list:own:1'],
-                ['foo', 'read:own:1'],
-                ['bar', 'list:any:1'],
+                'flag:own:1',
+                'publish:own:1',
+                'list:any:1',
+                'read:any:1',
+                'list:flaged:any:0',
+                'read:flaged:any:0',
             ],
             actions: {
-                delete: false,
+                delete: true,
+                flag: false,
+                publish: true,
             },
             database: database,
             name: 'foo',
@@ -81,23 +77,19 @@ describe('immutable-core-model - access control list', function () {
             data: {foo: 'bam'},
             session: session1,
         })
-        bar = await fooModel.createMeta({
-            data: {foo: 'bar'},
-            session: session2,
-        })
-        baz = await fooModel.createMeta({
-            data: {foo: 'baz'},
-            session: session3,
-        })
     })
 
-    it('should deny access to list', async function () {
+    it('should deny access to instance based on state', async function () {
         // capture error
         var error
         try {
-            // query all foo records
+            // flag record
+            await bam.flag()
+            // get unpublished record - access should be denied
             var res = await fooModel.query({
-                session: session3,
+                limit: 1,
+                session: session1,
+                where: {id: bam.id},
             })
         }
         catch (err) {
@@ -106,37 +98,6 @@ describe('immutable-core-model - access control list', function () {
         // test error
         assert.isDefined(error)
         assert.strictEqual(error.code, 403)
-    })
-
-    it('should allow access to list own', async function () {
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session1,
-            })
-            // get record
-            var foos = await res.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // should only return own record
-        assert.strictEqual(res.length, 1)
-        assert.strictEqual(foos[0].accountId, session1.accountId)
-    })
-
-    it('should allow access to list any', async function () {
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session2,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // should return all records
-        assert.strictEqual(res.length, 3)
     })
 
 })

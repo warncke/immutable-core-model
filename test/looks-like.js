@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const chai = require('chai')
 const immutable = require('immutable-core')
@@ -12,6 +13,7 @@ describe('immutable-core-model - looksLike', function () {
         // reset globals
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
     })
 
     it('should expose looksLike method', function () {

@@ -1,5 +1,6 @@
 'use strict'
 
+const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
@@ -39,6 +40,7 @@ describe('immutable-core-model - elasticsearch index', function () {
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
+        roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
 
@@ -46,6 +48,7 @@ describe('immutable-core-model - elasticsearch index', function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
         // clean up database tables
         await database.query('DROP TABLE IF EXISTS foo')
     })
