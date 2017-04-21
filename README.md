@@ -1630,3 +1630,23 @@ delete is performed.
 
 If a model has an unDelete action it will be added back to Elasticsearch if the
 unDelete action is performed.
+
+## ImmutableCoreModel properties
+
+Immutable Core Models have numerous properties that are used internally for
+building queries, determining access, and other purposes.
+
+These properties should be treated as read only and may be read only.
+
+To the greatest extent possible these properties will never be changed.
+
+This list does not include all model properties. Undocumented properties are
+subject to change and should not be relied upon.
+
+ name                   | type    | description                                |
+------------------------|---------|--------------------------------------------|
+columns                 | object  | column specs by name                       |
+defaultColumns          | object  | model column name to default column name   |
+defaultColumnsInverse   | object  | default column name to model column name   |
+extraColumns            | object  | non-default column specs by name           |
+columnNames             | array   | all column names                           |
