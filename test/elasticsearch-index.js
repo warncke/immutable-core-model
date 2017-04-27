@@ -8,6 +8,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const elasticsearch = require('elasticsearch')
 const immutable = require('immutable-core')
+const nullFunction = require('null-function')
 
 chai.use(chaiAsPromised)
 const assert = chai.assert
@@ -51,6 +52,13 @@ describe('immutable-core-model - elasticsearch index', function () {
         ImmutableAccessControl.reset()
         // clean up database tables
         await database.query('DROP TABLE IF EXISTS foo')
+        // clean up elasticsearch
+        await elasticsearchClient.indices.delete({
+            index: 'foo'
+        }).catch(nullFunction)
+        await elasticsearchClient.indices.delete({
+            index: 'not-foo'
+        }).catch(nullFunction)
     })
 
     it('should create index on model sync', async function () {

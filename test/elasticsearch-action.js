@@ -8,6 +8,7 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const elasticsearch = require('elasticsearch')
 const immutable = require('immutable-core')
+const nullFunction = require('null-function')
 
 chai.use(chaiAsPromised)
 const assert = chai.assert
@@ -51,6 +52,10 @@ describe('immutable-core-model - elasticsearch action', function () {
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
+        // clean up elasticsearch
+        await elasticsearchClient.indices.delete({
+            index: 'foo'
+        }).catch(nullFunction)
         // clean up database tables
         await database.query('DROP TABLE IF EXISTS foo')
         await database.query('DROP TABLE IF EXISTS fooDelete')
@@ -113,6 +118,8 @@ describe('immutable-core-model - elasticsearch action', function () {
                 data: {foo: 1},
                 session: session,
             })
+            // wait a second for record to be deleted
+            await Promise.delay(1000)
             // perform action
             await foo.delete()
             // wait a second for record to be deleted
@@ -154,6 +161,8 @@ describe('immutable-core-model - elasticsearch action', function () {
                 data: {foo: 1},
                 session: session,
             })
+            // wait a second for record to be deleted
+            await Promise.delay(1000)
             // perform action
             foo = await foo.delete()
             // wait a second for record to be deleted

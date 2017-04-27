@@ -7,17 +7,17 @@
     "debug": "2.6.4",
     "deep-equal": "1.0.1",
     "deep-extend": "0.4.1",
-    "if-defined": "1.0.0",
-    "immutable-access-control": "0.2.1",
-    "immutable-ai": "0.3.0",
-    "immutable-app-http-error": "0.1.1",
-    "immutable-core": "1.3.0",
-    "immutable-core-model-view": "0.3.0",
-    "immutable-require-valid-optional-object": "0.1.1",
+    "if-defined": "1.0.1",
+    "immutable-access-control": "0.2.3",
+    "immutable-ai": "0.4.1",
+    "immutable-app-http-error": "0.1.2",
+    "immutable-core": "1.3.1",
+    "immutable-core-model-view": "0.3.3",
+    "immutable-require-valid-optional-object": "0.1.2",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.13",
-    "null-function": "1.0.0",
+    "micro-timestamp": "0.1.14",
+    "null-function": "1.0.1",
     "snappy": "6.0.0"
   },
   "description": "Immutable model built on immutable-core",
@@ -25,9 +25,9 @@
     "chai": "3.5.0",
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.5.0",
-    "elasticsearch": "13.0.0-rc2",
-    "immutable-database-mariasql": "1.2.16",
-    "mocha": "3.2.0"
+    "elasticsearch": "13.0.0",
+    "immutable-database-mariasql": "1.2.18",
+    "mocha": "3.3.0"
   },
   "directories": {
     "test": "test"
@@ -42,5 +42,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.9.0"
+  "version": "1.9.1"
 }
