@@ -4,7 +4,7 @@
     "ajv": "5.0.0",
     "bluebird": "3.5.0",
     "change-case": "3.0.1",
-    "debug": "2.6.4",
+    "debug": "2.6.6",
     "deep-equal": "1.0.1",
     "deep-extend": "0.4.1",
     "if-defined": "1.0.1",
@@ -42,5 +42,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "1.9.1"
+  "version": "1.9.2"
 }
