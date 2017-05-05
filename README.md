@@ -569,7 +569,7 @@ normal model query.
 
 ### Loading related records with query
 
-    fooModel.query({
+    foo.query({
         limit: 1,
         where: {id: fooId},
         with: {
