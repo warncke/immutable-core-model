@@ -585,6 +585,32 @@ specifying the with option.
 All records will be loaded so caution must be taken to make sure that this does
 not become a performance and memory usage issue.
 
+## Creating a model with transform functions
+
+    var fooModel = new ImmutableCoreModel({
+        name: 'foo',
+        transform: {
+            bam: (value, model, args) => {
+                return 'bar'
+            }
+        }
+    })
+
+    fooModel.createMeta({
+        data: {bam: 'foo'}
+    })
+
+Transform functions are called when creating or updating a record to modify
+values set in the record data.
+
+Transform functions will only be called if the value is defined in the data
+passed to the create or update call.
+
+Transform functions are called before schema validation.
+
+The property name for the transform function will be resolved using lodash get
+and can reference nested data.
+
 ## Access control for models
 
 Immutable Core Model integrates with
