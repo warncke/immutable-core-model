@@ -116,6 +116,8 @@ When a revision to that object is persisted it will have the same fooOriginalId
 as the first instance and fooParentId will be equal to the fooId of the first
 instance.
 
+As of version 2.0.0 all ids are lower case. Previously they were upper case.
+
 #### fooId, fooOriginalId, fooParentId Example
 
 Revision | fooId | fooOriginalId | fooParentId |

@@ -120,7 +120,7 @@ describe('immutable-core-model - create instance', function () {
                 session: session,
             })
             // response should be undefined but no error thrown
-            assert.match(foo, /^[A-Z0-9]{32}$/)
+            assert.match(foo, /^[a-f0-9]{32}$/)
         }
         catch (err) {
             assert.ifError(err)
@@ -210,7 +210,7 @@ describe('immutable-core-model - create instance', function () {
                 wait: false,
             })
             // response should be undefined but no error thrown
-            assert.match(foo, /^[A-Z0-9]{32}$/)
+            assert.match(foo, /^[a-f0-9]{32}$/)
         }
         catch (err) {
             assert.ifError(err)
