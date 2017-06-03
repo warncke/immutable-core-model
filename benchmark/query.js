@@ -2,7 +2,6 @@
 
 /* npm modules */
 const Promise = require('bluebird')
-const benchmark = require('benchmark')
 const immutable = require('immutable-core')
 
 /* application modules*/
@@ -33,6 +32,7 @@ var database = new ImmutableDatabaseMariaSQL(connectionParams)
 var session = {
     accountId: '11111111111111111111111111111111',
     sessionId: '22222222222222222222222222222222',
+    roles: ['all'],
 }
 
 // reset immutable so that model modules are recreated with every test
@@ -55,12 +55,12 @@ var origFoo
 
 runBefore().then(async function () {
 
-    var iterations = 1000000
+    var iterations = 100000
 
     var start = new Date().getTime()
 
-    await testModelQuery(iterations)
-    // await testSqlQueryBuilder(iterations)
+    // await testModelQuery(iterations)
+    await testSqlQueryBuilder(iterations)
 
     var stop = new Date().getTime()
 
@@ -75,7 +75,7 @@ async function testModelQuery (iterations) {
             limit: 1,
             session: session,
             where: {
-                id: origFoo.id()
+                id: origFoo.id
             },
         })
     }
@@ -85,7 +85,7 @@ async function testSqlQueryBuilder (iterations) {
     for (var i = 0; i < iterations; i++) {
         var select = sql.select(fooModel, {
             where: {
-                id: origFoo.id(),
+                id: origFoo.id,
             }
         })
     }
@@ -99,7 +99,7 @@ async function runBefore () {
         // sync with database
         await fooModel.sync()
         // create new bam instance
-        origBam = await fooModel.create({
+        origBam = await fooModel.createMeta({
             data: {
                 bar: 0,
                 foo: 'bam',
@@ -107,7 +107,7 @@ async function runBefore () {
             session: session,
         })
         // create new bar instance
-        origBar = await fooModel.create({
+        origBar = await fooModel.createMeta({
             data: {
                 bar: 1,
                 foo: 'bar',
@@ -115,7 +115,7 @@ async function runBefore () {
             session: session,
         })
         // create new foo instance
-        origFoo = await fooModel.create({
+        origFoo = await fooModel.createMeta({
             data: {
                 bar: 2,
                 foo: 'foo',
