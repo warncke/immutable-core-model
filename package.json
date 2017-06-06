@@ -7,11 +7,11 @@
     "debug": "2.6.8",
     "deep-equal": "1.0.1",
     "deep-extend": "0.5.0",
-    "if-defined": "1.0.6",
-    "immutable-access-control": "0.4.2",
-    "immutable-ai": "0.4.7",
-    "immutable-app-http-error": "0.1.7",
-    "immutable-core": "1.4.6",
+    "if-defined": "1.0.7",
+    "immutable-access-control": "0.4.3",
+    "immutable-ai": "0.4.8",
+    "immutable-app-http-error": "0.1.8",
+    "immutable-core": "1.4.7",
     "immutable-core-model-view": "0.3.19",
     "immutable-require-valid-optional-object": "0.1.6",
     "json-stable-stringify": "1.0.1",
@@ -22,7 +22,7 @@
   },
   "description": "Immutable model built on immutable-core",
   "devDependencies": {
-    "chai": "4.0.1",
+    "chai": "4.0.2",
     "chai-as-promised": "6.0.0",
     "chai-subset": "1.5.0",
     "elasticsearch": "13.0.1",
@@ -42,5 +42,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "2.0.8"
+  "version": "2.0.9"
 }
