@@ -1016,6 +1016,16 @@ revisions of the object will be retured.
 When querying an object by id the revision matching the queried id will be
 returned.
 
+### Overwriting existing data
+
+    foo = await foo.updateMeta({
+        data: {foo: 'bar'},
+        merge: false,
+    })
+
+With the merge:false flag set all existing data will be overwritten with the
+value of the data property.
+
 ### Checking if an object is current
 
     foo = await foo.select.by.id(objectId)

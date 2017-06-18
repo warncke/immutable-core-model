@@ -159,4 +159,47 @@ describe('immutable-core-model - update', function () {
         assert.deepEqual(updateFoo.data, {foo: 'bar'})
     })
 
+    it('should merge data by default', async function () {
+        // create foo model with immutable property
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // sync model
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'bar'},
+            session: session,
+        })
+        // first update should succeed
+        var updateFoo = await foo.updateMeta({
+            data: {bar: 'bam'},
+        })
+        // check that first update succeeded
+        assert.deepEqual(updateFoo.data, {foo: 'bar', bar: 'bam'})
+    })
+
+    it('should overwrite instead of merging with merge:false', async function () {
+        // create foo model with immutable property
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // sync model
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'bar'},
+            session: session,
+        })
+        // first update should succeed
+        var updateFoo = await foo.updateMeta({
+            data: {bar: 'bam'},
+            merge: false,
+        })
+        // check that first update succeeded
+        assert.deepEqual(updateFoo.data, {bar: 'bam'})
+    })
+
 })
