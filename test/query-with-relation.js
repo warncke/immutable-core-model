@@ -43,7 +43,7 @@ describe('immutable-core-model - query with relations', function () {
     // local models with session
     var fooModel, bamModel, barModel
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
@@ -81,53 +81,73 @@ describe('immutable-core-model - query with relations', function () {
             database: database,
             name: 'bar',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            await database.query('DROP TABLE IF EXISTS bam')
-            await database.query('DROP TABLE IF EXISTS bar')
-            // sync with database
-            await fooModelGlobal.sync()
-            await bamModelGlobal.sync()
-            await barModelGlobal.sync()
-            // get local instances
-            fooModel = fooModelGlobal.session(session)
-            bamModel = bamModelGlobal.session(session)
-            barModel = barModelGlobal.session(session)
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS bam')
+        await database.query('DROP TABLE IF EXISTS bar')
+        // sync with database
+        await fooModelGlobal.sync()
+        await bamModelGlobal.sync()
+        await barModelGlobal.sync()
+        // get local instances
+        fooModel = fooModelGlobal.session(session)
+        bamModel = bamModelGlobal.session(session)
+        barModel = barModelGlobal.session(session)
     })
 
     it('should query related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            await foo.create('bar', {foo: 'bam'})
-            await foo.create('bar', {foo: 'bar'})
-            await foo.create('bar', {foo: 'foo'})
-            // load foo with related records
-            var foo = await fooModel.query({
-                limit: 1,
-                where: {id: foo.id},
-                with: {
-                    'bar': {
-                        order: ['createTime'],
-                    },
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        await foo.create('bar', {foo: 'bam'})
+        await foo.create('bar', {foo: 'bar'})
+        await foo.create('bar', {foo: 'foo'})
+        // load foo with related records
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {id: foo.id},
+            with: {
+                'bar': {
+                    order: ['createTime'],
                 },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+            },
+        })
         // foo should have related records
         assert.strictEqual(foo.related.bar.length, 3)
         assert.strictEqual(foo.related.bar[0].data.foo, 'bam')
         assert.strictEqual(foo.related.bar[1].data.foo, 'bar')
         assert.strictEqual(foo.related.bar[2].data.foo, 'foo')
+    })
+
+    it('should query related models for multiple records', async function () {
+        // create foo instance
+        var foo1 = await fooModel.create({foo: 'foo1'})
+        // create related
+        await foo1.create('bar', {foo: 'bam'})
+        await foo1.create('bar', {foo: 'bar'})
+        // create foo instance
+        var foo2 = await fooModel.create({foo: 'foo1'})
+        // create related
+        await foo2.create('bar', {foo: 'bam'})
+        await foo2.create('bar', {foo: 'baz'})
+        // load foo with related records
+        var foos = await fooModel.query({
+            all: true,
+            order: ['createTime'],
+            with: {
+                'bar': {
+                    order: ['createTime'],
+                },
+            },
+        })
+        // validate data
+        assert.strictEqual(foos.length, 2)
+        assert.strictEqual(foos[0].related.bar.length, 2)
+        assert.strictEqual(foos[0].related.bar[0].data.foo, 'bam')
+        assert.strictEqual(foos[0].related.bar[1].data.foo, 'bar')
+        assert.strictEqual(foos[1].related.bar.length, 2)
+        assert.strictEqual(foos[1].related.bar[0].data.foo, 'bam')
+        assert.strictEqual(foos[1].related.bar[1].data.foo, 'baz')
     })
 
 })
