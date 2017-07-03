@@ -1401,6 +1401,23 @@ return all objects whether or not they have been deleted.
     foo = await fooModel.select.where.bar.is.not.eq(5).query()
     foo = await fooModel.select.where.bar.not.eq(5).query()
 
+### Querying records with results required
+
+If the required flag is truthy and a query has no results an error will be
+thrown instead of returning undefined for an empty array.
+
+#### query
+
+    foo = await fooModel.query({required: true})
+
+#### select
+
+    foo = await fooModel.select.required.by.id('foo')
+    foo = await fooModel.select.required.where.id.eq('foo')
+
+When using the `required` keyword in a select statement it must come before
+the `by` or `where` keywords.
+
 ## Model Views
 
 Immutable Core Model uses Model Views to provide reusable and compositable
