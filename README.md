@@ -95,7 +95,8 @@ binding for Google's Snappy compression library.
 ### fooId
 
 fooId is a hash of the JSON encoding of fooOriginalId, fooParentId, fooData,
-fooCreateTime, sessionId, and accountId.
+fooCreateTime, sessionId, and accountId. The hash is calculated before any
+compression is performed.
 
 Undefined values are not included in the JSON encoding and the database driver
 converts NULL values from the database to undefined so that they will not be
@@ -296,7 +297,8 @@ boolean values must be either true or false.
 data values must be JSON encodable and be able to be stored compressed in a
 MEDIUMBLOB (~16MB).
 
-id values must be specified as 32 char HEX string which will be stored as a 16 byte binary value.
+id values must be specified as 32 char HEX string which will be stored as a
+16 byte binary value.
 
 strings have a maximum length of 255 characters. If strings exceed this length
 then only the first 255 characters of the string will be stored in the
@@ -351,24 +353,17 @@ options can be set.
         name: 'account',
     })
 
-Suppose you are creating an account model where you would like to have an
-email column that is unique so that only one account can exist per email
-address.
+Because all the revisions of a record are stored in the same table a unique index
+on a column would not allow revisions of an object to be inserted if the indexed
+value did not change.
 
-Because Immutable Core Model stores all the revisions of a model in the same
-table a unique index on a column would not allow revisions of an object to be
-inserted if the indexed value did not change.
+In order for this to work the value for the unique column is only inserted for
+the first revision of the record and this column is left NULL for future
+revisions unless the value changes.
 
-When the unique: true flag is set the firstOnly option will also be set by
-default.
+To disable this behavior use the firstOnly:false option.
 
-With the firstOnly flag set the value will only be inserted into the unique
-indexed column when the first revision of the object is created or if the
-indexed value changes.
-
-To override this behavior you must set the firstOnly option to false.
-
-With firstOnly true null must also be true.
+The firstOnly:true option is incompatible with the null:false option.
 
 ### Column options
 
@@ -881,7 +876,7 @@ to calling createMeta with duplicate: true and responseIdOnly: true set.
 Calling persist will return a promise that resolves with the id of the persisted
 object as a string.
 
-response: false overrides responseIdOnly so if response: false is set nothing
+response:false overrides responseIdOnly so if response:false is set nothing
 will be returned.
 
 ### Instance methods and properties
@@ -995,9 +990,7 @@ against the current state of the data.
 
     foo = await foo.empty()
 
-    foo = await foo.updateMeta({
-        data: null
-    })
+    foo = await foo.updateMeta({data: null})
 
 The empty method will create a new revision of the object with an empty data
 object.
@@ -1103,6 +1096,10 @@ a string as the value to match against.
 
 This is equivalent to SQL SELECT WHERE IN (...).
 
+When selecting a list of records by id the records in the result will be in
+the same order as the ids in the query but there is no guaratee that all of
+the queried records will be returned.
+
 #### query
 
     results = await fooModel.query({
@@ -1111,7 +1108,46 @@ This is equivalent to SQL SELECT WHERE IN (...).
 
 #### select
 
-*not yet supported*
+    results = await fooModel.select.where.id.in([objectId1, objectId2, objectId3])
+
+### Rules for select.by queries
+
+select.by.* queries can be performed on any column with select.by.id being the
+most common use case.
+
+#### select.by with single value
+
+    foo = await fooModel.select.by.id('1111')
+
+When a select.by query has a single value as an argument and the `all` option
+is not used then either a record object or undefined will be retured.
+
+#### select.all.by with a single value
+
+    foos = await fooModel.select.all.by.id('1111')
+
+When the `all` option is used the query will always return an array which will
+be empty if no records were found.
+
+#### select.by with an array value
+
+    foos = await fooModel.select.by.id(['1111', '2222'])
+
+When a select.by query is performed with an array value the `all` option is set
+by default so an array will always be returned.
+
+When doing a query for an array of ids the results will be in the same order
+as the ids were queried. Ordering is not performed for queries other than id.
+
+#### select.one.by with an array value
+
+    foo = await fooModel.select.one.by.id(['1111', '2222'])
+
+When the `one` option is used with an array of values only a single record
+object or undefined will be returned.
+
+There are no guarantees as to which record will be returned when multiple
+records match the query.
 
 ### Selecting specific columns
 
