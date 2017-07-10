@@ -116,6 +116,12 @@ describe('immutable-core-model - access model', function () {
             assert.deepEqual(_.map(foos, 'id'), [foo1.id])
         })
 
+        it('should add accessId to record', async function () {
+            var foo = await fooModel.select.by.id(foo1.id)
+            // check result
+            assert.strictEqual(foo.barId, '33333333333333333333333333333333')
+        })
+
         it('should not read a non owned record', async function () {
             var foo = await fooModel.select.by.id(foo2.id)
             // check result
