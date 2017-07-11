@@ -1,7 +1,7 @@
 {
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
-    "ajv": "5.2.1",
+    "ajv": "5.2.2",
     "bluebird": "3.5.0",
     "change-case": "3.0.1",
     "debug": "2.6.8",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "2.5.2"
+  "version": "2.5.3"
 }
