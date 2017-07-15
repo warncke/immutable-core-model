@@ -26,7 +26,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - query join relations', function () {
+describe.skip('immutable-core-model - query join relations', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)

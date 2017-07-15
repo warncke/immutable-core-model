@@ -79,7 +79,7 @@ describe('immutable-core-model - query required', function () {
         }
         // check result
         assert.isDefined(thrown)
-        assert.strictEqual(thrown.message, 'no foo records found')
+        assert.strictEqual(thrown.message, 'foo query error: no records found')
     })
 
     it('should throw error with required:true and no results with select by id', async function () {
@@ -100,7 +100,7 @@ describe('immutable-core-model - query required', function () {
         }
         // check result
         assert.isDefined(thrown)
-        assert.strictEqual(thrown.message, 'no foo records found')
+        assert.strictEqual(thrown.message, 'foo query error: no records found')
     })
 
     it('should throw error with required:true and no results with select where', async function () {
@@ -121,7 +121,7 @@ describe('immutable-core-model - query required', function () {
         }
         // check result
         assert.isDefined(thrown)
-        assert.strictEqual(thrown.message, 'no foo records found')
+        assert.strictEqual(thrown.message, 'foo query error: no records found')
     })
 
 })

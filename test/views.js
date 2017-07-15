@@ -199,7 +199,7 @@ describe('immutable-core-model - views', function () {
         assert.strictEqual(records[2].data.foo, origFoo.data.foo+' food')
     })
 
-    it('should apply view record view to result set', async function () {
+    it('should apply record view to result set', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
             database: database,
