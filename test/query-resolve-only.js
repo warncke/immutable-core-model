@@ -27,7 +27,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.only('immutable-core-model - query join relations', function () {
+describe('immutable-core-model - query resolve only', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -99,77 +99,117 @@ describe.only('immutable-core-model - query join relations', function () {
             // create foo record pointing to bam, bar records
             foo = await fooModel.create({
                 bam: [bam1.id, bam2.id],
-                bars: [bar2.id, origBar1.id],
+                bars: [bar2.originalId, bar1.originalId],
             })
 
         })
 
-        it('should resolve all records with resolve:true', async function () {
+        it('should resolve property with property:true', async function () {
             var res = await fooModel.query({
                 limit: 1,
-                resolve: true,
+                resolve: {
+                    bam: true,
+                },
                 where: {id: foo.id}
             })
             // check results
             assert.deepEqual(_.map(res.data.bam, 'id'), [bam1.id, bam2.id])
-            assert.deepEqual(_.map(res.data.bars, 'id'), [bar2.id, origBar1.id])
+            assert.deepEqual(res.data.bars, [bar2.originalId, bar1.originalId])
+        })
+
+        it('should resolve property with custom setProperty', async function () {
+            var res = await fooModel.query({
+                limit: 1,
+                resolve: {
+                    bam: {setProperty: 'foo'},
+                },
+                where: {id: foo.id}
+            })
+            // check results
+            assert.deepEqual(_.map(res.data.foo, 'id'), [bam1.id, bam2.id])
+            assert.deepEqual(res.data.bam, [bam1.id, bam2.id])
+            assert.deepEqual(res.data.bars, [bar2.originalId, bar1.originalId])
+        })
+
+        it('should resolve current property with originalId', async function () {
+            var res = await fooModel.query({
+                limit: 1,
+                resolve: {
+                    bam: true,
+                    bars: {isOriginalId: true},
+                },
+                where: {id: foo.id}
+            })
+            // check results
+            assert.deepEqual(_.map(res.data.bam, 'id'), [bam1.id, bam2.id])
+            assert.deepEqual(_.map(res.data.bars, 'originalId'), [bar2.originalId, bar1.originalId])
         })
 
     })
 
-    describe('with id object identified by model name', function () {
+    describe('with an id object identified by id', function () {
+
+        var bars
 
         beforeEach(async function () {
-            // build data
-            var bam = {}
-            bam[bam1.id] = true
-            bam[bam2.id] = true
-            var bars = {}
-            bars[bar2.id] = true
-            bars[origBar1.id] = true
+            bars = {}
+            bars[bar1.originalId] = true
+            bars[bar2.originalId] = true
             // create foo record pointing to bam, bar records
-            foo = await fooModel.create({
-                bam: bam,
-                bars: bars,
-            })
-
+            foo = await fooModel.create({barOriginalId: bars})
         })
 
-        it('should resolve all records with resolve:true', async function () {
+        it('should resolve exact objects with isOriginalId:false', async function () {
             var res = await fooModel.query({
                 limit: 1,
-                resolve: true,
+                resolve: {
+                    barOriginalId: {isOriginalId: false},
+                },
                 where: {id: foo.id}
             })
             // check results
-            assert.isDefined(res.data.bam[bam1.id])
-            assert.isDefined(res.data.bam[bam2.id])
-            assert.isDefined(res.data.bars[bar2.id])
-            assert.isDefined(res.data.bars[origBar1.id])
+            assert.isDefined(res.data.bar[bar1.originalId])
+            assert.isDefined(res.data.bar[bar2.originalId])
         })
 
     })
 
-    describe('with string ids identified by model name', function () {
+    describe('with an id object identified by property name for different model', function () {
+
+        var bars
 
         beforeEach(async function () {
+            bars = {}
+            bars[bar1.originalId] = true
+            bars[bar2.originalId] = true
             // create foo record pointing to bam, bar records
-            foo = await fooModel.create({
-                bam: bam2.id,
-                bars: origBar1.id,
-            })
-
+            foo = await fooModel.create({foo: bars})
         })
 
-        it('should resolve all records with resolve:true', async function () {
+        it('should resolve exact objects with modelName', async function () {
             var res = await fooModel.query({
                 limit: 1,
-                resolve: true,
+                resolve: {
+                    foo: {modelName: 'bar'},
+                },
                 where: {id: foo.id}
             })
             // check results
-            assert.strictEqual(res.data.bam.id, bam2.id)
-            assert.strictEqual(res.data.bars.id, origBar1.id)
+            assert.isDefined(res.data.foo[bar1.originalId])
+            assert.isDefined(res.data.foo[bar2.originalId])
+        })
+
+        it('should resolve current objects with modelProperty', async function () {
+            var res = await fooModel.query({
+                limit: 1,
+                resolve: {
+                    foo: {modelProperty: 'barOriginalId'},
+                },
+                where: {id: foo.id}
+            })
+            // check results
+            assert.isDefined(res.data.bar[bar1.originalId])
+            assert.isDefined(res.data.bar[bar2.originalId])
         })
 
     })

@@ -42,6 +42,18 @@ describe('immutable-core-model - add column', function () {
         var expectedSchema = {
             charset: 'utf8',
             columns: {
+                n: {
+                    null: false,
+                    primary: true,
+                    type: 'int',
+                    unsigned: true,
+                },
+                c: {
+                    default: '1',
+                    null: false,
+                    type: 'smallint',
+                    unsigned: true,
+                },
                 fooAccountId: {
                     type: 'id',
                     null: false,
@@ -59,7 +71,7 @@ describe('immutable-core-model - add column', function () {
                 fooId: {
                     type: 'id',
                     null: false,
-                    primary: true
+                    unique: true
                 },
                 fooOriginalId: {
                     type: 'id',

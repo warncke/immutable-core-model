@@ -30,16 +30,16 @@ describe('immutable-core-model - alter column', function () {
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
-    it('should add non-unique index with no previous index', function () {
+    it('should add non-unique index with no previous index', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -51,38 +51,33 @@ describe('immutable-core-model - alter column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        index: true,
-                        type: 'string',
-                    },
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    index: true,
+                    type: 'string',
                 },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, {
-                index: true,
-                type: 'string',
-            })
+        assert.deepEqual(schema.columns.foo, {
+            index: true,
+            type: 'string',
         })
     })
 
-    it('should add unique index with no previous index', function () {
+    it('should add unique index with no previous index', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -94,38 +89,33 @@ describe('immutable-core-model - alter column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        type: 'string',
-                        unique: true,
-                    },
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    type: 'string',
+                    unique: true,
                 },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
-        // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, {
-                type: 'string',
-                unique: true,
-            })
+        var schema = await fooModel.schema()
+        // check schema
+        assert.deepEqual(schema.columns.foo, {
+            type: 'string',
+            unique: true,
         })
     })
 
-    it('should throw error if attempting to change column type', function () {
+    it('should throw error if attempting to change column type', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -137,28 +127,34 @@ describe('immutable-core-model - alter column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        type: 'number',
-                    },
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    type: 'number',
                 },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database - should reject
-            return assert.isRejected(fooModel.sync())
+            },
+            database: database,
+            name: 'foo',
         })
+        var thrown
+        // sync with database - should throw error
+        try {
+            await fooModel.sync()
+        }
+        catch (err) {
+            thrown = err
+        }
+        // check error
+        assert.isDefined(thrown)
+        assert.strictEqual(thrown.message, 'column type cannot be changed')
     })
 
-    it('should throw error if attempting to change from non-unique to unique index', function () {
+    it('should throw error if attempting to change from non-unique to unique index', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -171,29 +167,35 @@ describe('immutable-core-model - alter column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        type: 'string',
-                        unique: true,
-                    },
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    type: 'string',
+                    unique: true,
                 },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database - should reject
-            return assert.isRejected(fooModel.sync())
+            },
+            database: database,
+            name: 'foo',
         })
+        var thrown
+        // sync with database - should throw error
+        try {
+            await fooModel.sync()
+        }
+        catch (err) {
+            thrown = err
+        }
+        // check error
+        assert.isDefined(thrown)
+        assert.strictEqual(thrown.message, 'index type cannot be changed')
     })
 
-    it('should throw error if attempting to change from unique to non-unique index', function () {
+    it('should throw error if attempting to change from unique to non-unique index', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -206,26 +208,32 @@ describe('immutable-core-model - alter column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        index: true,
-                        type: 'string',
-                    },
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    index: true,
+                    type: 'string',
                 },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database - should reject
-            return assert.isRejected(fooModel.sync())
+            },
+            database: database,
+            name: 'foo',
         })
+        var thrown
+        // sync with database - should throw error
+        try {
+            await fooModel.sync()
+        }
+        catch (err) {
+            thrown = err
+        }
+        // check error
+        assert.isDefined(thrown)
+        assert.strictEqual(thrown.message, 'index type cannot be changed')
     })
 
 })

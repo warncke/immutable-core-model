@@ -38,7 +38,7 @@ describe('immutable-core-model-result', function () {
     }
 
     // variable to populate in before
-    var fooModel, origBam, origBar, origFoo
+    var fooModel, fooModelGlobal, origBam, origBar, origFoo
 
     before(async function () {
         // reset global data
@@ -46,7 +46,7 @@ describe('immutable-core-model-result', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -54,188 +54,141 @@ describe('immutable-core-model-result', function () {
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await fooModel.sync()
-            // create new bam instance
-            origBam = await fooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            // create new bar instance
-            origBar = await fooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            // create new foo instance
-            origFoo = await fooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local fooModel
+        fooModel = fooModelGlobal.session(session)
+        // create new bam instance
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
+        })
+        // create new bar instance
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
+        })
+        // create new foo instance
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
+        })
     })
 
     it('should return result object when doing multi-record query', async function () {
-        try {
-            var result = await fooModel.query({
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // do query for all records
+        var result = await fooModel.query({
+            session: session,
+        })
         // check that result has records
         assert.strictEqual(result.length, 3)
     })
 
     it('should iterate over rows with each', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                session: session,
-            })
-            // set fetchNum to 1 so that it does a query for each iteration
-            result.fetchNum = 1
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // check that number fetched matches loop
-                assert.strictEqual(result.fetched, number + 1)
-                // keep track of objects fetched in context
-                context[record.data.foo] = record.data.bar
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
-            // check that results fetched and context returned
-            assert.deepEqual(context, {
-                bam: '0.000000000',
-                bar: '1.000000000',
-                foo: '2.000000000',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            session: session,
+        })
+        // set fetchNum to 1 so that it does a query for each iteration
+        result.fetchNum = 1
+        // iterate over records
+        var context = await result.each((record, number, context) => {
+            // check that number fetched matches loop
+            assert.strictEqual(result.fetched, number + 1)
+            // keep track of objects fetched in context
+            context[record.data.foo] = record.data.bar
+        })
+        // expect result iteration to be done
+        assert.isTrue(result.done)
+        // check that results fetched and context returned
+        assert.deepEqual(context, {
+            bam: '0.000000000',
+            bar: '1.000000000',
+            foo: '2.000000000',
+        })
     })
 
     it('should fetch multiple rows and buffer', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                session: session,
-            })
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // all rows should be fetched before first call
-                assert.strictEqual(result.fetched, 3)
-                // keep track of objects fetched in context
-                context[record.data.foo] = record.data.bar
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
-            // check that results fetched and context returned
-            assert.deepEqual(context, {
-                bam: '0.000000000',
-                bar: '1.000000000',
-                foo: '2.000000000',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            session: session,
+        })
+        // iterate over records
+        var context = await result.each((record, number, context) => {
+            // all rows should be fetched before first call
+            assert.strictEqual(result.fetched, 3)
+            // keep track of objects fetched in context
+            context[record.data.foo] = record.data.bar
+        })
+        // expect result iteration to be done
+        assert.isTrue(result.done)
+        // check that results fetched and context returned
+        assert.deepEqual(context, {
+            bam: '0.000000000',
+            bar: '1.000000000',
+            foo: '2.000000000',
+        })
     })
 
     it('should order iteration correctly', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                order: ['bar'],
-                session: session,
-            })
-            // iterate over records
-            var context = await result.each((record, number, context) => {
-                // check that order is correct (0,1,2)
-                assert.strictEqual(parseInt(record.data.bar), number)
-            })
-            // expect result iteration to be done
-            assert.isTrue(result.done)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            order: ['bar'],
+            session: session,
+        })
+        // iterate over records
+        var context = await result.each((record, number, context) => {
+            // check that order is correct (0,1,2)
+            assert.strictEqual(parseInt(record.data.bar), number)
+        })
+        // expect result iteration to be done
+        assert.isTrue(result.done)
     })
 
     it('should fetch records with limit', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                order: 'createTime',
-                session: session,
-            })
-            // fetch 2 records
-            var records = await result.fetch(2)
-            // validate records
-            assert.deepEqual(records[0].data, {
-                bar: "0.000000000",
-                foo: 'bam',
-            })
-            assert.deepEqual(records[1].data, {
-                bar: "1.000000000",
-                foo: 'bar',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            order: 'createTime',
+            session: session,
+        })
+        // fetch 2 records
+        var records = await result.fetch(2)
+        // validate records
+        assert.deepEqual(records[0].data, {
+            bar: "0.000000000",
+            foo: 'bam',
+        })
+        assert.deepEqual(records[1].data, {
+            bar: "1.000000000",
+            foo: 'bar',
+        })
     })
 
     it('should fetch records with limit and offset', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                order: 'createTime',
-                session: session,
-            })
-            // fetch max 2 records, starting with 3rd record
-            var records = await result.fetch(2, 2)
-            // should get 1
-            assert.strictEqual(records.length, 1)
-            // validate records
-            assert.deepEqual(records[0].data, {
-                bar: "2.000000000",
-                foo: 'foo',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            order: 'createTime',
+            session: session,
+        })
+        // fetch max 2 records, starting with 3rd record
+        var records = await result.fetch(2, 2)
+        // should get 1
+        assert.strictEqual(records.length, 1)
+        // validate records
+        assert.deepEqual(records[0].data, {
+            bar: "2.000000000",
+            foo: 'foo',
+        })
     })
 
     it('should have class properties', async function () {
-        try {
-            // query all rows
-            var result = await fooModel.query({
-                order: 'createTime',
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all rows
+        var result = await fooModel.query({
+            order: 'createTime',
+            session: session,
+        })
         // check for class properties
         assert.isTrue(result.ImmutableCoreModelResult)
         assert.strictEqual(result.class, 'ImmutableCoreModelResult')

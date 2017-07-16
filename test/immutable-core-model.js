@@ -53,6 +53,18 @@ describe('immutable-core-model', function () {
         // full table schema including all default columns
         var expectedSchema = {
             columns: {
+                n: {
+                    null: false,
+                    primary: true,
+                    type: 'int',
+                    unsigned: true,
+                },
+                c: {
+                    default: '1',
+                    null: false,
+                    type: 'smallint',
+                    unsigned: true,
+                },
                 fooAccountId: {
                     type: 'id',
                     null: false,
@@ -70,7 +82,7 @@ describe('immutable-core-model', function () {
                 fooId: {
                     type: 'id',
                     null: false,
-                    primary: true
+                    unique: true
                 },
                 fooOriginalId: {
                     type: 'id',
@@ -110,6 +122,8 @@ describe('immutable-core-model', function () {
         }
         // default columns
         var expectedDefaultColumns = {
+            n: 'n',
+            c: 'c',
             fooAccountId: 'accountId',
             fooCreateTime: 'createTime',
             fooData: 'data',
@@ -157,7 +171,7 @@ describe('immutable-core-model', function () {
             fooId: {
                 type: 'id',
                 null: false,
-                primary: true
+                unique: true
             }
         }
         // default columns
@@ -168,6 +182,8 @@ describe('immutable-core-model', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
+                n: false,
+                c: false,
                 accountId: false,
                 createTime: false,
                 originalId: false,
@@ -198,12 +214,14 @@ describe('immutable-core-model', function () {
             fooId: {
                 type: 'id',
                 null: false,
-                primary: true
+                unique: true
             }
         }
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
+                n: false,
+                c: false,
                 fooAccountId: false,
                 fooCreateTime: false,
                 fooData: {
@@ -453,7 +471,7 @@ describe('immutable-core-model', function () {
         }
     })
 
-    it('create model with associated action', function () {
+    it('create model with associated action', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             actions: {
@@ -463,43 +481,24 @@ describe('immutable-core-model', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // test foo model has delete/un-delete action
-        .then(() => {
-            assert.ok(fooModel.actions.delete)
-            assert.ok(fooModel.actions.delete.inverse)
-        })
+        assert.ok(fooModel.actions.delete)
+        assert.ok(fooModel.actions.delete.inverse)
         // get schema for delete
-        .then(() => fooModel.actions.delete.model.schema())
-        // validate delete schema
-        .then(schema => {
-            assert.deepEqual(schema, {
-                columns: {
-                    fooDeleteCreateTime: { type: 'time', null: false, index: true },
-                    fooDeleteId: { type: 'id', null: false, primary: true },
-                    fooDeleteSessionId: { type: 'id', null: false, index: true },
-                    fooId: { type: 'id', unique: true }
-                },
-                indexes: [],
-                charset: 'utf8',
-                engine: 'InnoDB',
-            })
-        })
-        // get schema for un-delete
-        .then(() => fooModel.actions.delete.inverse.schema())
-        // validate un-delete schema
-        .then(schema => {
-            assert.deepEqual(schema, {
-                columns: {
-                    fooUnDeleteCreateTime: { type: 'time', null: false, index: true },
-                    fooUnDeleteId: { type: 'id', null: false, primary: true },
-                    fooUnDeleteSessionId: { type: 'id', null: false, index: true },
-                    fooDeleteId: { type: 'id', unique: true }
-                },
-                indexes: [],
-                charset: 'utf8',
-                engine: 'InnoDB',
-            })
+        var schema = await fooModel.actions.delete.model.schema()
+        // check schema
+        assert.deepEqual(schema, {
+            columns: {
+                n: { null: false, primary: true, type: 'int', unsigned: true },
+                fooDeleteCreateTime: { type: 'time', null: false, index: true },
+                fooDeleteId: { type: 'id', null: false, unique: true },
+                fooDeleteSessionId: { type: 'id', null: false, index: true },
+                fooId: { type: 'id', unique: true },
+            },
+            indexes: [],
+            charset: 'utf8',
+            engine: 'InnoDB',
         })
     })
 
@@ -533,54 +532,13 @@ describe('immutable-core-model', function () {
         .then(schema => {
             assert.deepEqual(schema, {
                 columns: {
+                    n: { null: false, primary: true, type: 'int', unsigned: true },
+                    c: { default: '1', null: false, type: 'smallint', unsigned: true },
                     fooDeleteCreateTime: { type: 'time', null: false, index: true },
                     fooDeleteData: { type: 'data', null: false },
-                    fooDeleteId: { type: 'id', null: false, primary: true },
+                    fooDeleteId: { type: 'id', null: false, unique: true },
                     fooDeleteSessionId: { type: 'id', null: false, index: true },
                     fooId: { type: 'id', unique: true }
-                },
-                indexes: [],
-                charset: 'utf8',
-                engine: 'InnoDB',
-            })
-        })
-    })
-
-    it('create model inverse action with data', function () {
-        // create model
-        var fooModel = new ImmutableCoreModel({
-            actions: {
-                delete: {
-                    inverse: {
-                        columns: {
-                            data: {
-                                type: 'data'
-                            },
-                        },
-                    },
-                },
-            },
-            database: database,
-            name: 'foo',
-        })
-        // sync with database
-        return fooModel.sync()
-        // test foo model has delete/un-delete action
-        .then(() => {
-            assert.ok(fooModel.actions.delete)
-            assert.ok(fooModel.actions.delete.inverse)
-        })
-        // get schema for un-delete
-        .then(() => fooModel.actions.delete.inverse.schema())
-        // validate un-delete schema
-        .then(schema => {
-            assert.deepEqual(schema, {
-                columns: {
-                    fooUnDeleteCreateTime: { type: 'time', null: false, index: true },
-                    fooUnDeleteData: { type: 'data', null: false },
-                    fooUnDeleteId: { type: 'id', null: false, primary: true },
-                    fooUnDeleteSessionId: { type: 'id', null: false, index: true },
-                    fooDeleteId: { type: 'id', unique: true }
                 },
                 indexes: [],
                 charset: 'utf8',
