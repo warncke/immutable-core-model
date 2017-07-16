@@ -68,9 +68,6 @@ describe('immutable-core-model - access control list', function () {
                 ['foo', 'read:own:1'],
                 ['bar', 'list:any:1'],
             ],
-            actions: {
-                delete: false,
-            },
             database: database,
             name: 'foo',
         })

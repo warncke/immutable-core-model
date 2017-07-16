@@ -64,9 +64,6 @@ describe('immutable-core-model - via relation to account table', function () {
         })
         // create role model
         roleModelGlobal = new ImmutableCoreModel({
-            actions: {
-                delete: false,
-            },
             columns: {
                 roleName: {
                     immutable: true,
@@ -79,9 +76,6 @@ describe('immutable-core-model - via relation to account table', function () {
         })
         // create role account model
         roleAccountModelGlobal = new ImmutableCoreModel({
-            actions: {
-                delete: false,
-            },
             columns: {
                 accountId: {
                     index: true,
@@ -103,40 +97,29 @@ describe('immutable-core-model - via relation to account table', function () {
                 role: {},
             }
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS account')
-            await database.query('DROP TABLE IF EXISTS role')
-            await database.query('DROP TABLE IF EXISTS roleAccount')
-            // sync with database
-            await accountModelGlobal.sync()
-            await roleModelGlobal.sync()
-            await roleAccountModelGlobal.sync()
-            // get local instances
-            accountModel = accountModelGlobal.session(session)
-            roleModel = roleModelGlobal.session(session)
-            roleAccountModel = roleAccountModelGlobal.session(session)
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS account')
+        await database.query('DROP TABLE IF EXISTS role')
+        await database.query('DROP TABLE IF EXISTS roleAccount')
+        // sync with database
+        await accountModelGlobal.sync()
+        await roleModelGlobal.sync()
+        await roleAccountModelGlobal.sync()
+        // get local instances
+        accountModel = accountModelGlobal.session(session)
+        roleModel = roleModelGlobal.session(session)
+        roleAccountModel = roleAccountModelGlobal.session(session)
     })
 
     it('should query models related to account model', async function () {
-        try {
-            // create account
-            var account = await accountModel.create({})
-            // create related record
-            var role = await account.create('role', {foo: 'bar'})
-            // query related
-            var result = await account.select('role')
-            // fetch records
-            var records = await result.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create account
+        var account = await accountModel.create({})
+        // create related record
+        var role = await account.create('role', {foo: 'bar'})
+        // query related
+        var result = await account.select('role')
+        // fetch records
+        var records = await result.fetch(1)
         // test related
         assert.isArray(records)
         assert.strictEqual(records.length, 1)
@@ -144,19 +127,14 @@ describe('immutable-core-model - via relation to account table', function () {
     })
 
     it('should query models related to account model inverse', async function () {
-        try {
-            // create account
-            var account = await accountModel.create({})
-            // create related record
-            var role = await account.create('role', {foo: 'bar'})
-            // query related
-            var result = await role.select('account')
-            // fetch records
-            var records = await result.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create account
+        var account = await accountModel.create({})
+        // create related record
+        var role = await account.create('role', {foo: 'bar'})
+        // query related
+        var result = await role.select('account')
+        // fetch records
+        var records = await result.fetch(1)
         // test related
         assert.isArray(records)
         assert.strictEqual(records.length, 1)
@@ -164,21 +142,16 @@ describe('immutable-core-model - via relation to account table', function () {
     })
 
     it('should query account with related model', async function () {
-        try {
-            // create account
-            var account = await accountModel.create({})
-            // create related record
-            var role = await account.create('role', {foo: 'bar'})
-            // query related
-            var accountWithRole = await accountModel.query({
-                limit: 1,
-                where: { id: account.id },
-                with: { role: true },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create account
+        var account = await accountModel.create({})
+        // create related record
+        var role = await account.create('role', {foo: 'bar'})
+        // query related
+        var accountWithRole = await accountModel.query({
+            limit: 1,
+            where: { id: account.id },
+            with: { role: true },
+        })
         // test related
         assert.isObject(accountWithRole.related)
         assert.isArray(accountWithRole.related.role)

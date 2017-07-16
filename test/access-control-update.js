@@ -70,9 +70,6 @@ describe('immutable-core-model - access control update', function () {
                 ['foo', 'chown:own:1'],
                 ['bar', 'update:any:1'],
             ],
-            actions: {
-                delete: false,
-            },
             database: database,
             name: 'foo',
         })

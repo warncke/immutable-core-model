@@ -25,7 +25,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - delete instance', function () {
+describe.skip('immutable-core-model - delete instance', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)

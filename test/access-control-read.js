@@ -67,9 +67,6 @@ describe('immutable-core-model - access control read', function () {
                 ['foo', 'read:own:1'],
                 ['bar', 'read:any:1'],
             ],
-            actions: {
-                delete: false,
-            },
             database: database,
             name: 'foo',
         })

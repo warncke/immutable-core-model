@@ -47,9 +47,6 @@ describe('immutable-core-model - toJSON', function () {
         ImmutableAccessControl.reset()
         // create initial model
         fooModel = new ImmutableCoreModel({
-            actions: {
-                delete: true,
-            },
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -57,80 +54,62 @@ describe('immutable-core-model - toJSON', function () {
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await Promise.all([
-                database.query('DROP TABLE IF EXISTS foo'),
-                database.query('DROP TABLE IF EXISTS fooDelete'),
-                database.query('DROP TABLE IF EXISTS fooUnDelete'),
-            ])
-            // sync with database
-            await fooModel.sync()
-            // create new bam instance
-            origBam = await fooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            // create new bar instance
-            origBar = await fooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            // create new foo instance
-            origFoo = await fooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-            // create new grr instance
-            origGrr = await fooModel.createMeta({
-                data: {
-                    bar: "3.000000000",
-                    foo: 'grr',
-                },
-                session: session,
-            })
-            // delete grr
-            origGrr.delete()
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await Promise.all([
+            database.query('DROP TABLE IF EXISTS foo'),
+            database.query('DROP TABLE IF EXISTS fooDelete'),
+            database.query('DROP TABLE IF EXISTS fooUnDelete'),
+        ])
+        // sync with database
+        await fooModel.sync()
+        // create new bam instance
+        origBam = await fooModel.createMeta({
+            data: {
+                bar: "0.000000000",
+                foo: 'bam',
+            },
+            session: session,
+        })
+        // create new bar instance
+        origBar = await fooModel.createMeta({
+            data: {
+                bar: "1.000000000",
+                foo: 'bar',
+            },
+            session: session,
+        })
+        // create new foo instance
+        origFoo = await fooModel.createMeta({
+            data: {
+                bar: "2.000000000",
+                foo: 'foo',
+            },
+            session: session,
+        })
+        // create new grr instance
+        origGrr = await fooModel.createMeta({
+            data: {
+                bar: "3.000000000",
+                foo: 'grr',
+            },
+            session: session,
+        })
     })
 
     it('should have formatted toJSON object', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
         // get object that will be encoded to JSON
         var json = foo.toJSON()
         // check properties
         assert.strictEqual(json.id, origFoo.id)
-        assert.strictEqual(json.isDeleted, false)
-        assert.strictEqual(json.wasDeleted, false)
         assert.strictEqual(json.isCurrent, true)
         assert.deepEqual(json.data, {bar: '2.000000000', foo: 'foo'})
-        assert.isObject(json.actions)
-        assert.isObject(json.actions.delete)
-        assert.isObject(json.actions.unDelete)
     })
 
 })

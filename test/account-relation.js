@@ -64,10 +64,6 @@ describe('immutable-core-model - relations to account table', function () {
         })
         // create auth model
         authModelGlobal = new ImmutableCoreModel({
-            // allow auth records to be deleted but not un-deleted
-            actions: {
-                delete: false,
-            },
             // add queryable columns for auth provider id and name
             columns: {
                 authProviderId: {
@@ -85,40 +81,29 @@ describe('immutable-core-model - relations to account table', function () {
             ],
             name: 'auth',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS account')
-            await database.query('DROP TABLE IF EXISTS auth')
-            // sync with database
-            await accountModelGlobal.sync()
-            await authModelGlobal.sync()
-            // get local instances
-            accountModel = accountModelGlobal.session(session)
-            authModel = authModelGlobal.session(session)
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS account')
+        await database.query('DROP TABLE IF EXISTS auth')
+        // sync with database
+        await accountModelGlobal.sync()
+        await authModelGlobal.sync()
+        // get local instances
+        accountModel = accountModelGlobal.session(session)
+        authModel = authModelGlobal.session(session)
     })
 
     it('should query models related to account model', async function () {
-        try {
-            // create account
-            var account = await accountModel.create({})
-            // create related record
-            var auth = await account.create('auth', {
-                authProviderId: 'foo',
-                authProviderName: 'bar'
-            })
-            // query related auth accounts
-            var authsResult = await account.select('auth')
-            // fetch records
-            var relatedAuth = await authsResult.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create account
+        var account = await accountModel.create({})
+        // create related record
+        var auth = await account.create('auth', {
+            authProviderId: 'foo',
+            authProviderName: 'bar'
+        })
+        // query related auth accounts
+        var authsResult = await account.select('auth')
+        // fetch records
+        var relatedAuth = await authsResult.fetch(1)
         // test that related auth fetched
         assert.isArray(relatedAuth)
         assert.strictEqual(relatedAuth.length, 1)
@@ -126,22 +111,17 @@ describe('immutable-core-model - relations to account table', function () {
     })
 
     it('should inverse query models related to account model', async function () {
-        try {
-            // create account
-            var account = await accountModel.create({})
-            // create related record
-            var auth = await account.create('auth', {
-                authProviderId: 'foo',
-                authProviderName: 'bar'
-            })
-            // query related account accounts
-            var accountsResult = await auth.select('account')
-            // fetch records
-            var relatedAccount = await accountsResult.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create account
+        var account = await accountModel.create({})
+        // create related record
+        var auth = await account.create('auth', {
+            authProviderId: 'foo',
+            authProviderName: 'bar'
+        })
+        // query related account accounts
+        var accountsResult = await auth.select('account')
+        // fetch records
+        var relatedAccount = await accountsResult.fetch(1)
         // test that related auth fetched
         assert.isArray(relatedAccount)
         assert.strictEqual(relatedAccount.length, 1)

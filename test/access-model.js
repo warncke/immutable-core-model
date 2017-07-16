@@ -63,9 +63,6 @@ describe('immutable-core-model - access model', function () {
         await fooModelGlobal.sync()
         // create fooBar model
         fooBarModelGlobal = new ImmutableCoreModel({
-            actions: {
-                delete: false,
-            },
             columns: {
                 barId: 'id',
                 fooId: 'id',
@@ -130,7 +127,7 @@ describe('immutable-core-model - access model', function () {
 
     })
 
-    describe('with access:own and deleted access record', function () {
+    describe.skip('with access:own and deleted access record', function () {
 
         beforeEach(async function () {
             // get global access control instance
@@ -153,7 +150,7 @@ describe('immutable-core-model - access model', function () {
 
     })
 
-    describe('with access:own and deleted and not deleted access record', function () {
+    describe.skip('with access:own and deleted and not deleted access record', function () {
 
         beforeEach(async function () {
             // get global access control instance
