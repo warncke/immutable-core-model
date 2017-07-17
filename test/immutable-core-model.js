@@ -65,6 +65,11 @@ describe('immutable-core-model', function () {
                     type: 'smallint',
                     unsigned: true,
                 },
+                d: {
+                    default: false,
+                    null: false,
+                    type: 'boolean',
+                },
                 fooAccountId: {
                     type: 'id',
                     null: false,
@@ -124,6 +129,7 @@ describe('immutable-core-model', function () {
         var expectedDefaultColumns = {
             n: 'n',
             c: 'c',
+            d: 'd',
             fooAccountId: 'accountId',
             fooCreateTime: 'createTime',
             fooData: 'data',
@@ -184,6 +190,7 @@ describe('immutable-core-model', function () {
             columns: {
                 n: false,
                 c: false,
+                d: false,
                 accountId: false,
                 createTime: false,
                 originalId: false,
@@ -222,6 +229,7 @@ describe('immutable-core-model', function () {
             columns: {
                 n: false,
                 c: false,
+                d: false,
                 fooAccountId: false,
                 fooCreateTime: false,
                 fooData: {

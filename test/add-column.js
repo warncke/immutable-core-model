@@ -54,6 +54,11 @@ describe('immutable-core-model - add column', function () {
                     type: 'smallint',
                     unsigned: true,
                 },
+                d: {
+                    default: false,
+                    null: false,
+                    type: 'boolean',
+                },
                 fooAccountId: {
                     type: 'id',
                     null: false,

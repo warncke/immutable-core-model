@@ -508,8 +508,8 @@ describe('immutable-core-model - create instance', function () {
             assert.ifError(err)
         }
         // check for class properties
-        assert.isTrue(foo.ImmutableCoreModelInstance)
-        assert.strictEqual(foo.class, 'ImmutableCoreModelInstance')
+        assert.isTrue(foo.ImmutableCoreModelRecord)
+        assert.strictEqual(foo.class, 'ImmutableCoreModelRecord')
     })
 
 })

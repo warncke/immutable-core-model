@@ -25,7 +25,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.skip('immutable-core-model - delete instance', function () {
+describe('immutable-core-model - delete instance', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -38,7 +38,7 @@ describe.skip('immutable-core-model - delete instance', function () {
     }
 
     // variable to populate in before
-    var fooModel, origBam, origBar, origFoo, origGrr
+    var fooModel, fooModelGlobal, origBam, origBar, origFoo, origGrr
 
     before(async function () {
         // reset global data
@@ -46,15 +46,12 @@ describe.skip('immutable-core-model - delete instance', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             accessControlRules: [
                 'list:deleted:any:1',
                 'read:deleted:any:1',
                 'unDelete:deleted:any:1',
             ],
-            actions: {
-                delete: true,
-            },
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -62,124 +59,84 @@ describe.skip('immutable-core-model - delete instance', function () {
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await Promise.all([
-                database.query('DROP TABLE IF EXISTS foo'),
-                database.query('DROP TABLE IF EXISTS fooDelete'),
-                database.query('DROP TABLE IF EXISTS fooUnDelete'),
-            ])
-            // sync with database
-            await fooModel.sync()
-            // create new bam instance
-            origBam = await fooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            // create new bar instance
-            origBar = await fooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            // create new foo instance
-            origFoo = await fooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-            // create new grr instance
-            origGrr = await fooModel.createMeta({
-                data: {
-                    bar: "3.000000000",
-                    foo: 'grr',
-                },
-                session: session,
-            })
-            // delete grr
-            origGrr.delete()
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local foo model
+        fooModel = fooModelGlobal.session(session)
+        // create new bam instance
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
+        })
+        // create new bar instance
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
+        })
+        // create new foo instance
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
+        })
+        // create new grr instance
+        origGrr = await fooModel.create({
+            bar: "3.000000000",
+            foo: 'grr',
+        })
+        // delete grr
+        origGrr.delete()
     })
 
     it('should have action properties', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
         // foo should have action properties
         assert.isFalse(foo.isDeleted)
-        assert.isFalse(foo.wasDeleted)
     })
 
     it('should have action methods', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
         // foo should have action methods
         assert.strictEqual(typeof foo.delete, 'function')
         assert.strictEqual(typeof foo.unDelete, 'function')
+        assert.strictEqual(typeof foo.undelete, 'function')
     })
 
     it('should query deleted instance', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                session: session,
-                where: {
-                    isDeleted: true,
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                isDeleted: true,
+            },
+        })
         // check return
         assert.strictEqual(all.length, 1)
         assert.deepEqual(all[0].data, origGrr.data)
     })
 
     it('should query not-deleted instances', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-                where: {
-                    isDeleted: false,
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+            where: {
+                isDeleted: false,
+            },
+        })
         // check return
         assert.strictEqual(all.length, 3)
         assert.deepEqual(
@@ -189,19 +146,14 @@ describe.skip('immutable-core-model - delete instance', function () {
     })
 
     it('should query both deleted and not-deleted instances', async function () {
-        try {
-            var all = await fooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-                where: {
-                    isDeleted: null,
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+            where: {
+                isDeleted: null,
+            },
+        })
         // check return
         assert.strictEqual(all.length, 4)
         assert.deepEqual(
@@ -211,27 +163,17 @@ describe.skip('immutable-core-model - delete instance', function () {
     })
 
     it('should select deleted instance', async function () {
-        try {
-            var all = await fooModel.session(session).select.all
-                .where.isDeleted(true).query()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.select.all
+            .where.isDeleted(true).query()
         // check return
         assert.strictEqual(all.length, 1)
         assert.deepEqual(all[0].data, origGrr.data)
     })
 
     it('should select not-deleted instances', async function () {
-        try {
-            var all = await fooModel.session(session).select.all
-                .where.isDeleted(false)
-                .order.by.createTime.query()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.select.all
+            .where.isDeleted(false)
+            .order.by.createTime.query()
         // check return
         assert.strictEqual(all.length, 3)
         assert.deepEqual(
@@ -241,14 +183,9 @@ describe.skip('immutable-core-model - delete instance', function () {
     })
 
     it('should query both deleted and not-deleted instances', async function () {
-        try {
-            var all = await fooModel.session(session).select.all
-                .where.isDeleted(null)
-                .order.by.createTime.query()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var all = await fooModel.select.all
+            .where.isDeleted(null)
+            .order.by.createTime.query()
         // check return
         assert.strictEqual(all.length, 4)
         assert.deepEqual(
@@ -258,17 +195,12 @@ describe.skip('immutable-core-model - delete instance', function () {
     })
 
     it('should have result sets with both deleted and not-deleted instances', async function () {
-        try {
-            // get result set
-            var result = await fooModel.session(session).select
-                .where.isDeleted(null)
-                .order.by.createTime.query()
-            // get records
-            var all = await result.fetch(4)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get result set
+        var result = await fooModel.select
+            .where.isDeleted(null)
+            .order.by.createTime.query()
+        // get records
+        var all = await result.fetch(4)
         // check return
         assert.strictEqual(all.length, 4)
         assert.deepEqual(
@@ -277,104 +209,62 @@ describe.skip('immutable-core-model - delete instance', function () {
         )
     })
 
-    it('should delete instance', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id
-                },
-            })
-            // delete foo
-            foo = await foo.delete()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+    it('should delete record', async function () {
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
+        // delete foo
+        foo = await foo.delete()
         // foo should be deleted
         assert.isTrue(foo.isDeleted)
     })
 
-    it('should un-delete instance', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id,
-                    isDeleted: true,
-                },
-            })
-            // foo should be deleted
-            assert.isTrue(foo.isDeleted)
-            // delete foo
-            foo = await foo.unDelete()
+    it('should undelete record', async function () {
+        var foo = await fooModel.query({
+            current: true,
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id,
+                isDeleted: null,
+            },
+        })
+        // make sure foo is deleted
+        if (!foo.isDeleted) {
+            foo = await foo.delete()
         }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // foo should be deleted
+        assert.isTrue(foo.isDeleted)
+        // undelete foo
+        foo = await foo.undelete()
         // foo should not be deleted
         assert.isFalse(foo.isDeleted)
-        // foo should have been deleted before
-        assert.isTrue(foo.wasDeleted)
-    })
-
-    it('should have delete and undelete data properties', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id,
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // check that action data is set
-        assert.property(foo, 'actions')
-        assert.property(foo.actions, 'delete')
-        assert.property(foo.actions, 'unDelete')
-        assert.property(foo.actions.delete, 'createTime')
-        assert.property(foo.actions.delete, 'id')
-        assert.property(foo.actions.delete, 'sessionId')
-        assert.property(foo.actions.unDelete, 'createTime')
-        assert.property(foo.actions.unDelete, 'id')
-        assert.property(foo.actions.unDelete, 'sessionId')
     })
 
     it('delete another instance', async function () {
-        try {
-            var bar = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origBar.id
-                },
-            })
-            // delete bar
-            bar = await bar.delete()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var bar = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origBar.id
+            },
+        })
+        // delete bar
+        bar = await bar.delete()
         // bar should be deleted
         assert.isTrue(bar.isDeleted)
     })
 
     it('should not return deleted records in queries', async function () {
-        try {
-            var foos = await fooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foos = await fooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+        })
         // results should not include deleted record
         assert.strictEqual(foos.length, 2)
         assert.deepEqual(foos[0].data, origBam.data)

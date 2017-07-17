@@ -66,26 +66,21 @@ describe('immutable-core-model - elasticsearch create', function () {
             elasticsearch: elasticsearchClient,
             name: 'foo',
         })
-        try {
-            // sync model
-            await fooModel.sync()
-            // create new record
-            var foo = await fooModel.createMeta({
-                data: {foo: 1},
-                session: session,
-            })
-            // wait a second for record to be available
-            await Promise.delay(1000)
-            // get from elasticsearch
-            var res = await elasticsearchClient.get({
-                id: foo.originalId,
-                index: 'foo',
-                type: 'foo',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        await fooModel.sync()
+        // create new record
+        var foo = await fooModel.createMeta({
+            data: {foo: 1},
+            session: session,
+        })
+        // wait a second for record to be available
+        await Promise.delay(1000)
+        // get from elasticsearch
+        var res = await elasticsearchClient.get({
+            id: foo.originalId,
+            index: 'foo',
+            type: 'foo',
+        })
         // validate record
         assert.isObject(res)
         assert.strictEqual(res._index, 'foo')
@@ -94,6 +89,7 @@ describe('immutable-core-model - elasticsearch create', function () {
         assert.deepEqual(res._source, {
             accountId: session.accountId,
             createTime: foo.createTime,
+            d: '0',
             data: foo.data,
             id: foo.id,
             originalId: foo.originalId,
@@ -108,28 +104,23 @@ describe('immutable-core-model - elasticsearch create', function () {
             elasticsearch: elasticsearchClient,
             name: 'foo',
         })
-        try {
-            // sync model
-            await fooModel.sync()
-            // create new record
-            var foo = await fooModel.createMeta({
-                data: {foo: 1},
-                session: session,
-            })
-            // update foo
-            var newFoo = await foo.update({foo: 2})
-            // wait a second for record to be available
-            await Promise.delay(1000)
-            // get from elasticsearch
-            var res = await elasticsearchClient.get({
-                id: foo.originalId,
-                index: 'foo',
-                type: 'foo',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        await fooModel.sync()
+        // create new record
+        var foo = await fooModel.createMeta({
+            data: {foo: 1},
+            session: session,
+        })
+        // update foo
+        var newFoo = await foo.update({foo: 2})
+        // wait a second for record to be available
+        await Promise.delay(1000)
+        // get from elasticsearch
+        var res = await elasticsearchClient.get({
+            id: foo.originalId,
+            index: 'foo',
+            type: 'foo',
+        })
         // validate record
         assert.isObject(res)
         assert.strictEqual(res._index, 'foo')
@@ -138,6 +129,7 @@ describe('immutable-core-model - elasticsearch create', function () {
         assert.deepEqual(res._source, {
             accountId: session.accountId,
             createTime: newFoo.createTime,
+            d: '0',
             data: newFoo.data,
             id: newFoo.id,
             originalId: newFoo.originalId,
@@ -154,29 +146,24 @@ describe('immutable-core-model - elasticsearch create', function () {
             esType: 'bar.bam',
             name: 'foo',
         })
-        try {
-            // sync model
-            await fooModel.sync()
-            // create new record
-            var foo = await fooModel.createMeta({
-                data: {
-                    bar: { bam: 'myFoo' },
-                    foo: 1,
-                },
-                session: session,
-            })
-            // wait a second for record to be available
-            await Promise.delay(1000)
-            // get from elasticsearch
-            var res = await elasticsearchClient.get({
-                id: foo.originalId,
-                index: 'foo',
-                type: 'myFoo',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        await fooModel.sync()
+        // create new record
+        var foo = await fooModel.createMeta({
+            data: {
+                bar: { bam: 'myFoo' },
+                foo: 1,
+            },
+            session: session,
+        })
+        // wait a second for record to be available
+        await Promise.delay(1000)
+        // get from elasticsearch
+        var res = await elasticsearchClient.get({
+            id: foo.originalId,
+            index: 'foo',
+            type: 'myFoo',
+        })
         // validate record
         assert.isObject(res)
         assert.deepEqual(res._source.data, foo.data)
@@ -190,28 +177,23 @@ describe('immutable-core-model - elasticsearch create', function () {
             esType: 'bar.bam',
             name: 'foo',
         })
-        try {
-            // sync model
-            await fooModel.sync()
-            // create new record
-            var foo = await fooModel.createMeta({
-                data: {
-                    foo: 1,
-                },
-                session: session,
-            })
-            // wait a second for record to be available
-            await Promise.delay(1000)
-            // get from elasticsearch
-            var res = await elasticsearchClient.get({
-                id: foo.originalId,
-                index: 'foo',
-                type: 'foo',
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        await fooModel.sync()
+        // create new record
+        var foo = await fooModel.createMeta({
+            data: {
+                foo: 1,
+            },
+            session: session,
+        })
+        // wait a second for record to be available
+        await Promise.delay(1000)
+        // get from elasticsearch
+        var res = await elasticsearchClient.get({
+            id: foo.originalId,
+            index: 'foo',
+            type: 'foo',
+        })
         // validate record
         assert.isObject(res)
         assert.deepEqual(res._source.data, foo.data)
