@@ -48,48 +48,42 @@ describe('immutable-core-model - validate', function () {
             database: database,
             name: 'foo',
         })
-        // catch async errors
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync model
-            await fooModel.sync()
-            // create new bam instance
-            origBam = await fooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            // create new bar instance
-            origBar = await fooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            // create new foo instance
-            origFoo = await fooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-            // create new grr instance
-            origGrr = await fooModel.createMeta({
-                data: {
-                    bar: "3.000000000",
-                    foo: 'grr',
-                },
-                session: session,
-            })
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync model
+        await fooModel.sync()
+        // create new bam instance
+        origBam = await fooModel.createMeta({
+            data: {
+                bar: "0.000000000",
+                foo: 'bam',
+            },
+            session: session,
+        })
+        // create new bar instance
+        origBar = await fooModel.createMeta({
+            data: {
+                bar: "1.000000000",
+                foo: 'bar',
+            },
+            session: session,
+        })
+        // create new foo instance
+        origFoo = await fooModel.createMeta({
+            data: {
+                bar: "2.000000000",
+                foo: 'foo',
+            },
+            session: session,
+        })
+        // create new grr instance
+        origGrr = await fooModel.createMeta({
+            data: {
+                bar: "3.000000000",
+                foo: 'grr',
+            },
+            session: session,
+        })
     })
 
     it('should validate column data when adding column', async function () {
@@ -105,13 +99,7 @@ describe('immutable-core-model - validate', function () {
             database: database,
             name: 'foo',
         })
-        // catch async errors
-        try {
-            await fooModel.sync()
-        }
-        catch (err) {
-            throw err
-        }
+        await fooModel.sync()
         // validate flag should be true
         assert.isTrue(fooModel.needsValidate)
         // validate should be done
@@ -133,14 +121,7 @@ describe('immutable-core-model - validate', function () {
             database: database,
             name: 'foo',
         })
-        // catch async errors
-        try {
-            await fooModel.sync()
-        }
-        catch (err) {
-            throw err
-        }
-
+        await fooModel.sync()
         // validate flag should be false
         assert.isFalse(fooModel.needsValidate)
         assert.isFalse(fooModel.validated)
@@ -159,16 +140,9 @@ describe('immutable-core-model - validate', function () {
             database: database,
             name: 'foo',
         })
-        // catch async errors
-        try {
-            await fooModel.sync()
-            // manually call validate
-            await fooModel.validate()
-        }
-        catch (err) {
-            throw err
-        }
-
+        await fooModel.sync()
+        // manually call validate
+        await fooModel.validate()
         // validate flag should be false
         assert.isFalse(fooModel.needsValidate)
         assert.isTrue(fooModel.validated)

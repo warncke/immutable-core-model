@@ -68,19 +68,14 @@ describe('immutable-core-model - elasticsearch index', function () {
             elasticsearch: elasticsearchClient,
             name: 'foo',
         })
-        try {
-            // sync model
-            fooModel.sync()
-            // wait a second for index to be created
-            await Promise.delay(1000)
-            // check if index exists
-            var exists = await elasticsearchClient.indices.exists({
-                index: 'foo'
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        fooModel.sync()
+        // wait a second for index to be created
+        await Promise.delay(1000)
+        // check if index exists
+        var exists = await elasticsearchClient.indices.exists({
+            index: 'foo'
+        })
         // check that index exists
         assert.isTrue(exists)
     })
@@ -93,19 +88,14 @@ describe('immutable-core-model - elasticsearch index', function () {
             esIndex: 'not-foo',
             name: 'foo',
         })
-        try {
-            // sync model
-            fooModel.sync()
-            // wait a second for index to be created
-            await Promise.delay(1000)
-            // check if index exists
-            var exists = await elasticsearchClient.indices.exists({
-                index: 'not-foo'
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        fooModel.sync()
+        // wait a second for index to be created
+        await Promise.delay(1000)
+        // check if index exists
+        var exists = await elasticsearchClient.indices.exists({
+            index: 'not-foo'
+        })
         // check that index exists
         assert.isTrue(exists)
     })

@@ -36,15 +36,13 @@ describe('immutable-core-model - engine and charset', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     afterEach(function () {
@@ -53,24 +51,22 @@ describe('immutable-core-model - engine and charset', function () {
         delete process.env.DEFAULT_ENGINE
     })
 
-    it('should use default engine and charset', function () {
+    it('should use default engine and charset', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             database: database,
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.strictEqual(schema.engine, 'InnoDB')
-            assert.strictEqual(schema.charset, 'utf8')
-        })
+        assert.strictEqual(schema.engine, 'InnoDB')
+        assert.strictEqual(schema.charset, 'utf8')
     })
 
-    it('should set engine and charset globally', function () {
+    it('should set engine and charset globally', async function () {
         // set global engine and charset
         ImmutableCoreModel
             .defaultCharset('latin1')
@@ -81,17 +77,15 @@ describe('immutable-core-model - engine and charset', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.strictEqual(schema.engine, 'MyISAM')
-            assert.strictEqual(schema.charset, 'latin1')
-        })
+        assert.strictEqual(schema.engine, 'MyISAM')
+        assert.strictEqual(schema.charset, 'latin1')
     })
 
-    it('should set engine and charset in model args', function () {
+    it('should set engine and charset in model args', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             charset: 'latin1',
@@ -100,17 +94,15 @@ describe('immutable-core-model - engine and charset', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.strictEqual(schema.engine, 'MyISAM')
-            assert.strictEqual(schema.charset, 'latin1')
-        })
+        assert.strictEqual(schema.engine, 'MyISAM')
+        assert.strictEqual(schema.charset, 'latin1')
     })
 
-    it('should set engine and charset from env', function () {
+    it('should set engine and charset from env', async function () {
         // set global engine and charset
         process.env.DEFAULT_CHARSET = 'latin1'
         process.env.DEFAULT_ENGINE = 'MyISAM'
@@ -120,14 +112,12 @@ describe('immutable-core-model - engine and charset', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.strictEqual(schema.engine, 'MyISAM')
-            assert.strictEqual(schema.charset, 'latin1')
-        })
+        assert.strictEqual(schema.engine, 'MyISAM')
+        assert.strictEqual(schema.charset, 'latin1')
     })
 
 })

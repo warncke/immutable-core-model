@@ -52,39 +52,23 @@ describe('immutable-core-model - revisions', function () {
         })
         // create local model with session
         fooModel = globalFooModel.session(session)
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await globalFooModel.sync()
-            // insert first record
-            foo1 = await fooModel.createMeta({
-                data: {foo: 'foo'}
-            })
-            // create revision
-            foo2 = await foo1.updateMeta({
-                data: {foo: 'bar'}
-            })
-            // create another revision
-            foo3 = await foo2.updateMeta({
-                data: {foo: 'bam'}
-            })
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await globalFooModel.sync()
+        // insert first record
+        foo1 = await fooModel.create({foo: 'foo'})
+        // create revision
+        foo2 = await foo1.update({foo: 'bar'})
+        // create another revision
+        foo3 = await foo2.update({foo: 'bam'})
     })
 
     it('should only return the current revision of an object by default', async function () {
-        try {
-            // get all foos
-            var foos = await fooModel.query({
-                all: true
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get all foos
+        var foos = await fooModel.query({
+            all: true
+        })
         // there should only be one record returned
         assert.strictEqual(foos.length, 1)
         // record should be current revision
@@ -92,17 +76,12 @@ describe('immutable-core-model - revisions', function () {
     })
 
     it('should only return all revisions if option set', async function () {
-        try {
-            // get all foos
-            var foos = await fooModel.query({
-                all: true,
-                allRevisions: true,
-                order: ['createTime'],
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get all foos
+        var foos = await fooModel.query({
+            all: true,
+            allRevisions: true,
+            order: ['createTime'],
+        })
         // there should only be one record returned
         assert.strictEqual(foos.length, 3)
         // record should be current revision
@@ -112,84 +91,59 @@ describe('immutable-core-model - revisions', function () {
     })
 
     it('should return exact revision specified by id', async function () {
-        try {
-            // query for old revision
-            var foo = await fooModel.query({
-                limit: 1,
-                where: {
-                    id: foo1.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query for old revision
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {
+                id: foo1.id
+            },
+        })
         // record should match
         assert.deepEqual(foo.data, foo1.data)
     })
 
     it('should return current revision when selecting by id with current', async function () {
-        try {
-            // query for old revision
-            var foo = await fooModel.query({
-                current: true,
-                limit: 1,
-                where: {
-                    id: foo1.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query for old revision
+        var foo = await fooModel.query({
+            current: true,
+            limit: 1,
+            where: {
+                id: foo1.id
+            },
+        })
         // record should match
         assert.deepEqual(foo.data, foo3.data)
     })
 
     it('should set isCurrent false on old revision', async function () {
-        try {
-            // query for old revision
-            var foo = await fooModel.query({
-                limit: 1,
-                where: {
-                    id: foo1.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query for old revision
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {
+                id: foo1.id
+            },
+        })
         // foo should not be current
         assert.isFalse(foo.isCurrent)
     })
 
     it('should have current method that returns current instance', async function () {
-        try {
-            // query for old revision
-            var foo = await fooModel.query({
-                limit: 1,
-                where: {
-                    id: foo1.id
-                },
-            })
-            // query for current revision
-            foo = await foo.current()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query for old revision
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {
+                id: foo1.id
+            },
+        })
+        // query for current revision
+        foo = await foo.current()
         // foo should be current
         assert.isTrue(foo.isCurrent)
     })
 
     it('should select current instance', async function () {
-        try {
-            // select current with old id
-            var foo = await fooModel.select.current.by.id(foo1.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // select current with old id
+        var foo = await fooModel.select.current.by.id(foo1.id)
         // foo should be current
         assert.isTrue(foo.isCurrent)
     })

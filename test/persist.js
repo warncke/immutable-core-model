@@ -57,16 +57,10 @@ describe('immutable-core-model-local - persist', function () {
         })
         // create local foo model with session for select queries
         fooModel = glboalFooModel.session(session)
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await glboalFooModel.sync()
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await glboalFooModel.sync()
     })
 
     it('should throw duplicate key error when creating same data twice', async function () {
@@ -80,6 +74,7 @@ describe('immutable-core-model-local - persist', function () {
             roles: ['all', 'authenticated'],
             sessionId: '33333333333333333333333333333333',
         }
+        // catch expected error
         try {
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -97,20 +92,15 @@ describe('immutable-core-model-local - persist', function () {
         catch (err) {
             var threwErr = err
         }
-
+        // check thrown error
         assert.match(threwErr.message, /Duplicate entry/)
     })
 
     it('should not throw error when persisting data twice', async function () {
-        try {
-            // create first data entry and catpure value
-            var foo = await fooModel.create({foo: 'foo'})
-            // persist foo which should be duplicate
-            var fooId = await fooModel.persist({foo: 'foo'})
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create first data entry and catpure value
+        var foo = await fooModel.create({foo: 'foo'})
+        // persist foo which should be duplicate
+        var fooId = await fooModel.persist({foo: 'foo'})
         // persist should resolve with string id
         assert.isString(fooId)
         // id should match original

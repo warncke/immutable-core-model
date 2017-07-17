@@ -32,7 +32,7 @@ describe('immutable-core-model - access id', function () {
     // fake session to use for testing
     var session
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // fake session to use for testing
         session = {
             accessIdName: 'barId',
@@ -46,10 +46,7 @@ describe('immutable-core-model - access id', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-            database.query('DROP TABLE IF EXISTS fooDelete'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should create instance with custom accessId', async function () {

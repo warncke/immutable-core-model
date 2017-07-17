@@ -80,15 +80,10 @@ describe('immutable-core-model - elasticsearch search', function () {
     })
 
     it('should search', async function () {
-        try {
-            var res = await fooModel.search({
-                index: 'foo',
-                raw: true,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var res = await fooModel.search({
+            index: 'foo',
+            raw: true,
+        })
         // validate response
         assert.isObject(res)
         assert.isObject(res.hits)

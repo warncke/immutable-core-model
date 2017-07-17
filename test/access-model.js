@@ -49,7 +49,6 @@ describe('immutable-core-model - access model', function () {
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
         await database.query('DROP TABLE IF EXISTS fooBar')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
         // create foo model
         fooModelGlobal = new ImmutableCoreModel({
             accessIdName: 'barId',

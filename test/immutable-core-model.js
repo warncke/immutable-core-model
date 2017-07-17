@@ -36,20 +36,16 @@ describe('immutable-core-model', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-            database.query('DROP TABLE IF EXISTS fooDelete'),
-            database.query('DROP TABLE IF EXISTS fooUnDelete'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
-    it('should create a new model instance', function () {
+    it('should create a new model instance', async function () {
         // full table schema including all default columns
         var expectedSchema = {
             columns: {
@@ -159,16 +155,14 @@ describe('immutable-core-model', function () {
         // check default columns
         assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema, expectedSchema)
-        })
+        assert.deepEqual(schema, expectedSchema)
     })
 
-    it('should allow removing default columns', function () {
+    it('should allow removing default columns', async function () {
         var expectedSchema = {
             fooData: {
                 type: 'data',
@@ -203,16 +197,14 @@ describe('immutable-core-model', function () {
         // check default columns
         assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns, expectedSchema)
-        })
+        assert.deepEqual(schema.columns, expectedSchema)
     })
 
-    it('should allow overriding default columns', function () {
+    it('should allow overriding default columns', async function () {
         var expectedSchema = {
             fooData: {
                 type: 'string',
@@ -245,16 +237,14 @@ describe('immutable-core-model', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns, expectedSchema)
-        })
+        assert.deepEqual(schema.columns, expectedSchema)
     })
 
-    it('should allow setting default value for string', function () {
+    it('should allow setting default value for string', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: 'TEST',
@@ -271,16 +261,14 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should allow setting default value for number', function () {
+    it('should allow setting default value for number', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: '95.750000000',
@@ -297,16 +285,14 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should allow setting default false for boolean', function () {
+    it('should allow setting default false for boolean', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: false,
@@ -323,16 +309,14 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should allow setting default true for boolean', function () {
+    it('should allow setting default true for boolean', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: true,
@@ -349,16 +333,14 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should allow creating non-unique column index', function () {
+    it('should allow creating non-unique column index', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             index: true,
@@ -375,16 +357,14 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should allow creating unique column index', function () {
+    it('should allow creating unique column index', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             type: 'string',
@@ -401,85 +381,73 @@ describe('immutable-core-model', function () {
         // check that immutable module created
         assert.ok(immutable.hasModule('fooModel'), 'immutable module created')
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
     it('should compress large data objects', async function () {
-        try {
-            // create model
-            var fooModel = new ImmutableCoreModel({
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            await fooModel.sync()
-            // create big data object
-            var big = {foo: []}
-            // add 100 objects to foo
-            _.times(100, i => {
-                big.foo.push({bar: i})
-            })
-            // create object with lots of data
-            var origFoo = await fooModel.createMeta({
-                data: big,
-                session: session,
-            })
-            // get back foo
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {id: origFoo.id},
-            })
-            // compare results
-            assert.deepEqual(foo.data, origFoo.data)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // sync with database
+        await fooModel.sync()
+        // create big data object
+        var big = {foo: []}
+        // add 100 objects to foo
+        _.times(100, i => {
+            big.foo.push({bar: i})
+        })
+        // create object with lots of data
+        var origFoo = await fooModel.createMeta({
+            data: big,
+            session: session,
+        })
+        // get back foo
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {id: origFoo.id},
+        })
+        // compare results
+        assert.deepEqual(foo.data, origFoo.data)
     })
 
     it('should work with compression disabled', async function () {
-        try {
-            // create model
-            var fooModel = new ImmutableCoreModel({
-                compression: false,
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            await fooModel.sync()
-            // create big data object
-            var big = {foo: []}
-            // add 100 objects to foo
-            _.times(100, i => {
-                big.foo.push({bar: i})
-            })
-            // create object with lots of data
-            var origFoo = await fooModel.createMeta({
-                data: big,
-                session: session,
-            })
-            // get back foo
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {id: origFoo.id},
-            })
-            // compare results
-            assert.deepEqual(foo.data, origFoo.data)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            compression: false,
+            database: database,
+            name: 'foo',
+        })
+        // sync with database
+        await fooModel.sync()
+        // create big data object
+        var big = {foo: []}
+        // add 100 objects to foo
+        _.times(100, i => {
+            big.foo.push({bar: i})
+        })
+        // create object with lots of data
+        var origFoo = await fooModel.createMeta({
+            data: big,
+            session: session,
+        })
+        // get back foo
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {id: origFoo.id},
+        })
+        // compare results
+        assert.deepEqual(foo.data, origFoo.data)
     })
 
-    it('should create non-unique multi column index', function () {
+    it('should create non-unique multi column index', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             columns: {
@@ -496,18 +464,16 @@ describe('immutable-core-model', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.indexes, [{
-                columns: ['bam', 'bar'],
-            }])
-        })
+        assert.deepEqual(schema.indexes, [{
+            columns: ['bam', 'bar'],
+        }])
     })
 
-    it('should have class properties on model', function () {
+    it('should have class properties on model', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             name: 'foo',

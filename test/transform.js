@@ -37,13 +37,13 @@ describe('immutable-core-model - transform', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should transform value', async function () {

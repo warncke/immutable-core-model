@@ -51,16 +51,10 @@ describe('immutable-core-model-local', function () {
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await globalFooModel.sync()
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await globalFooModel.sync()
     })
 
     it('should create local model instance with session context', function () {

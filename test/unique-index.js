@@ -37,7 +37,7 @@ describe('immutable-core-model - unique index', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    var fooModel
+    var fooModel, fooModelGlobal
 
     beforeEach(async function () {
         // reset global data
@@ -45,7 +45,7 @@ describe('immutable-core-model - unique index', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 foo: {
                     type: 'string',
@@ -55,35 +55,20 @@ describe('immutable-core-model - unique index', function () {
             database: database,
             name: 'foo',
         })
-        // setup database
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await fooModel.sync()
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local fooModel
+        fooModel = fooModelGlobal.session(session)
     })
 
     it('should not create two objects with the same unique value', async function () {
         // insert first record
-        try {
-            await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        await fooModel.create({foo: 'foo'})
         // inserting second record should throw error
         try {
-            await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
+            await fooModel.create({foo: 'foo'})
         }
         catch (err) {
             var threwError = true
@@ -92,52 +77,27 @@ describe('immutable-core-model - unique index', function () {
     })
 
     it('should create revision with the same unique value', async function () {
-        try {
-            // insert first record
-            var foo = await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-            // create new revision with same foo value
-            foo = await foo.updateMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-            // verify that foo value still set in data
-            assert.strictEqual(foo.data.foo, 'foo')
-            // foo should not be set in raw data
-            assert.strictEqual(foo.raw.foo, undefined)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // insert first record
+        var foo = await fooModel.create({foo: 'foo'})
+        // create new revision with same foo value
+        foo = await foo.update({bar: 'bar'})
+        // verify that foo value still set in data
+        assert.strictEqual(foo.data.foo, 'foo')
+        // foo should not be set in raw data
+        assert.strictEqual(foo.raw.foo, undefined)
     })
 
     it('should update unique value if data changes', async function () {
-        try {
-            // insert first record
-            var foo = await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-            // create new revision with same foo value
-            foo = await foo.updateMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-            // create new revision with new foo value
-            foo = await foo.updateMeta({
-                data: {foo: 'foo2'},
-                session: session,
-            })
-            // verify that foo value still set in data
-            assert.strictEqual(foo.data.foo, 'foo2')
-            // foo should be set in raw data when updated
-            assert.strictEqual(foo.raw.foo, 'foo2')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // insert first record
+        var foo = await fooModel.create({foo: 'foo'})
+        // create new revision with same foo value
+        foo = await foo.update({bar: 'bar'})
+        // create new revision with new foo value
+        foo = await foo.update({foo: 'foo2'})
+        // verify that foo value still set in data
+        assert.strictEqual(foo.data.foo, 'foo2')
+        // foo should be set in raw data when updated
+        assert.strictEqual(foo.raw.foo, 'foo2')
     })
 
 })

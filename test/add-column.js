@@ -28,16 +28,16 @@ describe('immutable-core-model - add column', function () {
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
-    it('should add new columns', function () {
+    it('should add new columns', async function () {
         // full table schema including all default columns
         var expectedSchema = {
             charset: 'utf8',
@@ -114,34 +114,29 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    bam: 'boolean',
-                    bar: 'string',
-                    foo: 'number',
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                bam: 'boolean',
+                bar: 'string',
+                foo: 'number',
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema, expectedSchema)
-        })
+        assert.deepEqual(schema, expectedSchema)
     })
 
-    it('should add new string column with default value', function () {
+    it('should add new string column with default value', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: 'TEST',
@@ -153,32 +148,27 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: fooSchema,
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: fooSchema,
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should add new number column with default value', function () {
+    it('should add new number column with default value', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: '95.750000000',
@@ -190,32 +180,27 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: fooSchema,
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: fooSchema,
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should add new boolean column with default value', function () {
+    it('should add new boolean column with default value', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             default: false,
@@ -227,32 +212,27 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: fooSchema,
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: fooSchema,
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should add new column with non-unique index', function () {
+    it('should add new column with non-unique index', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             index: true,
@@ -264,32 +244,27 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: fooSchema,
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: fooSchema,
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
-    it('should add new column with unique index', function () {
+    it('should add new column with unique index', async function () {
         // expected schema for extra column foo
         var fooSchema = {
             type: 'string',
@@ -301,29 +276,24 @@ describe('immutable-core-model - add column', function () {
             name: 'foo',
         })
         // sync with database
-        return fooModel.sync()
-        // created updated schema
-        .then(() => {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            // create updated model
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: fooSchema,
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync with database
-            return fooModel.sync()
+        await fooModel.sync()
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated model
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: fooSchema,
+            },
+            database: database,
+            name: 'foo',
         })
+        // sync with database
+        await fooModel.sync()
         // get schema
-        .then(() => fooModel.schema())
+        var schema = await fooModel.schema()
         // test that schema matches spec
-        .then(schema => {
-            assert.deepEqual(schema.columns.foo, fooSchema)
-        })
+        assert.deepEqual(schema.columns.foo, fooSchema)
     })
 
 })

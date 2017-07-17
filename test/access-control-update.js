@@ -58,7 +58,6 @@ describe('immutable-core-model - access control update', function () {
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -106,13 +105,8 @@ describe('immutable-core-model - access control update', function () {
     })
 
     it('should allow access to update own', async function () {
-        try {
-            // get own record
-            var res = await bam.update({foo: 'bar'})
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get own record
+        var res = await bam.update({foo: 'bar'})
         // check record
         assert.strictEqual(res.data.foo, 'bar')
     })
@@ -133,13 +127,8 @@ describe('immutable-core-model - access control update', function () {
     })
 
     it('should allow access to chown', async function () {
-        try {
-            // get own record
-            var res = await bam.updateMeta({accountId: '33333333333333333333333333333333'})
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get own record
+        var res = await bam.updateMeta({accountId: '33333333333333333333333333333333'})
         // check record
         assert.strictEqual(res.accountId, '33333333333333333333333333333333')
     })
@@ -166,19 +155,14 @@ describe('immutable-core-model - access control update', function () {
     })
 
     it('should update other record', async function () {
-        try {
-            // get other record
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: baz.id},
-                session: session2,
-            })
-            // update - should succeed
-            res = await res.update({foo: 'bar'})
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get other record
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: baz.id},
+            session: session2,
+        })
+        // update - should succeed
+        res = await res.update({foo: 'bar'})
         // check record
         assert.strictEqual(res.data.foo, 'bar')
     })

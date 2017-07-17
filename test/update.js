@@ -38,43 +38,33 @@ describe('immutable-core-model - update', function () {
     }
 
     beforeEach(async function () {
-        try {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            ImmutableAccessControl.reset()
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-        }
-        catch (err) {
-            throw err
-        }
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should create model with immutable property', async function () {
-        try {
-            // create foo model with immutable property
-            var fooModel = new ImmutableCoreModel({
-                columns: {
-                    foo: {
-                        immutable: true,
-                        type: 'string',
-                    }
-                },
-                database: database,
-                name: 'foo',
-            })
-            // sync model
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo model with immutable property
+        var fooModel = new ImmutableCoreModel({
+            columns: {
+                foo: {
+                    immutable: true,
+                    type: 'string',
+                }
+            },
+            database: database,
+            name: 'foo',
+        })
+        // sync model
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'bar'},
+            session: session,
+        })
 
         try {
             // this should throw error
@@ -90,23 +80,18 @@ describe('immutable-core-model - update', function () {
     })
 
     it('should throw error when updating old instance', async function () {
-        try {
-            // create foo model with immutable property
-            var fooModel = new ImmutableCoreModel({
-                database: database,
-                name: 'foo',
-            })
-            // sync model
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo model with immutable property
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // sync model
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'bar'},
+            session: session,
+        })
 
         try {
             // first update should succeed
@@ -125,36 +110,25 @@ describe('immutable-core-model - update', function () {
     })
 
     it('should force update old instance', async function () {
-        try {
-            // create foo model with immutable property
-            var fooModel = new ImmutableCoreModel({
-                database: database,
-                name: 'foo',
-            })
-            // sync model
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-
-        try {
-            // first update should succeed
-            var updateFoo = await foo.update({foo: 'bam'})
-            // second update should succeed with force
-            updateFoo = await foo.updateMeta({
-                data: {foo: 'bar'},
-                force: true,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo model with immutable property
+        var fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+        })
+        // sync model
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'bar'},
+            session: session,
+        })
+        // first update should succeed
+        var updateFoo = await foo.update({foo: 'bam'})
+        // second update should succeed with force
+        updateFoo = await foo.updateMeta({
+            data: {foo: 'bar'},
+            force: true,
+        })
         // check that first update succeeded
         assert.deepEqual(updateFoo.data, {foo: 'bar'})
     })

@@ -36,16 +36,13 @@ describe('immutable-core-model - access control', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-            database.query('DROP TABLE IF EXISTS fooDelete'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should create model with default access control provider', async function () {
@@ -151,18 +148,13 @@ describe('immutable-core-model - access control', function () {
             database: database,
             name: 'foo',
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create record
-            var foo = fooModel.createMeta({
-                data: {foo: true},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create record
+        var foo = await fooModel.createMeta({
+            data: {foo: true},
+            session: session,
+        })
     })
 
 })

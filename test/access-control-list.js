@@ -58,7 +58,6 @@ describe('immutable-core-model - access control list', function () {
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -106,32 +105,22 @@ describe('immutable-core-model - access control list', function () {
     })
 
     it('should allow access to list own', async function () {
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session1,
-            })
-            // get record
-            var foos = await res.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all foo records
+        var res = await fooModel.query({
+            session: session1,
+        })
+        // get record
+        var foos = await res.fetch(1)
         // should only return own record
         assert.strictEqual(res.length, 1)
         assert.strictEqual(foos[0].accountId, session1.accountId)
     })
 
     it('should allow access to list any', async function () {
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                session: session2,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // query all foo records
+        var res = await fooModel.query({
+            session: session2,
+        })
         // should return all records
         assert.strictEqual(res.length, 3)
     })

@@ -36,16 +36,13 @@ describe('immutable-core-model - access control create', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-            database.query('DROP TABLE IF EXISTS fooDelete'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should deny access to create', async function () {
@@ -81,18 +78,13 @@ describe('immutable-core-model - access control create', function () {
             database: database,
             name: 'foo',
         })
-        try {
-            // sync model
-            await fooModel.sync()
-            // create should be success
-            var foo = await fooModel.createMeta({
-                data: {foo: true},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync model
+        await fooModel.sync()
+        // create should be success
+        var foo = await fooModel.createMeta({
+            data: {foo: true},
+            session: session,
+        })
         // test created instance
         assert.isDefined(foo)
         assert.strictEqual(foo.data.foo, true)

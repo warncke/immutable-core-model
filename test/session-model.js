@@ -59,30 +59,19 @@ describe('immutable-core-model - session model', function () {
         })
         // create local model with session
         sessionModel = globalSessionModel.session(session)
-        // setup database
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS session')
-            // sync with database
-            await globalSessionModel.sync()
-            // insert first record
-            foo1 = await globalSessionModel.createMeta({
-                id: '01000000000000000000000000000000',
-                session: session,
-            })
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS session')
+        // sync with database
+        await globalSessionModel.sync()
+        // insert first record
+        foo1 = await globalSessionModel.createMeta({
+            id: '01000000000000000000000000000000',
+            session: session,
+        })
     })
 
     it('should select session by id', async function () {
-        try {
-            var session = await sessionModel.select.by.id(foo1.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var session = await sessionModel.select.by.id(foo1.id)
         // check data
         assert.isDefined(session)
         assert.strictEqual(session.id, foo1.id)

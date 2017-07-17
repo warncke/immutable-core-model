@@ -37,13 +37,13 @@ describe('immutable-core-model - schema', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
-    beforeEach(function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
-        return database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS foo')
     })
 
     it('should create a model with a schema', async function () {
@@ -96,18 +96,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'foo'},
+            session: session,
+        })
         // validate data
         assert.strictEqual(foo.data.foo, 'foo')
     })
@@ -142,18 +137,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 0},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 0},
+            session: session,
+        })
         // validate data
         assert.strictEqual(foo.data.foo, '0')
     })
@@ -169,18 +159,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 0},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 0},
+            session: session,
+        })
         // validate data
         assert.deepEqual(foo.data.foo, [0])
     })
@@ -196,18 +181,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {bar: 'bar'},
+            session: session,
+        })
         // validate data
         assert.strictEqual(foo.data.bar, 'bar')
     })
@@ -224,18 +204,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {bar: 'bar'},
+            session: session,
+        })
         // validate data
         assert.isUndefined(foo.data.bar)
     })
@@ -251,22 +226,17 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-            // update
-            foo = await foo.update({
-                foo: 'bar'
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'foo'},
+            session: session,
+        })
+        // update
+        foo = await foo.update({
+            foo: 'bar'
+        })
         // validate data
         assert.strictEqual(foo.data.foo, 'bar')
     })
@@ -311,18 +281,13 @@ describe('immutable-core-model - schema', function () {
             },
             validate: false,
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: false},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: false},
+            session: session,
+        })
     })
 
     it('should not throw error when creating instance that does not match schema and validate:false on create', async function () {
@@ -336,19 +301,14 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: false},
-                session: session,
-                validate: false,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: false},
+            session: session,
+            validate: false,
+        })
     })
 
     it('should throw error when missing required (string) property', async function () {
@@ -418,18 +378,13 @@ describe('immutable-core-model - schema', function () {
                 },
             },
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {bar: 'bar'},
+            session: session,
+        })
     })
 
     it('should throw error when updating an instance that does not match schema', async function () {
@@ -476,23 +431,18 @@ describe('immutable-core-model - schema', function () {
             },
             required: ['foo'],
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {foo: 'foo'},
-                session: session,
-            })
-            // update
-            foo = await foo.updateMeta({
-                data: {foo: false},
-                validate: false,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {foo: 'foo'},
+            session: session,
+        })
+        // update
+        foo = await foo.updateMeta({
+            data: {foo: false},
+            validate: false,
+        })
     })
 
     it('should not throw error when missing required property that has default', async function () {
@@ -508,20 +458,14 @@ describe('immutable-core-model - schema', function () {
             },
             required: 'foo',
         })
-        try {
-            // sync with database
-            await fooModel.sync()
-            // create new foo instance
-            var foo = await fooModel.createMeta({
-                data: {bar: 'bar'},
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-
-        // check that default value set
+        // sync with database
+        await fooModel.sync()
+        // create new foo instance
+        var foo = await fooModel.createMeta({
+            data: {bar: 'bar'},
+            session: session,
+        })
+    // check that default value set
         assert.strictEqual(foo.data.foo, 'foo')
     })
 

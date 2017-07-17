@@ -38,7 +38,7 @@ describe('immutable-core-model - query', function () {
     }
 
     // variable to populate in before
-    var fooModel, origBam, origBar, origFoo, origGrr
+    var fooModel, fooModelGlobal, origBam, origBar, origFoo, origGrr
 
     before(async function () {
         // reset global data
@@ -46,7 +46,7 @@ describe('immutable-core-model - query', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -57,35 +57,29 @@ describe('immutable-core-model - query', function () {
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
         // sync with database
-        await fooModel.sync()
-        // create instances with different data values for testing
-        origBam = await fooModel.createMeta({
-            data: {
-                bar: "0.000000000",
-                foo: 'bam',
-            },
-            session: session,
+        await fooModelGlobal.sync()
+        // get local fooModel
+        fooModel = fooModelGlobal.session(session)
+        // create new bam instance
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
         })
-        origBar = await fooModel.createMeta({
-            data: {
-                bar: "1.000000000",
-                foo: 'bar',
-            },
-            session: session,
+        // create new bar instance
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
         })
-        origFoo = await fooModel.createMeta({
-            data: {
-                bar: "2.000000000",
-                foo: 'foo',
-            },
-            session: session,
+        // create new foo instance
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
         })
     })
 
     it('should do query by id', async function () {
         var foo = await fooModel.query({
             limit: 1,
-            session: session,
             where: {
                 id: origFoo.id
             },
@@ -97,7 +91,6 @@ describe('immutable-core-model - query', function () {
     it('should do query by string column', async function () {
         var bar = await fooModel.query({
             limit: 1,
-            session: session,
             where: {
                 foo: 'bar'
             },
@@ -109,7 +102,6 @@ describe('immutable-core-model - query', function () {
     it('should do query by number column', async function () {
         var bam = await fooModel.query({
             limit: 1,
-            session: session,
             where: {
                 bar: 0
             },
@@ -121,8 +113,7 @@ describe('immutable-core-model - query', function () {
     it('should query all', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
         })
         // there should be 3 results
         assert.strictEqual(all.length, 3)
@@ -137,7 +128,6 @@ describe('immutable-core-model - query', function () {
         var all = await fooModel.query({
             all: true,
             order: ['createTime', 'desc'],
-            session: session,
         })
         // there should be 3 results
         assert.strictEqual(all.length, 3)
@@ -155,7 +145,6 @@ describe('immutable-core-model - query', function () {
                 ['sessionId', 'accountId', 'asc'],
                 ['createTime', 'desc'],
             ],
-            session: session,
         })
         // there should be 3 results
         assert.strictEqual(all.length, 3)
@@ -169,8 +158,7 @@ describe('immutable-core-model - query', function () {
     it('should do in query with array', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { id: [
                 origBam.id,
                 origBar.id,
@@ -189,8 +177,7 @@ describe('immutable-core-model - query', function () {
     it('should do in query', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { id: { in: [
                 origBam.id,
                 origBar.id,
@@ -209,8 +196,7 @@ describe('immutable-core-model - query', function () {
     it('should do not in query', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: {
                 id: { not: { in: [
                     origBam.id,
@@ -230,8 +216,7 @@ describe('immutable-core-model - query', function () {
     it('should do like query', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { foo: { like: 'ba%' } },
         })
         // there should be 2 results
@@ -246,8 +231,7 @@ describe('immutable-core-model - query', function () {
     it('should do not like query', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { foo: { not: { like: 'ba%' } } },
         })
         // there should be 1 result
@@ -262,8 +246,7 @@ describe('immutable-core-model - query', function () {
     it('should do greater than', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: {gt: 0} },
         })
         // there should be 2 results
@@ -278,8 +261,7 @@ describe('immutable-core-model - query', function () {
     it('should do not greater than', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { not: {gt: 0} } },
         })
         // there should be 1 results
@@ -294,8 +276,7 @@ describe('immutable-core-model - query', function () {
     it('should do greater than or equal', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { gte: 1 } },
         })
         // there should be 2 results
@@ -310,8 +291,7 @@ describe('immutable-core-model - query', function () {
     it('should do less than', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { lt: 2 } },
         })
         // there should be 2 results
@@ -326,8 +306,7 @@ describe('immutable-core-model - query', function () {
     it('should do not less than', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { not: {lt: 2} } },
         })
         // there should be 2 results
@@ -342,8 +321,7 @@ describe('immutable-core-model - query', function () {
     it('should do less than or equal', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { lte: 1 } },
         })
         // there should be 2 results
@@ -358,8 +336,7 @@ describe('immutable-core-model - query', function () {
     it('should do between', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { bar: { between: [0, 1] } },
         })
         // there should be 2 results
@@ -382,8 +359,7 @@ describe('immutable-core-model - query', function () {
         // do query for foo null
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { foo: null },
         })
         // there should be 1 result
@@ -406,8 +382,7 @@ describe('immutable-core-model - query', function () {
         // do query for foo null
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { foo: { not: null } },
         })
         // there should be 3 results
@@ -422,7 +397,6 @@ describe('immutable-core-model - query', function () {
     it('should do equals query', async function () {
         var all = await fooModel.query({
             all: true,
-            session: session,
             where: { foo: { eq: 'bar' } },
         })
         // there should be 1 results
@@ -437,8 +411,7 @@ describe('immutable-core-model - query', function () {
     it('should do not equals query', async function () {
         var all = await fooModel.query({
             all: true,
-            order: ['createTime'],
-            session: session,
+            order: 'createTime',
             where: { foo: { not: { eq: 'bar' } } },
         })
         // there should be 2 results - does not return origGrr with null foo

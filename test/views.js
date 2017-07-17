@@ -46,44 +46,33 @@ describe('immutable-core-model - views', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        var glboalFooModel = new ImmutableCoreModel({
+        var fooModelGlobal = new ImmutableCoreModel({
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await glboalFooModel.sync()
-            // create instances with different data values for testing
-            origBam = await glboalFooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            origBar = await glboalFooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            origFoo = await glboalFooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-            // list of original records in order added
-            origRecords = [origBam, origBar, origFoo]
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local fooModel
+        var fooModel = fooModelGlobal.session(session)
+        // create new bam instance
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
+        })
+        // create new bar instance
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
+        })
+        // create new foo instance
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
+        })
+        // list of original records in order added
+        origRecords = [origBam, origBar, origFoo]
     })
 
     beforeEach(async function () {
@@ -163,12 +152,7 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.session(session).select.by.id(origBam.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.session(session).select.by.id(origBam.id)
         // view should be applied
         assert.strictEqual(foo.data.foo, origBam.data.foo+' food')
     })
@@ -183,16 +167,11 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get all records which should have foo model view applied
-        try {
-            var records = await glboalFooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var records = await glboalFooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+        })
         // view should be applied
         assert.strictEqual(records[0].data.foo, origBam.data.foo+' food')
         assert.strictEqual(records[1].data.foo, origBar.data.foo+' food')
@@ -209,17 +188,12 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get result set which should have foo model view applied
-        try {
-            var result = await glboalFooModel.query({
-                order: ['createTime'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var result = await glboalFooModel.query({
+            order: ['createTime'],
+            session: session,
+        })
         // view should be applied to result set
-        return result.each(function (record, number) {
+        await result.each(function (record, number) {
             assert.strictEqual(record.data.foo, origRecords[number].data.foo+' food')
         })
     })
@@ -234,12 +208,7 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.session(session).select.by.id(origBam.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.session(session).select.by.id(origBam.id)
         // view should be applied
         assert.deepEqual(foo, {
             bam: origBam.data,
@@ -258,16 +227,11 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+        })
         // view should be applied
         assert.deepEqual(foo, {
             bam: origBam.data,
@@ -288,15 +252,10 @@ describe('immutable-core-model - views', function () {
             }
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.query({
-                order: ['createTime'],
-                session: session,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.query({
+            order: ['createTime'],
+            session: session,
+        })
         // view should be applied
         assert.deepEqual(foo, {
             bam: origBam.data,
@@ -314,12 +273,7 @@ describe('immutable-core-model - views', function () {
             name: 'foo',
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.session(session).select.view('foo', 'bar')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.session(session).select.view('foo', 'bar')
         // view should be applied
         assert.deepEqual(foo, {
             'bam food': {bar: '0.000000000', foo: 'bam food'},
@@ -337,17 +291,12 @@ describe('immutable-core-model - views', function () {
             name: 'foo',
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.query({
-                all: true,
-                order: ['createTime'],
-                session: session,
-                view: ['foo', 'bar'],
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.query({
+            all: true,
+            order: ['createTime'],
+            session: session,
+            view: ['foo', 'bar'],
+        })
         // view should be applied
         assert.deepEqual(foo, {
             'bam food': {bar: '0.000000000', foo: 'bam food'},
@@ -365,14 +314,9 @@ describe('immutable-core-model - views', function () {
             name: 'foo',
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.session(session).select.one
-                .where.id.eq(origBam.id)
-                .view('foo', 'fooAsync')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.session(session).select.one
+            .where.id.eq(origBam.id)
+            .view('foo', 'fooAsync')
         // view should be applied
         assert.strictEqual(foo.data.foo, 'bam food foodAsync')
     })
@@ -384,12 +328,7 @@ describe('immutable-core-model - views', function () {
             name: 'foo',
         })
         // get single record which should have foo model view applied
-        try {
-            var foo = await glboalFooModel.session(session).select.view('bar', 'barAsync')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        var foo = await glboalFooModel.session(session).select.view('bar', 'barAsync')
         // view should be applied
         assert.deepEqual(foo, {
             bam: origBam.data,

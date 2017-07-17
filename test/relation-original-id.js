@@ -68,101 +68,75 @@ describe('immutable-core-model - relations with original id', function () {
             database: database,
             name: 'bar',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            await database.query('DROP TABLE IF EXISTS bar')
-            // sync with database
-            await fooModelGlobal.sync()
-            await barModelGlobal.sync()
-            // get local instances
-            fooModel = fooModelGlobal.session(session)
-            barModel = barModelGlobal.session(session)
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS bar')
+        // sync with database
+        await fooModelGlobal.sync()
+        await barModelGlobal.sync()
+        // get local instances
+        fooModel = fooModelGlobal.session(session)
+        barModel = barModelGlobal.session(session)
     })
 
     it('should create related model and via', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            var related = await foo.create('bar', {foo: 'bar'})
-            // load related
-            var bar = await barModel.select.one.by.fooOriginalId(foo.originalId)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        var related = await foo.create('bar', {foo: 'bar'})
+        // load related
+        var bar = await barModel.select.one.by.fooOriginalId(foo.originalId)
         // check that related was created
         assert.isObject(bar)
         assert.strictEqual(bar.data.fooOriginalId, foo.originalId)
     })
 
     it('should create related model and via from opposite model', async function () {
-        try {
-            // create bar instance
-            var bar = await barModel.create({foo: 'bar'})
-            // create related
-            var related = await bar.create('foo', {foo: 'foo'})
-            // load related
-            var foo = await fooModel.select.by.id(related.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create bar instance
+        var bar = await barModel.create({foo: 'bar'})
+        // create related
+        var related = await bar.create('foo', {foo: 'foo'})
+        // load related
+        var foo = await fooModel.select.by.id(related.id)
         // check that related was created
         assert.isObject(foo)
     })
 
     it('should select related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            await foo.create('bar', {foo: 'bam'})
-            await foo.create('bar', {foo: 'bar'})
-            // load related
-            var result = await foo.select('bar')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        await foo.create('bar', {foo: 'bam'})
+        await foo.create('bar', {foo: 'bar'})
+        // load related
+        var result = await foo.select('bar')
         // check result
         assert.strictEqual(result.length, 2)
     })
 
     it('should query related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create revision of instance
-            foo = await foo.update({foo: 'bar'})
-            // create related
-            await foo.create('bar', {foo: 'bam'})
-            await foo.create('bar', {foo: 'bar'})
-            await foo.create('bar', {foo: 'foo'})
-            // load related desc
-            var result = await foo.query({
-                order: ['createTime', 'DESC'],
-                relation: 'bar',
-            })
-            // fetch results
-            var desc = await result.fetch(6)
-            // load related asc
-            var result = await foo.query({
-                order: ['createTime'],
-                relation: 'bar',
-            })
-            // fetch results
-            var asc = await result.fetch(6)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create revision of instance
+        foo = await foo.update({foo: 'bar'})
+        // create related
+        await foo.create('bar', {foo: 'bam'})
+        await foo.create('bar', {foo: 'bar'})
+        await foo.create('bar', {foo: 'foo'})
+        // load related desc
+        var result = await foo.query({
+            order: ['createTime', 'DESC'],
+            relation: 'bar',
+        })
+        // fetch results
+        var desc = await result.fetch(6)
+        // load related asc
+        var result = await foo.query({
+            order: ['createTime'],
+            relation: 'bar',
+        })
+        // fetch results
+        var asc = await result.fetch(6)
         // check result
         assert.strictEqual(asc.length, 3)
         assert.strictEqual(asc[0].data.foo, 'bam')

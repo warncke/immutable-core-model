@@ -81,38 +81,27 @@ describe('immutable-core-model - relations via id', function () {
             database: database,
             name: 'bar',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            await database.query('DROP TABLE IF EXISTS bam')
-            await database.query('DROP TABLE IF EXISTS bar')
-            // sync with database
-            await fooModelGlobal.sync()
-            await bamModelGlobal.sync()
-            await barModelGlobal.sync()
-            // get local instances
-            fooModel = fooModelGlobal.session(session)
-            bamModel = bamModelGlobal.session(session)
-            barModel = barModelGlobal.session(session)
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS bam')
+        await database.query('DROP TABLE IF EXISTS bar')
+        // sync with database
+        await fooModelGlobal.sync()
+        await bamModelGlobal.sync()
+        await barModelGlobal.sync()
+        // get local instances
+        fooModel = fooModelGlobal.session(session)
+        bamModel = bamModelGlobal.session(session)
+        barModel = barModelGlobal.session(session)
     })
 
     it('should create related model and via', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            var bar = await foo.create('bar', {foo: 'bar'})
-            // load via
-            var via = await bamModel.select.one.by.fooId(foo.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        var bar = await foo.create('bar', {foo: 'bar'})
+        // load via
+        var via = await bamModel.select.one.by.fooId(foo.id)
         // check that bar and via created and ids match
         assert.isObject(bar)
         assert.isObject(via)
@@ -121,17 +110,12 @@ describe('immutable-core-model - relations via id', function () {
     })
 
     it('should create related model and via from opposite model', async function () {
-        try {
-            // create bar instance
-            var bar = await barModel.create({foo: 'bar'})
-            // create related
-            var foo = await bar.create('foo', {foo: 'foo'})
-            // load via
-            var via = await bamModel.select.one.by.barId(bar.id)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create bar instance
+        var bar = await barModel.create({foo: 'bar'})
+        // create related
+        var foo = await bar.create('foo', {foo: 'foo'})
+        // load via
+        var via = await bamModel.select.one.by.barId(bar.id)
         // check that bar and via created and ids match
         assert.isObject(bar)
         assert.isObject(via)
@@ -140,64 +124,49 @@ describe('immutable-core-model - relations via id', function () {
     })
 
     it('should select related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            await foo.create('bar', {foo: 'bam'})
-            await foo.create('bar', {foo: 'bar'})
-            // load related
-            var result = await foo.select('bar')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        await foo.create('bar', {foo: 'bam'})
+        await foo.create('bar', {foo: 'bar'})
+        // load related
+        var result = await foo.select('bar')
         // check result
         assert.strictEqual(result.length, 2)
     })
 
     it('should select inverse related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            var bar = await foo.create('bar', {foo: 'bam'})
-            // load related
-            var result = await bar.select('foo')
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        var bar = await foo.create('bar', {foo: 'bam'})
+        // load related
+        var result = await bar.select('foo')
         // check result
         assert.strictEqual(result.length, 1)
     })
 
     it('should query related models', async function () {
-        try {
-            // create foo instance
-            var foo = await fooModel.create({foo: 'foo'})
-            // create related
-            await foo.create('bar', {foo: 'bam'})
-            await foo.create('bar', {foo: 'bar'})
-            await foo.create('bar', {foo: 'foo'})
-            // load related desc
-            var result = await foo.query({
-                order: ['createTime', 'DESC'],
-                relation: 'bar',
-            })
-            // fetch results
-            var desc = await result.fetch(3)
-            // load related asc
-            var result = await foo.query({
-                order: ['createTime'],
-                relation: 'bar',
-            })
-            // fetch results
-            var asc = await result.fetch(3)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // create foo instance
+        var foo = await fooModel.create({foo: 'foo'})
+        // create related
+        await foo.create('bar', {foo: 'bam'})
+        await foo.create('bar', {foo: 'bar'})
+        await foo.create('bar', {foo: 'foo'})
+        // load related desc
+        var result = await foo.query({
+            order: ['createTime', 'DESC'],
+            relation: 'bar',
+        })
+        // fetch results
+        var desc = await result.fetch(3)
+        // load related asc
+        var result = await foo.query({
+            order: ['createTime'],
+            relation: 'bar',
+        })
+        // fetch results
+        var asc = await result.fetch(3)
         // check result
         assert.strictEqual(asc.length, 3)
         assert.strictEqual(asc[0].data.foo, 'bam')

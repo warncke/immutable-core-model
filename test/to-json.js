@@ -38,7 +38,7 @@ describe('immutable-core-model - toJSON', function () {
     }
 
     // variable to populate in before
-    var fooModel, origBam, origBar, origFoo, origGrr
+    var fooModel, fooModelGlobal, origBam, origBar, origFoo, origGrr
 
     before(async function () {
         // reset global data
@@ -46,7 +46,7 @@ describe('immutable-core-model - toJSON', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -55,44 +55,30 @@ describe('immutable-core-model - toJSON', function () {
             name: 'foo',
         })
         // drop any test tables if they exist
-        await Promise.all([
-            database.query('DROP TABLE IF EXISTS foo'),
-            database.query('DROP TABLE IF EXISTS fooDelete'),
-            database.query('DROP TABLE IF EXISTS fooUnDelete'),
-        ])
+        await database.query('DROP TABLE IF EXISTS foo')
         // sync with database
-        await fooModel.sync()
+        await fooModelGlobal.sync()
+        // get local fooModel
+        fooModel = fooModelGlobal.session(session)
         // create new bam instance
-        origBam = await fooModel.createMeta({
-            data: {
-                bar: "0.000000000",
-                foo: 'bam',
-            },
-            session: session,
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
         })
         // create new bar instance
-        origBar = await fooModel.createMeta({
-            data: {
-                bar: "1.000000000",
-                foo: 'bar',
-            },
-            session: session,
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
         })
         // create new foo instance
-        origFoo = await fooModel.createMeta({
-            data: {
-                bar: "2.000000000",
-                foo: 'foo',
-            },
-            session: session,
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
         })
         // create new grr instance
-        origGrr = await fooModel.createMeta({
-            data: {
-                bar: "3.000000000",
-                foo: 'grr',
-            },
-            session: session,
+        origGrr = await fooModel.create({
+            bar: "3.000000000",
+            foo: 'grr',
         })
     })
 

@@ -58,7 +58,6 @@ describe('immutable-core-model - access control read', function () {
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -107,49 +106,34 @@ describe('immutable-core-model - access control read', function () {
     })
 
     it('should allow access to read own', async function () {
-        try {
-            // get own record
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: bam.id},
-                session: session1,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get own record
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: bam.id},
+            session: session1,
+        })
         // check record
         assert.strictEqual(res.id, bam.id)
     })
 
     it('should not read other record with only own access', async function () {
-        try {
-            // get other record
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: bar.id},
-                session: session1,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get other record
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: bar.id},
+            session: session1,
+        })
         // should return nothing
         assert.isUndefined(res)
     })
 
     it('should allow access to read any', async function () {
-        try {
-            // get other record
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: bam.id},
-                session: session2,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // get other record
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: bam.id},
+            session: session2,
+        })
         // check record
         assert.strictEqual(res.id, bam.id)
     })

@@ -39,7 +39,7 @@ describe('immutable-core-model-select', function () {
     }
 
     // variable to populate in before
-    var fooModel, origBam, origBar, origFoo
+    var fooModel, fooModelGlobal, origBam, origBar, origFoo
 
     // reset global data
     immutable.reset()
@@ -51,7 +51,7 @@ describe('immutable-core-model-select', function () {
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
         // create initial model
-        fooModel = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 bar: 'number',
                 foo: 'string',
@@ -59,74 +59,46 @@ describe('immutable-core-model-select', function () {
             database: database,
             name: 'foo',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            // sync with database
-            await fooModel.sync()
-            // create new bam instance
-            origBam = await fooModel.createMeta({
-                data: {
-                    bar: "0.000000000",
-                    foo: 'bam',
-                },
-                session: session,
-            })
-            // create new bar instance
-            origBar = await fooModel.createMeta({
-                data: {
-                    bar: "1.000000000",
-                    foo: 'bar',
-                },
-                session: session,
-            })
-            // create new foo instance
-            origFoo = await fooModel.createMeta({
-                data: {
-                    bar: "2.000000000",
-                    foo: 'foo',
-                },
-                session: session,
-            })
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local foo model
+        fooModel = fooModelGlobal.session(session)  
+        // create new bam instance
+        origBam = await fooModel.create({
+            bar: "0.000000000",
+            foo: 'bam',
+        })
+        // create new bar instance
+        origBar = await fooModel.create({
+            bar: "1.000000000",
+            foo: 'bar',
+        })
+        // create new foo instance
+        origFoo = await fooModel.create({
+            bar: "2.000000000",
+            foo: 'foo',
+        })
     })
 
     it('should select by id', async function () {
-        // create new query builder
-        var select = new ImmutableCoreModelSelect({
-            model: fooModel,
-            session: session,
-        })
         // select foo by id
-        var foo = await select.by.id(origFoo.id)
+        var foo = await fooModel.select.by.id(origFoo.id)
         // check that return matches original
         assert.deepEqual(foo.data, origFoo.data)
     })
 
     it('should select one by column', async function () {
-        // create new query builder
-        var select = new ImmutableCoreModelSelect({
-            model: fooModel,
-            session: session,
-        })
         // select foo by id
-        var foo = await select.one.by.foo('bar')
+        var foo = await fooModel.select.one.by.foo('bar')
         // check that return matches original
         assert.deepEqual(foo.data, origBar.data)
     })
 
     it('should select specific columns', async function () {
-        // create new query builder
-        var select = new ImmutableCoreModelSelect({
-            model: fooModel,
-            session: session,
-        })
         // select foo by id
-        var foo = await select(['data']).by.id(origFoo.id)
+        var foo = await fooModel.select(['data']).by.id(origFoo.id)
         // check result
         assert.deepEqual(foo.data, { bar: '2.000000000', foo: 'foo' })
     })
