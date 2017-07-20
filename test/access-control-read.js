@@ -117,14 +117,22 @@ describe('immutable-core-model - access control read', function () {
     })
 
     it('should not read other record with only own access', async function () {
-        // get other record
-        var res = await fooModel.query({
-            limit: 1,
-            where: {id: bar.id},
-            session: session1,
-        })
-        // should return nothing
-        assert.isUndefined(res)
+        // capture error
+        var error
+        try {
+            // query all foo records
+            var res = await fooModel.query({
+                limit: 1,
+                where: {id: bar.id},
+                session: session1,
+            })
+        }
+        catch (err) {
+            error = err
+        }
+        // test error
+        assert.isDefined(error)
+        assert.strictEqual(error.code, 403)
     })
 
     it('should allow access to read any', async function () {

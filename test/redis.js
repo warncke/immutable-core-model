@@ -4,10 +4,13 @@ const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
-const Redis = require('ioredis')
+const Redis = require('redis')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const immutable = require('immutable-core')
+
+Promise.promisifyAll(Redis.RedisClient.prototype)
+Promise.promisifyAll(Redis.Multi.prototype)
 
 chai.use(chaiAsPromised)
 const assert = chai.assert
@@ -16,6 +19,9 @@ const dbHost = process.env.DB_HOST || 'localhost'
 const dbName = process.env.DB_NAME || 'test'
 const dbPass = process.env.DB_PASS || ''
 const dbUser = process.env.DB_USER || 'root'
+
+const redisHost = process.env.REDIS_HOST || 'localhost'
+const redisPort = process.env.REDIS_PORT || '6379'
 
 // use the same params for all connections
 const connectionParams = {
@@ -38,6 +44,12 @@ describe('immutable-core-model - redis', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
+    // connect to redis
+    var redis = Redis.createClient({
+        host: redisHost,
+        port: redisPort,
+    })
+
     // variable to populate in before
     var fooModel, fooModelGlobal, origBam, origBar, origFoo
 
@@ -46,6 +58,10 @@ describe('immutable-core-model - redis', function () {
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
+        // flush redis
+        await redis.flushdb()
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
         // create initial model
         fooModelGlobal = new ImmutableCoreModel({
             columns: {
@@ -54,9 +70,8 @@ describe('immutable-core-model - redis', function () {
             },
             database: database,
             name: 'foo',
+            redis: redis,
         })
-        // drop any test tables if they exist
-        await database.query('DROP TABLE IF EXISTS foo')
         // sync with database
         await fooModelGlobal.sync()
         // get local fooModel
@@ -78,21 +93,90 @@ describe('immutable-core-model - redis', function () {
         })
     })
 
-    it('should do query by id', async function () {
-        try {
-            var foo = await fooModel.query({
-                limit: 1,
-                session: session,
-                where: {
-                    id: origFoo.id
-                },
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // verify that objects match
-        assert.deepEqual(foo.data, origFoo.data)
+    it('should cache queries with single id', async function () {
+        // do first query to get record cached
+        var foo = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // second query should be cached
+        var fooCached = await fooModel.query({
+            limit: 1,
+            session: session,
+            where: {
+                id: origFoo.id
+            },
+        })
+        // check cached flag
+        assert.isTrue(fooCached.raw._cached)
+    })
+
+    it('should cache queries with array of ids', async function () {
+        // do first query to get record cached
+        var foos = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // second query should be cached
+        var foosCached = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // check cached flag
+        assert.isTrue(foosCached[0].raw._cached)
+        assert.isTrue(foosCached[1].raw._cached)
+    })
+
+    it('should partially cache queries with array of ids', async function () {
+        // do first query to get records cached
+        var foos = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // second query should have 2 records cached and 1 not cached
+        var foosCached = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id, origBam.id]
+            },
+        })
+        // check cached flag
+        assert.isTrue(foosCached[0].raw._cached)
+        assert.isTrue(foosCached[1].raw._cached)
+        assert.isUndefined(foosCached[2].raw._cached)
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // third query should have all records cached
+        var foosCached = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id, origBam.id]
+            },
+        })
+        // check cached flag
+        assert.isTrue(foosCached[0].raw._cached)
+        assert.isTrue(foosCached[1].raw._cached)
+        assert.isTrue(foosCached[2].raw._cached)
     })
 
 })

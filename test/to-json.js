@@ -84,6 +84,7 @@ describe('immutable-core-model - toJSON', function () {
 
     it('should have formatted toJSON object', async function () {
         var foo = await fooModel.query({
+            isCurrent: true,
             limit: 1,
             session: session,
             where: {

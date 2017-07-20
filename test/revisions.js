@@ -115,9 +115,10 @@ describe('immutable-core-model - revisions', function () {
         assert.deepEqual(foo.data, foo3.data)
     })
 
-    it('should set isCurrent false on old revision', async function () {
+    it('should set isCurrent false on old revision with isCurrent:true', async function () {
         // query for old revision
         var foo = await fooModel.query({
+            isCurrent: true,
             limit: 1,
             where: {
                 id: foo1.id
@@ -138,14 +139,14 @@ describe('immutable-core-model - revisions', function () {
         // query for current revision
         foo = await foo.current()
         // foo should be current
-        assert.isTrue(foo.isCurrent)
+        assert.strictEqual(foo.id, foo3.id)
     })
 
     it('should select current instance', async function () {
         // select current with old id
         var foo = await fooModel.select.current.by.id(foo1.id)
         // foo should be current
-        assert.isTrue(foo.isCurrent)
+        assert.strictEqual(foo.id, foo3.id)
     })
 
 })
