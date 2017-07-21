@@ -455,7 +455,16 @@ describe('immutable-core-model - select', function () {
 
     it('should return promise if then is undefined', async function () {
         // do query for foo null
-        var res = await fooModel.select.where.id.eq(origBam.id).then()
+        return fooModel.select.where.id.eq(origBam.id).then().then(res => {
+            // check error
+            assert.isDefined(res)
+            assert.strictEqual(res.length, 1)
+        })
+    })
+
+    it('should execute using query()', async function () {
+        // do query for foo null
+        var res = await fooModel.select.where.id.eq(origBam.id).query()
         // check error
         assert.isDefined(res)
         assert.strictEqual(res.length, 1)

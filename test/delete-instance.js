@@ -164,7 +164,7 @@ describe('immutable-core-model - delete instance', function () {
 
     it('should select deleted instance', async function () {
         var all = await fooModel.select.all
-            .where.isDeleted(true).query()
+            .where.isDeleted(true)
         // check return
         assert.strictEqual(all.length, 1)
         assert.deepEqual(all[0].data, origGrr.data)
@@ -173,7 +173,7 @@ describe('immutable-core-model - delete instance', function () {
     it('should select not-deleted instances', async function () {
         var all = await fooModel.select.all
             .where.isDeleted(false)
-            .order.by.createTime.query()
+            .order.by.createTime
         // check return
         assert.strictEqual(all.length, 3)
         assert.deepEqual(
@@ -185,7 +185,7 @@ describe('immutable-core-model - delete instance', function () {
     it('should query both deleted and not-deleted instances', async function () {
         var all = await fooModel.select.all
             .where.isDeleted(null)
-            .order.by.createTime.query()
+            .order.by.createTime
         // check return
         assert.strictEqual(all.length, 4)
         assert.deepEqual(
@@ -198,7 +198,7 @@ describe('immutable-core-model - delete instance', function () {
         // get result set
         var result = await fooModel.select
             .where.isDeleted(null)
-            .order.by.createTime.query()
+            .order.by.createTime
         // get records
         var all = await result.fetch(4)
         // check return

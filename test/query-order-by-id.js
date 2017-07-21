@@ -96,22 +96,22 @@ describe('immutable-core-model - query result ordered by ids', function () {
 
     it('should order by ids with id in query', async function () {
         // select foos by id
-        var foos = await fooModel.select.all.where.id.in([origFoo.id, origBar.id, origBam.id]).query()
+        var foos = await fooModel.select.all.where.id.in([origFoo.id, origBar.id, origBam.id])
         // check order of result
         assert.deepEqual(_.map(foos, 'id'), [origFoo.id, origBar.id, origBam.id])
         // select foos by id
-        foos = await fooModel.select.all.where.id.in([origBar.id, origFoo.id, origBam.id]).query()
+        foos = await fooModel.select.all.where.id.in([origBar.id, origFoo.id, origBam.id])
         // check order of result
         assert.deepEqual(_.map(foos, 'id'), [origBar.id, origFoo.id, origBam.id])
     })
 
     it('should order by ids when select result set', async function () {
         // select foos by id
-        var res = await fooModel.select.where.id.in([origFoo.id, origBar.id, origBam.id]).query()
+        var res = await fooModel.select.where.id.in([origFoo.id, origBar.id, origBam.id])
         // check order of result
         assert.deepEqual(res.ids, [origFoo.id, origBar.id, origBam.id])
         // select foos by id
-        res = await fooModel.select.where.id.in([origBar.id, origFoo.id, origBam.id]).query()
+        res = await fooModel.select.where.id.in([origBar.id, origFoo.id, origBam.id])
         // check order of result
         assert.deepEqual(res.ids, [origBar.id, origFoo.id, origBam.id])
     })
@@ -135,11 +135,11 @@ describe('immutable-core-model - query result ordered by ids', function () {
         var newBar = await origBar.update({bar: 20})
         var newFoo = await origFoo.update({bar: 30})
         // select current records by old id
-        var foos = await fooModel.select.all.current.where.id.in([origFoo.id, origBar.id, origBam.id]).query()
+        var foos = await fooModel.select.all.current.where.id.in([origFoo.id, origBar.id, origBam.id])
         // check order of result
         assert.deepEqual(_.map(foos, 'id'), [newFoo.id, newBar.id, newBam.id])
         // select current records by old id
-        foos = await fooModel.select.all.current.where.id.in([origFoo.id, origBam.id, origBar.id]).query()
+        foos = await fooModel.select.all.current.where.id.in([origFoo.id, origBam.id, origBar.id])
         // check order of result
         assert.deepEqual(_.map(foos, 'id'), [newFoo.id, newBam.id, newBar.id])
     })
@@ -149,11 +149,11 @@ describe('immutable-core-model - query result ordered by ids', function () {
         var newBar = await origBar.update({bar: 20})
         var newFoo = await origFoo.update({bar: 30})
         // select current records by old id
-        var res = await fooModel.select.current.where.id.in([origFoo.id, origBar.id, origBam.id]).query()
+        var res = await fooModel.select.current.where.id.in([origFoo.id, origBar.id, origBam.id])
         // check order of result
         assert.deepEqual(res.ids, [newFoo.id, newBar.id, newBam.id])
         // select current records by old id
-        res = await fooModel.select.current.where.id.in([origFoo.id, origBam.id, origBar.id]).query()
+        res = await fooModel.select.current.where.id.in([origFoo.id, origBam.id, origBar.id])
         // check order of result
         assert.deepEqual(res.ids, [newFoo.id, newBam.id, newBar.id])
     })

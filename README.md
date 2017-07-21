@@ -1055,6 +1055,30 @@ examples of the same query being performed with each.
 Queries using the select method can only be performed on a local model
 instance with a session context set.
 
+### Select interface
+
+    foo = await fooModel.select.all.order.by.foo
+
+    foo = await fooModel.select.all.order.by.foo.query()
+
+    foo = await fooMdoel.select.all.order.by.foo.then(
+        res => { ... },
+        err => { ... }
+    )
+
+The select interface works using
+[JavaScript Proxies](https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+
+Every property access modifies the internal state of the select query and when
+the query is executed the state is reset to perform the next query.
+
+Every object retured by a property access returns a proxy object with query
+and then methods defined on it.
+
+Calling either query or then will execute the query returning a promise.
+
+When await is used the then method is called implicitly.
+
 ### Query a record by id
 
 #### query
