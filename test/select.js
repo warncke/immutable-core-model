@@ -96,7 +96,7 @@ describe('immutable-core-model - select', function () {
     })
 
     it('should query all with order', async function () {
-        var all = await fooModel.select.all.order.by.createTime.query()
+        var all = await fooModel.select.all.order.by.createTime
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -109,7 +109,7 @@ describe('immutable-core-model - select', function () {
     it('should query all with limit after order', async function () {
         var all = await fooModel.select.all
             .order.by.createTime
-            .limit(2).query()
+            .limit(2)
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -122,7 +122,7 @@ describe('immutable-core-model - select', function () {
     it('should query all with limit and offset after order', async function () {
         var all = await fooModel.select.all
             .order.by.createTime
-            .limit(2).offset(1).query()
+            .limit(2).offset(1)
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -136,7 +136,7 @@ describe('immutable-core-model - select', function () {
         try {
             var all = await fooModel.select.all
                 .order.by.createTime
-                .limit(1).query()
+                .limit(1)
         }
         catch (err) {
             var error = err.message
@@ -146,7 +146,7 @@ describe('immutable-core-model - select', function () {
     })
 
     it('should order desc', async function () {
-        var all = await fooModel.select.all.order.by.createTime.desc.query()
+        var all = await fooModel.select.all.order.by.createTime.desc
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -159,7 +159,7 @@ describe('immutable-core-model - select', function () {
     it('should order with multiple clauses', async function () {
         var all = await fooModel.select.all
             .order.by.sessionId.accountId.asc
-            .createTime.desc.query()
+            .createTime.desc
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -173,7 +173,7 @@ describe('immutable-core-model - select', function () {
         var all = await fooModel.select.all
             .order.by.sessionId.accountId.asc
             .createTime.desc
-            .limit(2).query()
+            .limit(2)
         // there should be 3 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -186,7 +186,7 @@ describe('immutable-core-model - select', function () {
     it('should do in query', async function () {
         var all = await fooModel.select.all
             .where.id.in([origBam.id, origBar.id, origFoo.id])
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -200,7 +200,7 @@ describe('immutable-core-model - select', function () {
         var all = await fooModel.select.all
             .where.id.in([origBam.id, origBar.id, origFoo.id])
             .order.by.createTime
-            .limit(2).offset(1).query()
+            .limit(2).offset(1)
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -213,7 +213,7 @@ describe('immutable-core-model - select', function () {
     it('should do not in query', async function () {
         var all = await fooModel.select.all
             .where.id.not.in([origBam.id, origBar.id])
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 result
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -226,7 +226,7 @@ describe('immutable-core-model - select', function () {
     it('should do like query', async function () {
         var all = await fooModel.select.all
             .where.foo.like('ba%')
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -239,7 +239,7 @@ describe('immutable-core-model - select', function () {
     it('should do not like query', async function () {
         var all = await fooModel.select.all
             .where.foo.not.like('ba%')
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 result
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -252,7 +252,7 @@ describe('immutable-core-model - select', function () {
     it('should do greater than', async function () {
         var all = await fooModel.select.all
             .where.bar.gt(0)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -265,7 +265,7 @@ describe('immutable-core-model - select', function () {
     it('should do not greater than', async function () {
         var all = await fooModel.select.all
             .where.bar.not.gt(0)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 results
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -278,7 +278,7 @@ describe('immutable-core-model - select', function () {
     it('should do greater than or equal', async function () {
         var all = await fooModel.select.all
             .where.bar.gte(1)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -291,7 +291,7 @@ describe('immutable-core-model - select', function () {
     it('should do less than', async function () {
         var all = await fooModel.select.all
             .where.bar.lt(2)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -304,7 +304,7 @@ describe('immutable-core-model - select', function () {
     it('should do not less than', async function () {
         var all = await fooModel.select.all
             .where.bar.not.lt(2)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -317,7 +317,7 @@ describe('immutable-core-model - select', function () {
     it('should do less than or equal', async function () {
         var all = await fooModel.select.all
             .where.bar.lte(1)
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -330,7 +330,7 @@ describe('immutable-core-model - select', function () {
     it('should do between', async function () {
         var all = await fooModel.select.all
             .where.bar.between([0,1])
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -351,7 +351,7 @@ describe('immutable-core-model - select', function () {
         // do query for foo null
         var all = await fooModel.select.all
             .where.foo.null
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 result
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -365,7 +365,7 @@ describe('immutable-core-model - select', function () {
         // do query for foo null
         var all = await fooModel.select.all
             .where.foo.is.null
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 result
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -379,7 +379,7 @@ describe('immutable-core-model - select', function () {
         // do query for foo null
         var all = await fooModel.select.all
             .where.foo.not.null
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -393,7 +393,7 @@ describe('immutable-core-model - select', function () {
         // do query for foo null
         var all = await fooModel.select.all
             .where.foo.is.not.null
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 3 results
         assert.strictEqual(all.length, 3)
         // verify that objects match
@@ -406,7 +406,7 @@ describe('immutable-core-model - select', function () {
     it('should do equals query', async function () {
         var all = await fooModel.select.all
             .where.foo.eq('bar')
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 1 results
         assert.strictEqual(all.length, 1)
         // verify that objects match
@@ -419,7 +419,7 @@ describe('immutable-core-model - select', function () {
     it('should do not equals query', async function () {
         var all = await fooModel.select.all
             .where.foo.not.eq('bar')
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 2 results - does not return origGrr with null foo
         assert.strictEqual(all.length, 2)
         // verify that objects match
@@ -432,7 +432,7 @@ describe('immutable-core-model - select', function () {
     it('should do select with order and no where', async function () {
         // do query for foo null
         var all = await fooModel.select.all
-            .order.by.createTime.query()
+            .order.by.createTime
         // there should be 4 results
         assert.strictEqual(all.length, 4)
         // verify that objects match
@@ -440,6 +440,41 @@ describe('immutable-core-model - select', function () {
             [all[0].data, all[1].data, all[2].data, all[3].data],
             [origBam.data, origBar.data, origFoo.data, origGrr.data]
         )
+    })
+
+    it('should do call error callback in then', async function () {
+        var thrown
+        // do query for foo null
+        await fooModel.select.required.where.id.eq('xxx').then(
+            res => {},
+            err => { thrown = err}
+        )
+        // check error
+        assert.isDefined(thrown)
+    })
+
+    it('should return promise if then is undefined', async function () {
+        // do query for foo null
+        var res = await fooModel.select.where.id.eq(origBam.id).then()
+        // check error
+        assert.isDefined(res)
+        assert.strictEqual(res.length, 1)
+    })
+
+    it('should do isCurrent check with select.where', async function () {
+        // do query for foo null
+        var res = await fooModel.select.one.isCurrent.where.id.eq(origBam.id)
+        // check error
+        assert.isDefined(res)
+        assert.isTrue(res.isCurrent)
+    })
+
+    it('should do isCurrent check with select.by.id', async function () {
+        // do query for foo null
+        var res = await fooModel.select.isCurrent.by.id(origBam.id)
+        // check error
+        assert.isDefined(res)
+        assert.isTrue(res.isCurrent)
     })
 
 })

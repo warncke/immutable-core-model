@@ -5,6 +5,7 @@ const ImmutableCoreModelSelect = require('../lib/immutable-core-model-select')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
+const _ = require('lodash')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const immutable = require('immutable-core')
@@ -26,7 +27,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.skip('immutable-core-model - query join relations', function () {
+describe('immutable-core-model - query join relations', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -43,9 +44,9 @@ describe.skip('immutable-core-model - query join relations', function () {
     // local models with session
     var fooModel, bamModel, barModel
     // foo instance
-    var foo
+    var foo1, foo2, foo3
     // bar instances
-    var barBam, barBar, barFoo
+    var bar1, bar2, bar3
 
     before(async function () {
         // reset global data
@@ -86,96 +87,87 @@ describe.skip('immutable-core-model - query join relations', function () {
         })
         // create bar model
         barModelGlobal = new ImmutableCoreModel({
+            columns: {
+                foo: 'string',
+            },
             database: database,
             name: 'bar',
         })
-        // setup data to perform queries
-        try {
-            // drop any test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            await database.query('DROP TABLE IF EXISTS bam')
-            await database.query('DROP TABLE IF EXISTS bar')
-            // sync with database
-            await fooModelGlobal.sync()
-            await bamModelGlobal.sync()
-            await barModelGlobal.sync()
-            // get local instances
-            fooModel = fooModelGlobal.session(session)
-            bamModel = bamModelGlobal.session(session)
-            barModel = barModelGlobal.session(session)
-            // create foo instance
-            foo = await fooModel.create({foo: 'foo'})
-            // create related
-            barBam = await foo.create('bar', {foo: 'bam'})
-            barBar = await foo.create('bar', {foo: 'bar'})
-            barFoo = await foo.create('bar', {foo: 'foo'})
-        }
-        catch (err) {
-            throw err
-        }
+        // drop any test tables if they exist
+        await database.query('DROP TABLE IF EXISTS foo')
+        await database.query('DROP TABLE IF EXISTS bam')
+        await database.query('DROP TABLE IF EXISTS bar')
+        // sync with database
+        await fooModelGlobal.sync()
+        await bamModelGlobal.sync()
+        await barModelGlobal.sync()
+        // get local instances
+        fooModel = fooModelGlobal.session(session)
+        bamModel = bamModelGlobal.session(session)
+        barModel = barModelGlobal.session(session)
+        // create foo instance
+        foo1 = await fooModel.create({foo: 'foo1'})
+        foo2 = await fooModel.create({foo: 'foo2'})
+        foo3 = await fooModel.create({foo: 'foo3'})
+        // create related
+        bar1 = await foo1.create('bar', {foo: 'a'})
+        bar2 = await foo2.create('bar', {foo: 'b'})
+        bar3 = await foo3.create('bar', {foo: 'c'})
     })
 
-    it('should join related models with order', async function () {
-        try {
-            // load foo with related records
-            var res = await fooModel.query({
-                all: true,
-                order: ['bar.createTime'],
-                raw: true,
-                where: {id: foo.id},
-                join: ['bar'],
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+    it('should order by joined model', async function () {
+        // load foo with related records
+        var res = await fooModel.query({
+            all: true,
+            join: ['bar'],
+            order: ['bar.foo'],
+        })
         // check result
-        assert.deepEqual(res[0].barData, {foo: 'bam'})
-        assert.deepEqual(res[1].barData, {foo: 'bar'})
-        assert.deepEqual(res[2].barData, {foo: 'foo'})
+        assert.deepEqual(_.map(res, 'id'), [foo1.id, foo2.id, foo3.id])
     })
 
-    it('should join related models with order desc', async function () {
-        try {
-            // load foo with related records
-            var res = await fooModel.query({
-                all: true,
-                order: ['bar.createTime', 'desc'],
-                raw: true,
-                where: {id: foo.id},
-                join: ['bar'],
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+    it('should order by joined model desc', async function () {
+        // load foo with related records
+        var res = await fooModel.query({
+            all: true,
+            join: ['bar'],
+            order: ['bar.foo', 'desc'],
+        })
         // check result
-        assert.deepEqual(res[0].barData, {foo: 'foo'})
-        assert.deepEqual(res[1].barData, {foo: 'bar'})
-        assert.deepEqual(res[2].barData, {foo: 'bam'})
+        assert.deepEqual(_.map(res, 'id'), [foo3.id, foo2.id, foo1.id])
     })
 
-    it('should select columns with joined models', async function () {
-        try {
-            // load foo with related records
-            var res = await fooModel.query({
-                all: true,
-                order: ['bar.createTime'],
-                raw: true,
-                select: ['bar.data'],
-                where: {
-                    'bar.id': barBam.id,
-                    id: foo.id
-                },
-                join: ['bar'],
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+    it('should do where query on joined model', async function () {
+        // load foo with related records
+        var res = await fooModel.query({
+            one: true,
+            join: ['bar'],
+            where: {'bar.foo': 'a'},
+        })
         // check result
-        assert.strictEqual(res.length, 1)
-        assert.deepEqual(res[0].barData, {foo: 'bam'})
+        assert.strictEqual(res.id, foo1.id)
+    })
+
+    it('should not select joined columns by default', async function () {
+        // load foo with related records
+        var res = await fooModel.query({
+            one: true,
+            join: ['bar'],
+            where: {'bar.foo': 'a'},
+        })
+        // check result
+        assert.deepEqual(res.raw, {
+            n: '1',
+            c: '1',
+            d: '0',
+            fooAccountId: foo1.accountId,
+            fooCreateTime: foo1.createTime,
+            fooData: { foo: 'foo1' },
+            fooId: foo1.id,
+            fooOriginalId: foo1.originalId,
+            fooParentId: undefined,
+            fooSessionId: foo1.sessionId,
+       })
     })
 
 })

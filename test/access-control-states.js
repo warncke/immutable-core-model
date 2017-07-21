@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.skip('immutable-core-model - access control states', function () {
+describe('immutable-core-model - access control states', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -47,7 +47,7 @@ describe.skip('immutable-core-model - access control states', function () {
     }
 
     // model instance
-    var fooModel
+    var fooModel, fooModelGlobal
     // record instances
     var bam, bar, baz
 
@@ -58,11 +58,6 @@ describe.skip('immutable-core-model - access control states', function () {
         ImmutableAccessControl.reset()
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
-        await database.query('DROP TABLE IF EXISTS fooDelete')
-        await database.query('DROP TABLE IF EXISTS fooUnDelete')
-        await database.query('DROP TABLE IF EXISTS fooPublish')
-        await database.query('DROP TABLE IF EXISTS fooUnPublish')
-        await database.query('DROP TABLE IF EXISTS fooFlag')
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -70,19 +65,11 @@ describe.skip('immutable-core-model - access control states', function () {
                 'create:1',
                 'read:own:1',
                 'delete:own:1',
-                'publish:own:1',
-                'flag:own:1',
-                'list:published:any:1',
-                'read:published:any:1',
+                'update:own:1',
                 ['foo', 'read:deleted:own:1'],
                 ['bar', 'read:deleted:any:1'],
-                ['foo', 'unPublish:flaged:any:1']
+                ['foo', 'undelete:any:1']
             ],
-            actions: {
-                delete: true,
-                flag: false,
-                publish: true,
-            },
             database: database,
             name: 'foo',
         })
@@ -105,12 +92,7 @@ describe.skip('immutable-core-model - access control states', function () {
 
     it('should deny access to deleted records', async function () {
         // delete record
-        try {
-            await baz.delete()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        baz = await baz.delete()
         // capture error
         var error
         try {
@@ -129,172 +111,32 @@ describe.skip('immutable-core-model - access control states', function () {
         assert.strictEqual(error.code, 403)
     })
 
-    it('should deny access to mixed records', async function () {
-        // delete record
-        try {
-            await baz.delete()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // capture error
-        var error
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: baz.id, isDeleted: null},
-                session: session3,
-            })
-        }
-        catch (err) {
-            error = err
-        }
-        // test error
-        assert.isDefined(error)
-        assert.strictEqual(error.code, 403)
-    })
-
     it('should allow access to own deleted records', async function () {
-        try {
-            // delete record
-            await bam.delete()
-            // query all foo records
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: bam.id, isDeleted: true},
-                session: session1,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // delete record
+        bam = await bam.delete()
+        // query all foo records
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: bam.id, isDeleted: true},
+            session: session1,
+        })
         // test error
         assert.isObject(res)
         assert.strictEqual(res.id, bam.id)
     })
 
     it('should allow access to any deleted records', async function () {
-        try {
-            // delete record
-            await bam.delete()
-            // query all foo records
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: bam.id, isDeleted: true},
-                session: session2,
-            })
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
+        // delete record
+        bam = await bam.delete()
+        // query all foo records
+        var res = await fooModel.query({
+            limit: 1,
+            where: {id: bam.id, isDeleted: true},
+            session: session2,
+        })
         // test error
         assert.isObject(res)
         assert.strictEqual(res.id, bam.id)
     })
 
-    it('should allow access to any published record', async function () {
-        var error
-        try {
-            // should deny access to list
-            await fooModel.query({
-                session: session3,
-            })
-        }
-        catch (err) {
-            error = err
-        }
-        // should have thrown error
-        assert.isDefined(error)
-        // should allow access to list published
-        try {
-            // publish record
-            await bam.publish()
-            // should allow list published
-            var res = await fooModel.query({
-                where: {isPublished: true},
-                session: session3,
-            })
-            // fetch record
-            var [record] = await res.fetch(1)
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // test error
-        assert.isObject(res)
-        assert.deepEqual(res.ids, [bam.id])
-        assert.strictEqual(record.id, bam.id)
-    })
-
-    it('should deny access to published and deleted record', async function () {
-        try {
-            // publish and delete record
-            await baz.publish()
-            await baz.delete()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // capture error
-        var error
-        try {
-            // query all foo records
-            var res = await fooModel.query({
-                limit: 1,
-                where: {id: baz.id, isDeleted: true, isPublished: true},
-                session: session3,
-            })
-        }
-        catch (err) {
-            error = err
-        }
-        // test error
-        assert.isDefined(error)
-        assert.strictEqual(error.code, 403)
-    })
-
-    it('should deny action when not in allowed state', async function () {
-        // publish record
-        try {
-            await bam.publish()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // capture error
-        var error
-        try {
-            // unpublish baz - should fail
-            await bam.unPublish()
-        }
-        catch (err) {
-            error = err
-        }
-        // test error
-        assert.isDefined(error)
-        assert.strictEqual(error.code, 403)
-    })
-
-    it('should allow action when in allowed state', async function () {
-        // publish and flag record
-        try {
-            bam = await bam.publish()
-            bam = await bam.flag()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // should allow unpublish on flagged record
-        try {
-            // publish record
-            bam = await bam.unPublish()
-        }
-        catch (err) {
-            assert.ifError(err)
-        }
-        // should be unpublished
-        assert.isFalse(bam.isPublished)
-        assert.isTrue(bam.wasPublished)
-    })
 })

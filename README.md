@@ -724,34 +724,6 @@ This column must have the `id` type and should usually be indexed.
 When a custom accessId property is used that property must be set on the session
 in order for access to be granted based on ownership.
 
-### Using a property of another model for defining ownership
-
-    var fooModel = new ImmutableCoreModel({
-        accessIdName: 'barId',
-        accessModel: 'fooBar',
-        name: 'foo',
-    })
-
-    var fooBarModel = new ImmutableCoreModel({
-        actions: {
-            delete: false,
-        },
-        columns: {
-            barId: 'id',
-            fooId: 'id',
-        },
-        name: 'fooBar',
-    })
-
-In some cases, such as when a model does not allow revisions, it may be
-necessary to assign ownership via a second model. This can be done with the
-`accessModel` option.
-
-The accessModel must link to the primary model by either id or originalId.
-
-Models using an accessModel cannot be cached so the use of accessModels
-should be avoided if at all possible.
-
 ### Allowing access for queries
 
     var fooModel = new ImmutableCoreModel({

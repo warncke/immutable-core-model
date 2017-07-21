@@ -24,7 +24,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.skip('immutable-core-model - access control delete', function () {
+describe('immutable-core-model - access control delete', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -54,9 +54,6 @@ describe.skip('immutable-core-model - access control delete', function () {
             accessControlRules: [
                 'delete:any:0'
             ],
-            actions: {
-                delete: false,
-            },
             database: database,
             name: 'foo',
         })
@@ -81,16 +78,13 @@ describe.skip('immutable-core-model - access control delete', function () {
         assert.strictEqual(error.code, 403)
     })
 
-    it('should allow access to delete', async function () {
+    it('should allow access to delete own', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             accessControlRules: [
                 'delete:any:0',
                 'delete:own:1',
             ],
-            actions: {
-                delete: false,
-            },
             database: database,
             name: 'foo',
         })
@@ -110,6 +104,68 @@ describe.skip('immutable-core-model - access control delete', function () {
         }
         // check that foo deleted
         assert.strictEqual(foo.isDeleted, true)
+    })
+
+    it('should deny access to undelete', async function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            accessControlRules: [
+                'undelete:any:0'
+            ],
+            database: database,
+            name: 'foo',
+        })
+        // capture error
+        var error
+        try {
+            // sync model
+            await fooModel.sync()
+            // foo create should succeed
+            var foo = await fooModel.createMeta({
+                data: {foo: true},
+                session: session,
+            })
+            // foo delete should succeed
+            foo = await foo.delete()
+            // undelete should fail
+            foo = await foo.undelete()
+        }
+        catch (err) {
+            error = err
+        }
+        // test error
+        assert.isDefined(error)
+        assert.strictEqual(error.code, 403)
+    })
+
+    it('should allow access to delete own', async function () {
+        // create model
+        var fooModel = new ImmutableCoreModel({
+            accessControlRules: [
+                'undelete:any:0',
+                'undelete:own:1',
+            ],
+            database: database,
+            name: 'foo',
+        })
+        try {
+            // sync model
+            await fooModel.sync()
+            // foo create should succeed
+            var foo = await fooModel.createMeta({
+                data: {foo: true},
+                session: session,
+            })
+            // foo delete should succeed
+            foo = await foo.delete()
+            // undelete should succeed
+            foo = await foo.undelete()
+        }
+        catch (err) {
+            assert.ifError(err)
+        }
+        // check that foo deleted
+        assert.strictEqual(foo.isDeleted, false)
     })
 
 })
