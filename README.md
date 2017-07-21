@@ -1,17 +1,13 @@
 # immutable-core-model
 
-Immutable Core Model builds on Immutable Core to persist immutable data to a
-MySQL database.
+Immutable Core Model integrates with the
+[Immutable App](https://www.npmjs.com/package/immutable-app) ecosystem and
+provides persistence of immutable data objects using MySQL, Redis and
+Elasticsearch.
 
-Immutable Core Model is not an ORM in the traditional sense because it makes
-no attempt to map objects to a relational schema. Instead Immutable Core Model
-stores JSON serialized objects directly and then maps properties of those
-objects to columns where needed for querying.
+Immutable Core Model requires native async/await support.
 
-## Native async/await
-
-Immutable Core Model requires Node.js v7.6.0 or greater with native async/await
-support.
+## Immutable Core Model v3
 
 ## Creating a new model
 
@@ -57,22 +53,52 @@ be read when compression is off.
 For the simple example above the following schema will be created:
 
     CREATE TABLE foo (
+        n bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+        c smallint(5) unsigned NOT NULL DEFAULT '1',
+        d tinyint(1) NOT NULL DEFAULT '0',
         fooAccountId binary(16) NOT NULL,
         fooCreateTime datetime(6) NOT NULL,
-        fooData MEDIUMBLOB NOT NULL,
+        fooData mediumblob NOT NULL,
         fooId binary(16) NOT NULL,
         fooOriginalId binary(16) NOT NULL,
         fooParentId binary(16) DEFAULT NULL,
         fooSessionId binary(16) NOT NULL,
-        PRIMARY KEY (fooId),
+        PRIMARY KEY (n),
+        UNIQUE KEY (fooId),
         UNIQUE KEY (fooParentId),
+        KEY (fooAccountId),
+        KEY (fooCreateTime),
         KEY (fooOriginalId),
-        KEY (fooSessionId),
-        KEY (fooAccountId)
+        KEY (fooSessionId)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 
-Immutable Core Model schemas follow the convention of creating lists of items
-in alphabetical order.
+All single character column names are reserved for system use and single
+character system columns will always come first in the schema.
+
+All model columns are created in alphabetical order after system columns.
+
+As of version 2.0.0 all ids are lower case. Previously they were upper case.
+
+### n
+
+The n column provides and auto increment id for each record.
+
+**NEVER USE THIS ID IN YOUR APPLICATIONS**
+
+### c
+
+The c column indicates whether or not record data is compressed. The c
+column will only be created if a data column is present.
+
+0 indicates that data is not commpressed and 1 indicates that data is
+compressed using snappy.
+
+### d
+
+The d column indicates whether or not the record is deleted.
+
+0 indicates that the record is not deleted and 1 indicates that the record
+is deleted.
 
 ### fooAccountId
 
@@ -88,9 +114,11 @@ necessary because fooId includes the timestamp in the data that is hashed.
 
 ### fooData
 
-fooData is a JSON encoding of the foo object using the json-stable-stringify
-module. This data is then compressed using the node-snappy module which is a
-binding for Google's Snappy compression library.
+fooData is a JSON encoding of the foo object using the
+[json-stable-stringify](https://www.npmjs.com/package/json-stable-stringify)
+module. This data is then compressed using the
+[snappy](https://www.npmjs.com/package/snappy) module which is a binding for
+Google's Snappy compression library.
 
 ### fooId
 
@@ -103,21 +131,18 @@ converts NULL values from the database to undefined so that they will not be
 included in JSON encodings.
 
 The hash value is the first 128 bits on an SHA-2 hash calculated using the
-stable-id module.
+[stable-id](https://www.npmjs.com/package/stable-id) module.
 
 ### fooOriginalId and fooParentId
 
 The original and parent ids in Immutable Core Model are used to track object
 revisions.
 
-When the first instance of a foo object is persisted its fooOriginalId will be
-equal to its fooId and its fooParentId will be NULL.
+When a foo record is initially created its originalId will be equal to its id
+and its parentId will be null.
 
-When a revision to that object is persisted it will have the same fooOriginalId
-as the first instance and fooParentId will be equal to the fooId of the first
-instance.
-
-As of version 2.0.0 all ids are lower case. Previously they were upper case.
+When a revision to that record is created it will have the same originalId as
+the first record and its parentId will be equal to the id of the first record.
 
 #### fooId, fooOriginalId, fooParentId Example
 
@@ -156,11 +181,11 @@ The database engine will not be changed or checked after the initial sync.
 
 ### Setting the database engine from the ENV
 
-    DEFAULT_ENGINE=MyISAM node app.js
+    DEFAULT_ENGINE=TokuDB node app.js
 
 ### Setting the database engine globally
 
-    ImmutableCoreModel.defaultEngine('MyISAM')
+    ImmutableCoreModel.defaultEngine('TokuDB')
 
 When setting the defaultEngine the ImmutableCoreModel class object is returned
 so that global configuration methods can be chained.
@@ -171,7 +196,7 @@ so that global configuration methods can be chained.
 
 ### Setting the database engine on a model
 
-    new ImmutableCoreModel({engine: 'MyISAM'})
+    new ImmutableCoreModel({engine: 'TokuDB'})
 
 ## Setting the charset for models
 
@@ -215,12 +240,12 @@ so that global configuration methods can be chained.
     })
 
 The properties object is a list of [JSON Schema](https://spacetelescope.github.io/understanding-json-schema/index.html)
-properties for the instance data.
+properties for the record data.
 
 The schema specified here will be built into a schema for the complete object
 including meta data columns (id, createTime, etc).
 
-Properties with default:true set will be added to the data.
+Properties with defaults will be added to the data.
 
 Data type coercion will be performed so that numbers are converted to strings,
 single element arrays are converted to scalar values, scalars are converted to
@@ -248,7 +273,7 @@ following options to perform JSON schema validation:
 JSON schema validation is enabled by default. To disable JSON schema validation
 set the validate:false flag.
 
-JSON schema validation can also be enabled and disabled for individual created
+JSON schema validation can also be enabled and disabled for individual creat
 and update calls.
 
 Even if validation is disabled the schema and metaSchema properties of the model
@@ -279,7 +304,7 @@ will still be created.
         name: 'foo',
     })
 
-While all of the object data for foo is stored in fooData it is often
+While all of the object data for foo is stored in fooData it may be
 necessary to query tables using column values.
 
 Immutable Core Model allows for specifying additional columns that will be
@@ -289,8 +314,8 @@ Data for these columns will always match the values in fooData.
 
 ### Supported data types
 
-Immutable Core Model supports six data types for columns: boolean, data, id,
-number, string and time.
+Immutable Core Model supports the folowing data typesfor columns: boolean,
+data, id, int, number, smallint, string and time.
 
 boolean values must be either true or false.
 
@@ -316,7 +341,9 @@ Immutable Type | MySQL Type     |
 boolean        | TINYINT(1)     |
 data           | MEDIUMBLOB     |
 id             | BINARY(16)     |
+int            | BIGINT(20)     |
 number         | DECIMAL(36,9)  |
+smallint       | SMALLINT(5)    |
 string         | VARCHAR(255)   |
 time           | DATETIME(6)    |
 
@@ -354,7 +381,7 @@ options can be set.
     })
 
 Because all the revisions of a record are stored in the same table a unique index
-on a column would not allow revisions of an object to be inserted if the indexed
+on a column would not allow revisions of a record to be inserted if the indexed
 value did not change.
 
 In order for this to work the value for the unique column is only inserted for
@@ -370,6 +397,7 @@ The firstOnly:true option is incompatible with the null:false option.
 Option Name | Default   | Description                                         |
 ------------|-----------|-----------------------------------------------------|
 default     | null      | default value for column                            |
+firstOnly   | true      | only apply unique index to original record          |
 index       | true      | create index for column                             |
 immutable   | false     | value cannot be changed after creation              |
 null        | true      | allow null values                                   |
@@ -377,7 +405,7 @@ path        | undefined | path to get value from object (uses lodash _.get)   |
 primary     | false     | column is primary key                               |
 type        | undefined | data type (boolean|number|string)                   |
 unique      | false     | create index as unique                              |
-firstOnly   | true      | only apply unique index to original object instance |
+unsigned    | false     | create integer columns as unsigned                  |
 
 ## Creating multi-column indexes
 
@@ -417,41 +445,8 @@ The unique flag controls whether or not the index is unique.
 When the idDataOnly flag is set then only the data values for an object will be
 used to calculate the id for the object.
 
-When creating models where the instance is based only on the data values it will
-usually not make sense to have instances owned by individual accounts or to have
-an originalId and parentId for revision tracking.
-
-## Creating models with actions
-
-    var fooModel = new ImmutableCoreModel({
-        actions: {
-            delete: true,
-        },
-        name: 'foo',
-    })
-
-Immutable Core Models can have associate actions such as delete, publish,
-cancel, etc.
-
-When the action is created with a boolean value this value determine whether
-or not an inverse action is created.
-
-In this case where the action delete: true is specified the inverse action
-unDelete will also be created.
-
-Actions have their own models with their own tables for storing data.
-
-By default action models have only an id, createTime, sessionId and id column
-that references the parent model or the parent action in the case of an 
-inverse action.
-
-When an Immutable Core Model Instance is created for the example model it will
-have isDeleted and wasDelete properties and delete and unDelete methods added
-to it.
-
-The delete action as a default defaultWhere: false parameter so that by
-default queries will not return deleted instances if a model has a delete
-action added to it.
+When creating models where the id is based only on the data it will usually not
+make sense to allow revisions or ownership of records.
 
 ## Creating models with relations
 
@@ -472,7 +467,7 @@ action added to it.
         name: 'bar',
     })
 
-Relations allow linked models to be created and queried from model instances.
+Relations allow linked models to be created and queried from record objects.
 
 In this example foo is related to bar.
 
@@ -517,10 +512,10 @@ order.
         name: 'bar',
     })
 
-The via option can be used to link two models via a third table.
+The via option can be used to link two models via a third model.
 
-The linking table should have either an id or originalId column from each of
-the two table being linked.
+The linking model should have either an id or originalId column from each of
+the two models being linked.
 
 ### Creating a new related model
 
@@ -528,10 +523,10 @@ the two table being linked.
 
     foo.create('bar', {foo: 'foo'})
 
-Calling the create method on a model instance with the name of the related
-model.
+To create a new related record the create method is call on an existing record
+with the name of the related model and the data for the related record.
 
-If the related model is linked via a third table the linking record will be
+If the related record is linked via a third model the linking record will be
 also be created.
 
 ### Creating a new related model with meta options
@@ -549,7 +544,7 @@ The createMeta method can be used to set meta options for the create method.
     foo.select('bar')
 
 The select method takes the name of a relation and queries all records related
-to the instance.
+to the record object.
 
 The select method always returns a results object which must be used to fetch
 or iterate over the related records.
@@ -567,7 +562,6 @@ normal model query.
 ### Loading related records with query
 
     foo.query({
-        limit: 1,
         where: {id: fooId},
         with: {
             bar: {
@@ -611,15 +605,14 @@ and can reference nested data.
 ## Access control for models
 
 Immutable Core Model integrates with
-[immutable-access-control](https://www.npmjs.com/package/immutable-access-control)
+[Immutable Access Control](https://www.npmjs.com/package/immutable-access-control)
 to control access to records.
 
 Access control rules should typically be configured independently from model
-specifications.
+specifications but access control rules can be specified directly on the model.
 
-Simple access control rules can be specified with the model. This is primarily
-useful for setting default rules to deny access to a model so that access must
-be specifically granted in order to use the model.
+This is primarily useful for setting default rules to deny access to a model so
+that access must be specifically granted in order to use the model.
 
 ### Setting the Immutable Access Control provider
 
@@ -631,7 +624,7 @@ be specifically granted in order to use the model.
 The access control provider for a model can be set via the accessControl
 parameter when the model is created.
 
-Since Immutable Access Control uses a global singleton instance this will only
+Immutable Access Control uses a global singleton instance so this will only
 be needed if a custom access control provider is used.
 
 ### Deny access for all actions
@@ -685,8 +678,8 @@ These rules are equivalent to calling Immutable Access Control with:
         name: 'foo',
     })
 
-These rules will allowed `authenticated` (i.e. logged in) sessions to list and
-read records.
+These rules will allowed authenticated (logged in) sessions to list and read
+records.
 
 To specify roles(s) the access control rule must be passed as an array instead
 of a string and one or more role must be specified prior to the rule.
@@ -703,11 +696,11 @@ These rules are equivalent to calling Immutable Access Control with:
 
 Access is checked before performing any action. If access is denied an error
 will be thrown using
-[immutable-app-http-error](https://www.npmjs.com/package/immutable-app-http-error)
+[Immutable App Http Error](https://www.npmjs.com/package/immutable-app-http-error)
 which will generate a 403 Access Denied error when used with the Immutable App
 framework.
 
-### Setting a custom column for defining ownership
+### Setting a custom property for defining ownership
 
     var fooModel = new ImmutableCoreModel({
         accessIdName: 'barId',
@@ -721,18 +714,17 @@ framework.
         name: 'foo',
     })
 
-By default the accountId on a record is used to determine the ownership of a
-record.
+By default accountId is used to determine ownership of records.
 
-The accessIdName parameter can be used to specify a different column/property
+The accessIdName parameter can be used to specify a different property
 to use for determining ownership of records.
 
-This column should typically be of the `id` type and be indexed.
+This column must have the `id` type and should usually be indexed.
 
 When a custom accessId property is used that property must be set on the session
 in order for access to be granted based on ownership.
 
-### Using a column on another model for defining ownership
+### Using a property of another model for defining ownership
 
     var fooModel = new ImmutableCoreModel({
         accessIdName: 'barId',
@@ -757,8 +749,8 @@ necessary to assign ownership via a second model. This can be done with the
 
 The accessModel must link to the primary model by either id or originalId.
 
-Access model records can be deleted but the query engine does not support
-undelete.
+Models using an accessModel cannot be cached so the use of accessModels
+should be avoided if at all possible.
 
 ### Allowing access for queries
 
@@ -775,12 +767,8 @@ code can override access controls by passing the allow:true argument.
 
 ## Working with models
 
-These examples will use async/await to demonstrate how new model instances
-can be created and queried. It is assumed that this code will execute inside
-an async function.
-
-All code with await statements must be executed inside of try/catch
-statements.
+These examples use async/await to show how records can be created and queried.
+It is assumed that this code will execute inside an async function.
 
 ### Creating a local model instance with session context
 
@@ -801,7 +789,7 @@ an object before using it locally.
 
 If create, query, or select are called on a local instance of a model that has
 a session context set they do not need to have a session object passed as an
-argument but if one is passed it will override the session context.
+argument but if one is passed it will override the existing session context.
 
 ### Creating a simple model with default options
 
@@ -812,34 +800,34 @@ argument but if one is passed it will override the session context.
 
     await fooModel.sync()
 
-### Creating a new object instance
+### Creating a new record with a global model
 
     var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
         session: session,
     })
 
-To create an object instance with the global fooModel instance you must use the
+To create a record with the global fooModel instance you must use the
 createMeta method and include the session for the object being created.
 
-The createMeta method can also be used for manually setting default columns like
-accountId, createTime, and parentId.
+The createMeta method can also be used for manually setting default columns
+like accountId, createTime, and parentId.
 
-### Creating a new object instance with a local foo model
+### Creating a new record with a local model
 
     var fooModel = globalFooModel.session(session)
 
     fooModel.create({foo: 'foo'})
 
-The local fooModel instance has a create method that takes only the instance
+The local fooModel instance has a create method that takes only the record
 data as an argument.
 
-This is the prefered way to create model instances.
+This is the prefered way to create new records.
 
-The local fooModel instance also has the createMeta method which can be used
+The local fooModel instance also has a createMeta method which can be used
 for any advanced create operations that require it.
 
-### Creating a new object while ignoring duplicate key errors
+### Creating a new record while ignoring duplicate key errors
 
     var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
@@ -847,10 +835,13 @@ for any advanced create operations that require it.
         session: session,
     })
 
-To ignore duplicate key errors when creating an object set the duplicate option
-to true.
+To ignore duplicate key errors when creating an object use the duplicate:true
+flag.
 
-### Creating a new object while ignoring the response
+If duplicate key errors are ignored the response data is not guaranteed to be
+correct.
+
+### Creating a new record while ignoring the response
 
     var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
@@ -859,12 +850,12 @@ to true.
         session: session,
     })
 
-Set the response: false flag to not return a response. This is typically used
-together with duplicate: true because if a duplicate key error is returned the
-response may not be valid anyway since it is based on the input not what is in
-the database.
+Set the response:false flag to not return a response.
 
-### Creating a new object and responding with id only
+This is typically used together with duplicate:true because the data returned
+may not be correct if duplicate key errors are ignored.
+
+### Creating a new record and responding with id only
 
     var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
@@ -873,7 +864,9 @@ the database.
         session: session,
     })
 
-### Creating a new object without waiting for insert to complete
+With the responseIdOnly:true option only the record id will be returned.
+
+### Creating a new record without waiting for insert to complete
 
     var foo = await globalFooModel.createMeta({
         data: {foo: 'foo'},
@@ -886,11 +879,12 @@ the database.
 When createMeta is called with wait:false the response will be returned
 immediately without waiting for the insert query to complete.
 
-When wait:false is used the insert promise will be added to the model instance
+When wait:false is used the insert promise will be added to the record
 object that is returned.
 
-Errors will be caught be default when wait:false is used. To prevent errors from
-being caught catch:false must be used with wait:false.
+Errors will be caught by default when wait:false is used.
+
+To prevent errors from being caught the catch:false option must be used.
 
 ### Persisting data with a local foo model
 
@@ -899,15 +893,15 @@ being caught catch:false must be used with wait:false.
     var fooId = await fooModel.persist({foo: 'foo'})
 
 The persist method is available on local fooModel instances and is equivalent
-to calling createMeta with duplicate: true and responseIdOnly: true set.
+to calling createMeta with duplicate:true and responseIdOnly:true set.
 
 Calling persist will return a promise that resolves with the id of the persisted
-object as a string.
+record as a string.
 
 response:false overrides responseIdOnly so if response:false is set nothing
 will be returned.
 
-### Instance methods and properties
+### Record methods and properties
 
     foo = await fooModel.select.by.id(fooId)
 
@@ -921,81 +915,78 @@ will be returned.
     foo.update(...)
     foo.empty()
 
-Instance objects follow a strict paradigm of accessing data via properties and
-performing actions by calling methods.
+Record objects follow a paradigm of accessing data via properties and performing
+actions by calling methods.
 
-Methods for custom actions such as delete will be added to instance objects
-when they are specified on the model.
+Record objects also include toJSON and inspect methods to customize the
+output provided for JSON.stringify and console.log.
 
-
-Instance objects also include toJSON and inspect methods to customize the
-output provided when serializing and console.log'ing objects.
-
-### Common instance methods
+### Common record methods
 
 Method Name | Description                           |
 ------------|---------------------------------------|
 inspect     | custom formater for console.log       |
 toJSON      | custom formater for JSON.stringify    |
 
-### Common instance properties
+### Common recprd properties
 
 Property Name | Description                                     |
 --------------|--------------------------------------------------
-model         | model instance was create from                  |
+model         | model record was create for                     |
 raw           | raw database record with data column decoded    |
-session       | session that instantiated instance              |
+session       | session that instantiated record                |
 
-### Default data instance properties
+### Default record properties
 
 Property Name | Description                             |
 --------------|-----------------------------------------|
-accountId     | id of account that object belongs to    |
-createTime    | object creation timestamp               |
-data          | object data as plain object             |
-id            | hash id of object                       |
-originalId    | hash id of original object revision     |
-parentId      | hash id of parent object revision       |
-sessionId     | id of session that created object       |
+accountId     | id of account that record belongs to    |
+createTime    | record creation timestamp               |
+data          | record data as plain object             |
+id            | hash id of record                       |
+originalId    | hash id of original record revision     |
+parentId      | hash id of parent record revision       |
+sessionId     | id of session that created record       |
 
-### Updating an object instance
+### Updating a record
 
     foo = await foo.update({foo: 'bar'})
 
-When an object is updated the data object passed as an argument will be merged
+When a record is updated the data object passed as an argument will be merged
 over the existing data using the lodash _.merge method.
 
-The update method returns the new object instance. Multiple attempts to
-update the same object will fail so the new object returned by update must
+The update method returns a new record object. Multiple attempts to
+update the same record will fail so the new record returned by update must
 always be captured if further updates will be performed.
 
-By default the updated instance inherits the session and accountId of the
-parent instance.
+By default the updated record inherits the accountId of the previous revision
+of the record and the sessionId from the session that created or queried the
+record being updated.
 
-The updated instance will always get the same originalId as the parent and
-the parentId for the updated instance will always be the id of the parent.
+The updated record will always have the same originalId as the parent and
+the parentId for the updated record will always be the id of the record
+that was updated.
 
-### Updating the accountId on an object
+### Changing the accountId on a record
 
     foo = await foo.updateMeta({
         accountId: '2222'
     })
 
-By default an object will have the same accountId as its parent. The accountId
+By default a record will have the same accountId as its parent. The accountId
 must be passed as an argument to change it.
 
-### Changing the sessionId on an object
+### Changing the sessionId on a record
 
     foo = await foo.updateMeta({
         session: session
     })
 
 If a session is passed as an argument to the update method then that sessionId
-will be assigned to the new object revision. Otherwise the sessionId from the
-session that original instantiated the local instance of the object will be
-used.
+will be assigned to the new record revision. Otherwise the sessionId from the
+session that created or queried the record will be used.
 
-### Forcing an update on an old instance
+### Forcing an update on an old record
 
     await foo.update({foo: 'bam'})
 
@@ -1004,37 +995,39 @@ used.
         force: true,
     })
 
-By default calling update twice on the same object will result in a unique
-index conflict on the parentId column for the instance.
+By default calling update twice on the same record will result in a unique key
+constraint violation and the update will throw an exception.
 
 When updateMeta is called with force:true the update will be retried up to 3
-times if an index conflict on the parentId column occurs.
+times.
 
-Each time the update operation is retried the current instance of the object
+Each time the update operation is retried the current revision of the record
 will be fetched and the data passed to the update statement will be re-merged
-against the current state of the data.
+against the current record data.
 
-### Emptying object data
+Using force:true can very easily lead to data corruption and so it should be
+used rarely if at all.
+
+### Emptying record data
 
     foo = await foo.empty()
 
     foo = await foo.updateMeta({data: null})
 
-The empty method will create a new revision of the object with an empty data
-object.
+The empty method creates a new record revision with an empty data object.
 
-The empty method is an alias for calling updateMeta with a null data property
-and accepts the same arguments as updateMeta.
+The empty method is an alias for calling updateMeta with data:null and accepts
+the same arguments as updateMeta.
 
 ## Working with revisions
 
-Immutable Core Model stores every revision to an object as another row in the
-same table which exposes the revision history of an object to the client.
+Immutable Core Model stores every revision to a record as another row in the
+same table which exposes the revision history of a record to the client.
 
-When doing a query on anything other than the id of an object only the current
-revisions of the object will be retured.
+When doing a query on anything other than id only current record revisions will
+be returned.
 
-When querying an object by id the revision matching the queried id will be
+When querying a record by id the revision matching the queried id will be 
 returned.
 
 ### Overwriting existing data
@@ -1047,24 +1040,32 @@ returned.
 With the merge:false flag set all existing data will be overwritten with the
 value of the data property.
 
-### Checking if an object is current
+### Checking if a record is current
 
-    foo = await foo.select.by.id(objectId)
+    foo = await foo.select.isCurrent.by.id(objectId)
+
+    foo = await foo.query({
+        isCurrent: true,
+        where: { id: objectId }
+    })
 
     if (foo.isCurrent) {
         ...
     }
 
-### Getting the current revision of an object
+When doing a query by id the isCurrent flag can be set to check if the
+record(s) returned are the latest revisions.
+
+isCurrent queries cannot be cached so this functionality should only be used
+when necessary.
+
+### Getting the current revision of a record
 
     foo = await foo.select.by.id(objectId)
 
-    if (!foo.isCurrent) {
-        foo = await foo.current()
-    }
+    foo = await foo.current()
 
-The current method will always query the database for the most recent revision
-of the current object.
+The current method queries the most recent revision of a record.
 
 ## Querying data
 
@@ -1073,8 +1074,8 @@ select.
 
 The query method provides a raw low-level interface to all of the query
 functionality that Immutable Core Model provides while the select method
-provides shorthand helper methods that make common queries much simpler
-to read and write.
+provides shorthand helper methods that make simple queries easier to read
+and write.
 
 This section demonstrates both query and select by providing side-by-side
 examples of the same query being performed with each.
@@ -1104,18 +1105,16 @@ call it will result in an exception.
 All further examples of the select method assume that a local model instance
 with the session context set is being used.
 
-#### select with session context set
+#### select by id with session context set
 
     foo = await fooModel.select.by.id(objectId)
 
-When doing a select.by.id the limit for the query is automatically set to 1.
+When doing a select.by query where the argument is a string the limit:1 option
+will be set by default and the returned value will be either an object or
+undefined.
 
-#### select a single record
-
-    foo = await fooModel.select.one.by.foo('bar')
-
-When doing a select.by on any column other than id select.one must be used
-to return a single result.
+When doing a select.by query where the argument is an array the all:true option
+will be set by default and the returned value will be an array.
 
 ### Querying multiple records by id
 
@@ -1136,7 +1135,7 @@ the queried records will be returned.
 
 #### select
 
-    results = await fooModel.select.where.id.in([objectId1, objectId2, objectId3])
+    results = await fooModel.select.by.id([objectId1, objectId2, objectId3])
 
 ### Rules for select.by queries
 
@@ -1193,15 +1192,15 @@ records match the query.
 
 ### Querying multiple records with a results object
 
-If no limit is set or the limit is greater than 1 and the all option is not
-true then query will return a results object that is obtained by running the
-query and only selecting the ids of the objects that match.
+If no limit is set or the limit is greater than 1 and the all:true option is
+not set then query will return a result object that is obtained by running the
+query and only selecting the ids of the records that match.
 
     results = await fooModel.query({
         where: { foo: { like: '%bar%' } }
     })
 
-#### Results object properties
+#### Result object properties
 
 Property Name | Description                                     |
 --------------|-------------------------------------------------|
@@ -1220,14 +1219,15 @@ Records are accessed with the each method which iterates over the records,
 fetching and buffering them when needed, and calls the provided callback
 function for each.
 
-    context = await results.each(function callback (record, number, context) {
+    context = await result.each(function callback (record, number, context) {
 
     })
 
-The callback function passed to each will be called for each record with the
-record, the number of the record in the set starting at 0, and a context
-object which is passed to each callback and can be used to gather information
-across callbacks.
+The callback function passed to each will be called for each record in order.
+
+The arguments passed to the callback function are the record, the number of the
+record in the set starting at 0, and a context object which is passed to each
+callback.
 
 If the callback function returns a promise this promise will be waited for
 before continuing to the next record.
@@ -1245,13 +1245,11 @@ Now context will be passed to callbackFunction with each iteration.
 
 ### Querying all matching records
 
-When all is set to true all records matching the query will be returned
-immediately.
+When the all:true option is used all records will be returned immediately.
 
 In cases where the result set is small this is more efficient than using a
-response iterator but it is also more dangerous because significant
-performance impacts and even out-of-memory errors may occur if the result set
-is too large.
+response iterator but it is also dangerous because significant performance
+impacts and out-of-memory errors may occur if the result set is too large.
 
 It is recommended to use response iterators in most cases and only use query
 all when the record size is known and an appropriate limit is set.
@@ -1280,11 +1278,11 @@ Query all must not be set to true if limit is set to 1.
 
 #### select
 
-    foo = await fooModel.select.order.by.foo.desc.query()
-    foo = await fooModel.select.order.foo.desc.query()
+    foo = await fooModel.select.order.by.foo.desc
+    foo = await fooModel.select.order.foo.desc
 
-The by keyword in order selects is optional and query will be performed the
-same with or without it.
+The by keyword in order selects is optional and the query will be the same with
+or without it.
 
 ### Querying with multiple order clauses
 
@@ -1299,11 +1297,11 @@ same with or without it.
 
 #### select
 
-    foo = await fooModel.select.order.by.bam.bar.asc.foo.desc.query()
+    foo = await fooModel.select.order.by.bam.bar.asc.foo.desc
 
 The asc/desc keywords split up column groups for order selects.
 
-### Querying objects where action has been performed
+### Querying deleted records
 
 #### query
 
@@ -1311,13 +1309,13 @@ The asc/desc keywords split up column groups for order selects.
         where: { isDeleted: true }
     })
 
-This query will return all objects that have been deleted.
+This query will return all record that have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.isDeleted(true).query()
+    foo = await fooModel.select.where.isDeleted(true)
 
-### Querying objects where an action has not been performed
+### Querying records that have not been deleted
 
 #### query
 
@@ -1325,13 +1323,14 @@ This query will return all objects that have been deleted.
         where: { isDeleted: false }
     })
 
-This query will return all objects that have not been deleted.
+This query returns all records that have not been deleted. the isDeleted:false
+flag is set by default for all queries.
 
 #### select
 
-    foo = await fooModel.select.where.isDeleted(false).query()
+    foo = await fooModel.select.where.isDeleted(false)
 
-### Querying objects where an action either has or has not been performed
+### Querying both deleted and not-deleted records
 
 #### query
 
@@ -1339,15 +1338,14 @@ This query will return all objects that have not been deleted.
         where: { isDeleted: null }
     })
 
-In the case of the delete action where by default queries return only
-isDeleted: false records the isDeleted: null where query can be added to
-return all objects whether or not they have been deleted.
+The isDeleted:false flag is set for all queries by default. The isDeleted:null
+option is used to query both deleted and not-deleted records.
 
 #### select
 
-    foo = await fooModel.select.where.isDeleted(false).query()
+    foo = await fooModel.select.where.isDeleted(false)
 
-### Querying the current version of an object by id
+### Querying the current revision of a record
 
 #### query
 
@@ -1371,8 +1369,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.foo.is.null.query()
-    foo = await fooModel.select.where.foo.null.query()
+    foo = await fooModel.select.where.foo.is.null
+    foo = await fooModel.select.where.foo.null
 
 ### Querying where column is not null
 
@@ -1384,8 +1382,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.foo.is.not.null.query()
-    foo = await fooModel.select.where.foo.not.null.query()
+    foo = await fooModel.select.where.foo.is.not.null
+    foo = await fooModel.select.where.foo.not.null
 
 ### Querying where column greater than value
 
@@ -1397,8 +1395,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.gt(5).query()
-    foo = await fooModel.select.where.bar.gt(5).query()
+    foo = await fooModel.select.where.bar.is.gt(5)
+    foo = await fooModel.select.where.bar.gt(5)
 
 ### Querying where column greater than or equal to value
 
@@ -1410,8 +1408,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.gte(5).query()
-    foo = await fooModel.select.where.bar.gte(5).query()
+    foo = await fooModel.select.where.bar.is.gte(5)
+    foo = await fooModel.select.where.bar.gte(5)
 
 ### Querying where column is less than value
 
@@ -1423,8 +1421,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.lt(5).query()
-    foo = await fooModel.select.where.bar.lt(5).query()
+    foo = await fooModel.select.where.bar.is.lt(5)
+    foo = await fooModel.select.where.bar.lt(5)
 
 ### Querying where column is less than or equal to value
 
@@ -1436,8 +1434,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.lte(5).query()
-    foo = await fooModel.select.where.bar.lte(5).query()
+    foo = await fooModel.select.where.bar.is.lte(5)
+    foo = await fooModel.select.where.bar.lte(5)
 
 ### Querying where column equals a value
 
@@ -1449,8 +1447,8 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.eq(5).query()
-    foo = await fooModel.select.where.bar.eq(5).query()
+    foo = await fooModel.select.where.bar.is.eq(5)
+    foo = await fooModel.select.where.bar.eq(5)
 
 ### Querying where column does not equal a value
 
@@ -1462,13 +1460,13 @@ return all objects whether or not they have been deleted.
 
 #### select
 
-    foo = await fooModel.select.where.bar.is.not.eq(5).query()
-    foo = await fooModel.select.where.bar.not.eq(5).query()
+    foo = await fooModel.select.where.bar.is.not.eq(5)
+    foo = await fooModel.select.where.bar.not.eq(5)
 
 ### Querying records with results required
 
-If the required flag is truthy and a query has no results an error will be
-thrown instead of returning undefined for an empty array.
+If the required:true option is used an error will be thrown if no results
+are found.
 
 #### query
 
@@ -1479,17 +1477,19 @@ thrown instead of returning undefined for an empty array.
     foo = await fooModel.select.required.by.id('foo')
     foo = await fooModel.select.required.where.id.eq('foo')
 
-When using the `required` keyword in a select statement it must come before
-the `by` or `where` keywords.
+When using the required keyword in a select statement it must come before
+the by or where keywords.
 
 ## Model Views
 
-Immutable Core Model uses Model Views to provide reusable and compositable
-methods for formatting and summarizing model data.
+Immutable Core Model uses
+[Immutable Core Model View](https://www.npmjs.com/package/immutable-core-model-view)
+to provide reusable and compositable methods for formatting and summarizing
+record data.
 
-Model views created with immutable-core-model-view can be included in the
-model definition, in which case they will be available for use with every
-query, or ad-hoc model views can be used with specific query instances.
+Immutable Core Model Views can be included in the model definition, in which
+case they will be available for use with every query, or ad-hoc model views
+can be used with specific query instances.
 
 ### Creating a model with a model view
 
@@ -1506,15 +1506,15 @@ query, or ad-hoc model views can be used with specific query instances.
 In this example the FooModelView is created as a named view `foo` for the
 model. Additionally foo is added as a default view.
 
-Now on every query foo model view will be applied to the result records.
+With foo set as a default model view it will be applied to every foo model
+query.
 
-Any number of named views can be to a model and each naned view can be either
-a single model view object or an array of model view objects or model view
-names.
+Any number of named views can be added to a model and each naned view can be
+either a single model view object, the name of a model view object, an array
+of model view objects or an array of model view names.
 
-Model view names will first be resolved against the model's views but if a
-name is not specifically defined for the model it will be resolved against
-the global model view register instead.
+Model view names are looked up in the local model views first and if not found
+there they will be looked up in the global model view register.
 
 ### Creating a model with a globally registered model view
 
@@ -1546,11 +1546,11 @@ instance of FooModelView will be created and used as the default view.
         },
     })
 
-In this example two named views are defined both of them applied two model
-views. Then one of these named views is made the default view for the model.
+In this example two named views are defined and both of them apply two model
+views.
 
-Whenever records are queried from fooModel viewA will be applied by default
-which means that the bam and bar views will be applied.
+The default view references viewA and so the bam and bar model views will be
+applied to all fooModel queries by default.
 
 ### Querying views
 
@@ -1562,7 +1562,7 @@ which means that the bam and bar views will be applied.
         view: ['foo', 'bar']
     })
 
-Either one or more views can be specified with the view param on a query.
+One or more views can be specified with the view param on a query.
 
 ### Selecting views
 
@@ -1572,9 +1572,6 @@ Either one or more views can be specified with the view param on a query.
 
     fooModel.select.view(['foo', 'bar'])
 
-The view method on a select acts the same as query. view must be called at
-the end of the select and the query will be executed with the specified
-view(s).
 
 The arguments to view can be either a single array or any number of strings.
 
@@ -1594,11 +1591,11 @@ Immutable Core Model allows using
 [Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
 in addition to MySQL.
 
-When the `elasticsearch` parameter is set for a model then the current revision
-of each model instance will be stored in Elasticsearch as well as MySQL.
+When the elasticsearch parameter is set for a model then the current revision
+of each record will be stored in Elasticsearch as well as MySQL.
 
-Immutable Core Model updates the document in Elasticsearch whenever instance
-updates are made.
+Immutable Core Model updates the document in Elasticsearch whenever updates to
+a record are made.
 
 Elasticsearch storage is asynchronous and unreliable in the sense that if an
 insert or update to Elasticsearch fails this is not treated as a fatal error.
@@ -1606,7 +1603,7 @@ insert or update to Elasticsearch fails this is not treated as a fatal error.
 The Elasticsearch index for a model will be created when model sync is called.
 
 For an intro to Elasticsearch terminology used here see
-[Elasticsearch Basic Concepts]https://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html
+[Elasticsearch Basic Concepts](https://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html)
 
 ## Adding Elasticsearch support to a model
 
@@ -1652,7 +1649,7 @@ When the the elasticsearch client is set globally it will be used for all models
 where the elasticsearch property is set to true. It will not be used for models
 where an elasticsearch client instance has been set.
 
-If a model is create after the client is set globally then the global
+If a model is created after the client is set globally then the global
 elasticsearch client will be set on the model when it is created.
 
 If the global elasticsearch client is set after the model is created then it will
@@ -1675,7 +1672,7 @@ require elasticsearch.
 
     var fooModel = new ImmutableCoreModel({
         elasticsearch: client,
-        esIndex: 'notFoo',
+        esIndex: 'not-foo',
         name: 'foo',
     })
 
@@ -1693,7 +1690,7 @@ Elasticsearch does not allow capital letters in index names.
         name: 'foo',
     })
 
-    // 'baz' will be come the elasticsearch document type
+    // 'baz' will become the elasticsearch document type
     fooModel.createMeta({
         data: {
             bar: { bam: 'baz' }
@@ -1702,7 +1699,7 @@ Elasticsearch does not allow capital letters in index names.
     })
 
 The value of the esType property is used with lodash _.get to retrieve a value
-from the instance data which is used as the document type.
+from the record data which is used as the document type.
 
 If no esType property is set or the data is missing the property then the model
 name will be used as the default type.
@@ -1734,21 +1731,10 @@ The index for the search will be set to the index for the model by default.
 When the raw property is set the raw results of the elasticsearch api query are
 returned. Only raw mode is currently supported.
 
-## Storing action data
-
-Whenever an action is performed on an instance the Elasticsearch document will
-be updated with the results of that action.
-
-Because actions are linked to specific instances any time an instance is updated
-the new revision will have no actions performed on it.
-
 ## Handling deleted records
 
-If a model has a delete action it will be deleted from Elasticsearch if a
-delete is performed.
-
-If a model has an unDelete action it will be added back to Elasticsearch if the
-unDelete action is performed.
+If a model is deleted it will be deleted from Elasticsearch and if it is
+un-deleted it will be inserted back into Elasticsearch.
 
 ## ImmutableCoreModel properties
 
