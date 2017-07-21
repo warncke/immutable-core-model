@@ -32,7 +32,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe('immutable-core-model - redis', function () {
+describe('immutable-core-model - cache id', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -114,69 +114,6 @@ describe('immutable-core-model - redis', function () {
         })
         // check cached flag
         assert.isTrue(fooCached.raw._cached)
-    })
-
-    it('should cache queries with array of ids', async function () {
-        // do first query to get record cached
-        var foos = await fooModel.query({
-            all: true,
-            session: session,
-            where: {
-                id: [origFoo.id, origBar.id]
-            },
-        })
-        // wait to make sure async cache set has time to complete
-        await Promise.delay(100)
-        // second query should be cached
-        var foosCached = await fooModel.query({
-            all: true,
-            session: session,
-            where: {
-                id: [origFoo.id, origBar.id]
-            },
-        })
-        // check cached flag
-        assert.isTrue(foosCached[0].raw._cached)
-        assert.isTrue(foosCached[1].raw._cached)
-    })
-
-    it('should partially cache queries with array of ids', async function () {
-        // do first query to get records cached
-        var foos = await fooModel.query({
-            all: true,
-            session: session,
-            where: {
-                id: [origFoo.id, origBar.id]
-            },
-        })
-        // wait to make sure async cache set has time to complete
-        await Promise.delay(100)
-        // second query should have 2 records cached and 1 not cached
-        var foosCached = await fooModel.query({
-            all: true,
-            session: session,
-            where: {
-                id: [origFoo.id, origBar.id, origBam.id]
-            },
-        })
-        // check cached flag
-        assert.isTrue(foosCached[0].raw._cached)
-        assert.isTrue(foosCached[1].raw._cached)
-        assert.isUndefined(foosCached[2].raw._cached)
-        // wait to make sure async cache set has time to complete
-        await Promise.delay(100)
-        // third query should have all records cached
-        var foosCached = await fooModel.query({
-            all: true,
-            session: session,
-            where: {
-                id: [origFoo.id, origBar.id, origBam.id]
-            },
-        })
-        // check cached flag
-        assert.isTrue(foosCached[0].raw._cached)
-        assert.isTrue(foosCached[1].raw._cached)
-        assert.isTrue(foosCached[2].raw._cached)
     })
 
 })
