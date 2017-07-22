@@ -199,4 +199,44 @@ describe('immutable-core-model - cache select', function () {
         assert.isUndefined(foo._cached)
     })
 
+    it('should not return cached when schema changed', async function () {
+        // do first query to get query cached
+        var foo = await fooModel.query({
+            order: 'createTime',
+            where: {
+                bar: { gte: 1 },
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
+        // create initial model
+        fooModelGlobal = new ImmutableCoreModel({
+            columns: {
+                bam: 'string',
+                bar: 'number',
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+            redis: redis,
+        })
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local foo
+        fooModel = fooModelGlobal.session(session)
+        // second query should be cached
+        foo = await fooModel.query({
+            order: 'createTime',
+            where: {
+                bar: { gte: 1 },
+            },
+        })
+        // check result
+        assert.isUndefined(foo._cached)
+    })
+
 })

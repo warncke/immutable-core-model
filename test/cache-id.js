@@ -56,7 +56,7 @@ describe('immutable-core-model - cache id', function () {
     // records
     var origBam, origBar, origFoo
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
@@ -366,6 +366,99 @@ describe('immutable-core-model - cache id', function () {
         assert.isTrue(foos[0].related.bar[1].raw._cached)
         assert.isTrue(foos[2].related.bar[0].raw._cached)
         assert.isTrue(foos[2].related.bar[1].raw._cached)
+    })
+
+    it('should not cache when cache:false', async function () {
+        // do first query to get record cached
+        var foos = await fooModel.query({
+            all: true,
+            cache: false,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // second query should be cached
+        var foosCached = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // check cached flag
+        assert.isUndefined(foosCached[0].raw._cached)
+        assert.isUndefined(foosCached[1].raw._cached)
+    })
+
+    it('should not return cached when cache:false', async function () {
+        // do first query to get record cached
+        var foos = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // second query should be cached
+        var foosCached = await fooModel.query({
+            all: true,
+            cache: false,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // check cached flag
+        assert.isUndefined(foosCached[0].raw._cached)
+        assert.isUndefined(foosCached[1].raw._cached)
+    })
+
+    it('should not return cached when schema changed', async function () {
+        // do first query to get record cached
+        var foos = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // wait to make sure async cache set has time to complete
+        await Promise.delay(100)
+        // reset global data
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        ImmutableAccessControl.reset()
+        // create initial model
+        fooModelGlobal = new ImmutableCoreModel({
+            columns: {
+                bam: 'string',
+                bar: 'number',
+                foo: 'string',
+            },
+            database: database,
+            name: 'foo',
+            redis: redis,
+        })
+        // sync with database
+        await fooModelGlobal.sync()
+        // get local foo
+        fooModel = fooModelGlobal.session(session)
+        // second query should be cached
+        var foosCached = await fooModel.query({
+            all: true,
+            session: session,
+            where: {
+                id: [origFoo.id, origBar.id]
+            },
+        })
+        // check cached flag
+        assert.isUndefined(foosCached[0].raw._cached)
+        assert.isUndefined(foosCached[1].raw._cached)
     })
 
 })
