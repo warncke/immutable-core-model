@@ -190,7 +190,7 @@ describe('immutable-core-model - cache id', function () {
         // wait to make sure async cache set has time to complete
         await Promise.delay(100)
         // third query should have all records cached
-        var foosCached = await fooModel.query({
+        foosCached = await fooModel.query({
             all: true,
             session: session,
             where: {

@@ -142,8 +142,8 @@ describe('immutable-core-model - elasticsearch', function () {
         })
     })
 
-    it('should throw error seting invalid elasticsearch globally', function () {
-        assert.throws(function () {
+    it('should not throw error seting invalid elasticsearch globally', function () {
+        assert.doesNotThrow(function () {
             // set invalid client
             ImmutableCoreModel.elasticsearchGlobal({})
         })
