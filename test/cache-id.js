@@ -24,6 +24,8 @@ const dbUser = process.env.DB_USER || 'root'
 const redisHost = process.env.REDIS_HOST || 'localhost'
 const redisPort = process.env.REDIS_PORT || '6379'
 
+const testCache = process.env.TEST_CACHE === '1' ? true : false
+
 // use the same params for all connections
 const connectionParams = {
     charset: 'utf8',

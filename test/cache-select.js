@@ -24,6 +24,8 @@ const dbUser = process.env.DB_USER || 'root'
 const redisHost = process.env.REDIS_HOST || 'localhost'
 const redisPort = process.env.REDIS_PORT || '6379'
 
+const testCache = process.env.TEST_CACHE === '1' ? true : false
+
 // use the same params for all connections
 const connectionParams = {
     charset: 'utf8',
@@ -38,18 +40,18 @@ describe('immutable-core-model - cache select', function () {
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
 
+    // connect to redis
+    var redis = Redis.createClient({
+        host: redisHost,
+        port: redisPort,
+    })
+
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
         roles: ['all', 'authenticated'],
         sessionId: '22222222222222222222222222222222',
     }
-
-    // connect to redis
-    var redis = Redis.createClient({
-        host: redisHost,
-        port: redisPort,
-    })
 
     // models
     var fooModel, fooModelGlobal, barModel, barModelGlobal

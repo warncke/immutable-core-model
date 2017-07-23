@@ -4,6 +4,7 @@ const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
+const Redis = require('redis')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const elasticsearch = require('elasticsearch')
@@ -17,6 +18,11 @@ const dbHost = process.env.DB_HOST || 'localhost'
 const dbName = process.env.DB_NAME || 'test'
 const dbPass = process.env.DB_PASS || ''
 const dbUser = process.env.DB_USER || 'root'
+
+const redisHost = process.env.REDIS_HOST || 'localhost'
+const redisPort = process.env.REDIS_PORT || '6379'
+
+const testCache = process.env.TEST_CACHE === '1' ? true : false
 
 // use the same params for all connections
 const connectionParams = {
@@ -33,6 +39,15 @@ describe('immutable-core-model - elasticsearch create', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
+
+    // connect to redis if TEST_CACHE enabled
+    if (testCache) {
+        var redis = Redis.createClient({
+            host: redisHost,
+            port: redisPort,
+        })
+    }
+
     // create elasticsearch connection for testing
     const elasticsearchClient = new elasticsearch.Client({
         host: esHost,
@@ -50,6 +65,10 @@ describe('immutable-core-model - elasticsearch create', function () {
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
+        // flush redis
+        if (redis) {
+            await redis.flushdb()
+        }
         // clean up elasticsearch
         await elasticsearchClient.indices.delete({
             index: 'foo'
@@ -65,6 +84,7 @@ describe('immutable-core-model - elasticsearch create', function () {
             database: database,
             elasticsearch: elasticsearchClient,
             name: 'foo',
+            redis: redis,
         })
         // sync model
         await fooModel.sync()
@@ -103,6 +123,7 @@ describe('immutable-core-model - elasticsearch create', function () {
             database: database,
             elasticsearch: elasticsearchClient,
             name: 'foo',
+            redis: redis,
         })
         // sync model
         await fooModel.sync()
@@ -145,6 +166,7 @@ describe('immutable-core-model - elasticsearch create', function () {
             elasticsearch: elasticsearchClient,
             esType: 'bar.bam',
             name: 'foo',
+            redis: redis,
         })
         // sync model
         await fooModel.sync()
@@ -176,6 +198,7 @@ describe('immutable-core-model - elasticsearch create', function () {
             elasticsearch: elasticsearchClient,
             esType: 'bar.bam',
             name: 'foo',
+            redis: redis,
         })
         // sync model
         await fooModel.sync()

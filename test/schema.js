@@ -4,6 +4,7 @@ const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const Promise = require('bluebird')
+const Redis = require('redis')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const immutable = require('immutable-core')
@@ -15,6 +16,11 @@ const dbHost = process.env.DB_HOST || 'localhost'
 const dbName = process.env.DB_NAME || 'test'
 const dbPass = process.env.DB_PASS || ''
 const dbUser = process.env.DB_USER || 'root'
+
+const redisHost = process.env.REDIS_HOST || 'localhost'
+const redisPort = process.env.REDIS_PORT || '6379'
+
+const testCache = process.env.TEST_CACHE === '1' ? true : false
 
 // use the same params for all connections
 const connectionParams = {
@@ -30,6 +36,14 @@ describe('immutable-core-model - schema', function () {
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
 
+    // connect to redis if TEST_CACHE enabled
+    if (testCache) {
+        var redis = Redis.createClient({
+            host: redisHost,
+            port: redisPort,
+        })
+    }
+
     // fake session to use for testing
     var session = {
         accountId: '11111111111111111111111111111111',
@@ -42,6 +56,10 @@ describe('immutable-core-model - schema', function () {
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
+        // flush redis
+        if (redis) {
+            await redis.flushdb()
+        }
         // drop any test tables if they exist
         await database.query('DROP TABLE IF EXISTS foo')
     })
@@ -56,6 +74,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // get schema
         var schema = fooModel.global().validator.getSchema(fooModel.schemaId)
@@ -76,6 +95,7 @@ describe('immutable-core-model - schema', function () {
                         type: 'xxx'
                     },
                 },
+                redis: redis,
             })
         }
         catch (err) {
@@ -95,6 +115,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -117,6 +138,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // get schema validator
         var schemaData = fooModel.global().validator.getSchema(fooModel.schemaDataId)
@@ -136,6 +158,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -158,6 +181,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'array'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -180,6 +204,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'array'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -203,6 +228,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'array'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -225,6 +251,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -251,6 +278,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
             required: 'foo'
         })
         try {
@@ -279,6 +307,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
             validate: false,
         })
         // sync with database
@@ -300,6 +329,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -321,6 +351,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string',
                 },
             },
+            redis: redis,
             required: 'foo',
         })
         try {
@@ -349,6 +380,7 @@ describe('immutable-core-model - schema', function () {
                     type: ['string'],
                 },
             },
+            redis: redis,
             required: 'foo',
         })
         try {
@@ -377,6 +409,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
         })
         // sync with database
         await fooModel.sync()
@@ -397,6 +430,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 },
             },
+            redis: redis,
             required: 'foo',
         })
         try {
@@ -429,6 +463,7 @@ describe('immutable-core-model - schema', function () {
                     type: 'string'
                 }
             },
+            redis: redis,
             required: ['foo'],
         })
         // sync with database
@@ -456,6 +491,7 @@ describe('immutable-core-model - schema', function () {
                     default: 'foo',
                 },
             },
+            redis: redis,
             required: 'foo',
         })
         // sync with database
@@ -474,6 +510,7 @@ describe('immutable-core-model - schema', function () {
         var fooModel = new ImmutableCoreModel({
             database: database,
             name: 'foo',
+            redis: redis,
             required: 'foo',
         })
         // get global validator
