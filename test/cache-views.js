@@ -6,6 +6,7 @@ const ImmutableCoreModel = require('../lib/immutable-core-model')
 const ImmutableCoreModelView = require('immutable-core-model-view')
 const Promise = require('bluebird')
 const Redis = require('redis')
+const _ = require('lodash')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const immutable = require('immutable-core')
@@ -30,7 +31,7 @@ const connectionParams = {
     user: dbUser,
 }
 
-describe.only('immutable-core-model - cache views', function () {
+describe('immutable-core-model - cache views', function () {
 
     // create database connection to use for testing
     var database = new ImmutableDatabaseMariaSQL(connectionParams)
@@ -47,17 +48,18 @@ describe.only('immutable-core-model - cache views', function () {
         sessionId: '22222222222222222222222222222222',
     }
 
+    var fooModel, fooModelGlobal
+
     var origBam, origBar, origFoo, origRecords
 
+    // create data and views that will be used for all tests
     before(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
         ImmutableAccessControl.reset()
-        // flush redis
-        await redis.flushdb()
         // create initial model
-        var fooModelGlobal = new ImmutableCoreModel({
+        fooModelGlobal = new ImmutableCoreModel({
             database: database,
             name: 'foo',
             redis: redis,
@@ -71,7 +73,7 @@ describe.only('immutable-core-model - cache views', function () {
             await redis.flushdb()
         }
         // get local fooModel
-        var fooModel = fooModelGlobal.session(session)
+        fooModel = fooModelGlobal.session(session)
         // create new bam instance
         origBam = await fooModel.create({
             bar: "0.000000000",
@@ -91,11 +93,14 @@ describe.only('immutable-core-model - cache views', function () {
         origRecords = [origBam, origBar, origFoo]
     })
 
+    // reset models and re-create views for each test 
     beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModelView.reset()
         ImmutableCoreModel.reset()
+        // flush redis
+        await redis.flushdb()
         // create collection model view
         new ImmutableCoreModelView({
             each: function (modelView, record, number, context) {
@@ -158,20 +163,122 @@ describe.only('immutable-core-model - cache views', function () {
         })
     })
 
-    it('should cache view result', async function () {
-        // create foo model
-        var glboalFooModel = new ImmutableCoreModel({
-            database: database,
-            name: 'foo',
-            redis: redis,
-            views: {
-                default: 'foo',
-            }
+    describe('with sync record view', function () {
+
+        beforeEach(function () {
+            // create foo model
+            fooModelGlobal = new ImmutableCoreModel({
+                database: database,
+                name: 'foo',
+                redis: redis,
+                views: {
+                    default: 'foo',
+                }
+            })
+            // get local foo model
+            fooModel = fooModelGlobal.session(session)
         })
-        // get single record which should have foo model view applied
-        var foo = await glboalFooModel.session(session).select.by.id(origBam.id)
-        // view should be applied
-        assert.strictEqual(foo.data.foo, origBam.data.foo+' food')
+
+        it('should cache view result when requesting multiple ids', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.isUndefined(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam food', 'bar food'])
+            // second query should be cached
+            foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isTrue(foos[0].raw._cachedView)
+            assert.isTrue(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam food', 'bar food'])
+        })
+
+        it('should return partially cached result when requesting multiple ids', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam food'])
+            // second query should be cached
+            foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isTrue(foos[0].raw._cachedView)
+            assert.isUndefined(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam food', 'bar food'])
+        })
+
+        it('should cache raw record when caching view record', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam food'])
+            // second query without view should be cached
+            var foo = await fooModel.select.one.where.id.eq(origBam.id).view(false)
+            // check result
+            assert.isTrue(foo.raw._cached)
+            assert.strictEqual(foo.data.foo, 'bam')
+        })
+    })
+
+    describe('with async record view', function () {
+
+        beforeEach(function () {
+            // create foo model
+            fooModelGlobal = new ImmutableCoreModel({
+                database: database,
+                name: 'foo',
+                redis: redis,
+                views: {
+                    default: 'fooAsync',
+                }
+            })
+            // get local foo model
+            fooModel = fooModelGlobal.session(session)
+        })
+
+        it('should cache view result when requesting multiple ids', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.isUndefined(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam foodAsync', 'bar foodAsync'])
+            // second query should be cached
+            foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isTrue(foos[0].raw._cachedView)
+            assert.isTrue(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam foodAsync', 'bar foodAsync'])
+        })
+
+        it('should return partially cached result when requesting multiple ids', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam foodAsync'])
+            // second query should be cached
+            foos = await fooModel.select.by.id([origBam.id, origBar.id])
+            // check result
+            assert.isTrue(foos[0].raw._cachedView)
+            assert.isUndefined(foos[1].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam foodAsync', 'bar foodAsync'])
+        })
+
+        it('should cache raw record when caching view record', async function () {
+            // first query should not be cached
+            var foos = await fooModel.select.by.id([origBam.id])
+            // check result
+            assert.isUndefined(foos[0].raw._cachedView)
+            assert.deepEqual(_.map(foos, 'data.foo'), ['bam foodAsync'])
+            // second query without view should be cached
+            var foo = await fooModel.select.one.where.id.eq(origBam.id).view(false)
+            // check result
+            assert.isTrue(foo.raw._cached)
+            assert.strictEqual(foo.data.foo, 'bam')
+        })
     })
 
 })
