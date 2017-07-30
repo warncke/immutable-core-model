@@ -17,12 +17,15 @@ new features and a few major breaking changes.
 * support for actions eliminated
 * support for `select` of custom columns eliminated
 * support for using column names in where queries (e.g. fooId) eliminated
+* changed class name ImmutableCoreModelInstance to ImmutableCoreModelRecord
+* changed record unDelete method name to undelete
 
 ### New features
 
 * caching of records, queries, and views
 * resolve option to load related records referenced in record data
 * n column auto increment primary key to track inserts and order
+* select interface exposes then function that executes query
 * c column to indicate if record is compressed
 * d column to indicate if record is deleted
 * int (64bit) and smallint (16bit) types
