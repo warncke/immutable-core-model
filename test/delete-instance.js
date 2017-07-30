@@ -108,7 +108,7 @@ describe('immutable-core-model - delete instance', function () {
         origGrr.delete()
     })
 
-    it('should have action properties', async function () {
+    it('should have isDeleted property', async function () {
         var foo = await fooModel.query({
             limit: 1,
             session: session,
@@ -120,7 +120,7 @@ describe('immutable-core-model - delete instance', function () {
         assert.isFalse(foo.isDeleted)
     })
 
-    it('should have action methods', async function () {
+    it('should have delete/undelete methods', async function () {
         var foo = await fooModel.query({
             limit: 1,
             session: session,
@@ -130,7 +130,6 @@ describe('immutable-core-model - delete instance', function () {
         })
         // foo should have action methods
         assert.strictEqual(typeof foo.delete, 'function')
-        assert.strictEqual(typeof foo.unDelete, 'function')
         assert.strictEqual(typeof foo.undelete, 'function')
     })
 

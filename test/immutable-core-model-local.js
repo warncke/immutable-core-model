@@ -81,7 +81,7 @@ describe('immutable-core-model-local', function () {
         // check for methods
         assert.strictEqual(typeof fooModel.create, 'function')
         assert.strictEqual(typeof fooModel.query, 'function')
-        assert.strictEqual(typeof fooModel.select, 'function')
+        assert.strictEqual(typeof fooModel.select, 'object')
     })
 
     it('should create instance with local model', async function () {

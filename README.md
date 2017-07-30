@@ -9,6 +9,24 @@ Immutable Core Model requires native async/await support.
 
 ## Immutable Core Model v3
 
+Version 3.0.0 of Immutable Core Model is a major release with significant
+new features and a few major breaking changes.
+
+### Breaking changes
+
+* support for actions eliminated
+* support for `select` of custom columns eliminated
+* support for using column names in where queries (e.g. fooId) eliminated
+
+### New features
+
+* caching of records, queries, and views
+* resolve option to load related records referenced in record data
+* n column auto increment primary key to track inserts and order
+* c column to indicate if record is compressed
+* d column to indicate if record is deleted
+* int (64bit) and smallint (16bit) types
+
 ## Creating a new model
 
     const ImmutableCoreModel = require('immutable-core-model')
@@ -1172,30 +1190,6 @@ object or undefined will be returned.
 There are no guarantees as to which record will be returned when multiple
 records match the query.
 
-### Selecting specific columns
-
-#### query
-
-    foo = await fooModel.query({
-        limit: 1,
-        select: ['data'],
-        where: { id: objectId },
-    })
-
-#### select
-
-    foo = await fooModel.select(['data']).by.id(objectId)
-
-### Querying multiple records with a results object
-
-If no limit is set or the limit is greater than 1 and the all:true option is
-not set then query will return a result object that is obtained by running the
-query and only selecting the ids of the records that match.
-
-    results = await fooModel.query({
-        where: { foo: { like: '%bar%' } }
-    })
-
 #### Result object properties
 
 Property Name | Description                                     |
@@ -1580,6 +1574,72 @@ view will always be applied to select.by.id.
 
 If a non-default view is needed for select.by.id the long form 
 select.one.where approach must be used.
+
+## Resolving related records
+
+    var bar = barModel.create({bar: true})
+
+    var foo = fooModel.create({
+        bar: bar.id,
+    })
+
+    foo = fooModel.select.resolve.by.id(foo.id)
+
+    // foo.data: {bar: {bar: true}}
+
+When the resolve:true option is set record data will be search for model names
+and model id names and the related records will be resolved.
+
+The name of a model (e.g. bar) or the plural name (e.g. bars) will be resolved.
+
+The id columns of model (e.g. barId, barOriginalId) and their plural version
+(e.g. barIds, barOriginalIds) will be resolved and the value will be stored
+under the model name or plural model name (e.g. bar, bars).
+
+If a specific revision is referenced (e.g. barId) that revision will be
+resolved. If originalId is used the the current revision of the record will
+be resolved.
+
+If the value is a string it will be replaced with the loaded record object or
+undefined. If the value is an object the keys will be used as object ids and
+the resolved records will be set as values. If the value is an array if will
+be replaced with an array of the resolved objects. Ids that are not found will
+not be returned.
+
+For string and array values they must be 32 char hex strings or they will not
+be resolved and the original values will be left in place.
+
+Deep properties are not resolved automatically.
+
+### Resolving related records explicitly
+
+    foo = fooModel.query({
+        resolve: {
+            'bar.bam': {
+                isOriginalId: true,
+                modelName: 'bam',
+                setProperty: 'bamRecord',
+            },
+            baz: true,
+        },
+        where: {id: foo.id},
+    })
+
+When explicit values are set for resolve only the specified properties will
+be resolved. While this is more verbose it is also more efficient and less
+error prone.
+
+The property name (e.g. `bam.bar`) will be accessed using lodash _.get so
+deep properties can be resolved this way.
+
+To resolve the property using default settings use the true value. Otherwise
+and object with explicit options can be used to override defaults.
+
+The `isOriginalId` flag is used to indicate that the current revision of the
+referenced record should be resolved.
+
+The `setProperty` option is used to specify a path that will be used with
+lodash _.set to store the resolved record.
 
 ## Using Elasticsearch
 

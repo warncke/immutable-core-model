@@ -115,11 +115,4 @@ describe('immutable-core-model-select', function () {
         assert.deepEqual(foo.data, origBar.data)
     })
 
-    it('should select specific columns', async function () {
-        // select foo by id
-        var foo = await fooModel.select(['data']).by.id(origFoo.id)
-        // check result
-        assert.deepEqual(foo.data, { bar: '2.000000000', foo: 'foo' })
-    })
-
 })
