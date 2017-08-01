@@ -95,7 +95,7 @@ describe('immutable-core-model - update', function () {
 
         assert.isDefined(threw)
         // verify error message
-        assert.strictEqual(threw.message, '[immutable.model.foo] cannot modify immutable property foo')
+        assert.strictEqual(threw.message, `foo#${foo.id} record error: cannot modify immutable property foo`)
     })
 
     it('should throw error when updating old instance', async function () {

@@ -196,13 +196,16 @@ describe('immutable-core-model - cache id', function () {
             all: true,
             session: session,
             where: {
-                id: [origFoo.id, origBar.id, origBam.id]
+                id: [origFoo.id, origBam.id, origBar.id]
             },
         })
         // check cached flag
         assert.isTrue(foosCached[0].raw._cached)
+        assert.strictEqual(foosCached[0].id, origFoo.id)
         assert.isTrue(foosCached[1].raw._cached)
+        assert.strictEqual(foosCached[1].id, origBam.id)
         assert.isTrue(foosCached[2].raw._cached)
+        assert.strictEqual(foosCached[2].id, origBar.id)
     })
 
     it('should use id cache with result each', async function () {

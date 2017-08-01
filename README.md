@@ -420,7 +420,7 @@ Option Name | Default   | Description                                         |
 default     | null      | default value for column                            |
 firstOnly   | true      | only apply unique index to original record          |
 index       | true      | create index for column                             |
-immutable   | false     | value cannot be changed after creation              |
+immutable   | false     | value cannot be changed after being set             |
 null        | true      | allow null values                                   |
 path        | undefined | path to get value from object (uses lodash _.get)   |
 primary     | false     | column is primary key                               |
@@ -921,7 +921,7 @@ Method Name | Description                           |
 inspect     | custom formater for console.log       |
 toJSON      | custom formater for JSON.stringify    |
 
-### Common recprd properties
+### Common record properties
 
 Property Name | Description                                     |
 --------------|--------------------------------------------------
