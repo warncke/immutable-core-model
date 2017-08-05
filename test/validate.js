@@ -128,6 +128,30 @@ describe('immutable-core-model - validate', function () {
         assert.strictEqual(fooModel.updated, 4)
     })
 
+    it('should validate column data when VALIDATE env variable set', async function () {
+        // reset immutable so that model modules are recreated
+        immutable.reset()
+        ImmutableCoreModel.reset()
+        // create updated foo model with columns
+        fooModel = new ImmutableCoreModel({
+            database: database,
+            name: 'foo',
+            redis: redis,
+        })
+        // set VALIDATE env var
+        process.env.VALIDATE = '1'
+        // execute sync
+        await fooModel.sync()
+        // delete flag
+        delete process.env.VALIDATE
+        // validate flag should be true
+        assert.isFalse(fooModel.needsValidate)
+        // validate should be done
+        assert.isTrue(fooModel.validated)
+        // four records should be updated
+        assert.strictEqual(fooModel.updated, 0)
+    })
+
     it('should not validate when schema has not changed', async function () {
         // reset immutable so that model modules are recreated
         immutable.reset()
