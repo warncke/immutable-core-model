@@ -67,6 +67,7 @@ describe('immutable-core-model - session model', function () {
         globalSessionModel = new ImmutableCoreModel({
             columns: {
                 accountId: false,
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,

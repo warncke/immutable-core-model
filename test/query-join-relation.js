@@ -93,6 +93,7 @@ describe('immutable-core-model - query join relations', function () {
                     null: false,
                     type: 'id',
                 },
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,

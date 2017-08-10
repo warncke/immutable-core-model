@@ -88,6 +88,7 @@ describe('immutable-core-model - relations via id', function () {
                     null: false,
                     type: 'id',
                 },
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,

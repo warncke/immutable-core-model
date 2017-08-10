@@ -69,6 +69,7 @@ describe('immutable-core-model - via relation to account table', function () {
             // disable default columns
             columns: {
                 accountAccountId: false,
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,
@@ -102,6 +103,7 @@ describe('immutable-core-model - via relation to account table', function () {
                     null: false,
                     type: 'id',
                 },
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,

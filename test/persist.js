@@ -66,6 +66,7 @@ describe('immutable-core-model-local - persist', function () {
         glboalFooModel = new ImmutableCoreModel({
             columns: {
                 accountId: false,
+                d: false,
                 originalId: false,
                 parentId: false,
             },

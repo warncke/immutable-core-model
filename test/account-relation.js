@@ -69,6 +69,7 @@ describe('immutable-core-model - relations to account table', function () {
             // disable default columns
             columns: {
                 accountAccountId: false,
+                d: false,
                 data: false,
                 originalId: false,
                 parentId: false,
