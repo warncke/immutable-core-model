@@ -54,7 +54,7 @@ describe('immutable-core-model - delete instance', function () {
     // variable to populate in before
     var fooModel, fooModelGlobal, origBam, origBar, origFoo, origGrr
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
@@ -278,6 +278,9 @@ describe('immutable-core-model - delete instance', function () {
     })
 
     it('should not return deleted records in queries', async function () {
+        // delete bar
+        await origBar.delete()
+        // fetch all
         var foos = await fooModel.query({
             all: true,
             order: ['createTime'],

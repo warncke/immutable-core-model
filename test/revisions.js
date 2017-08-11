@@ -54,7 +54,7 @@ describe('immutable-core-model - revisions', function () {
     // will be pouplated in before
     var foo1, foo2, foo3, globalFooModel, fooModel
 
-    before(async function () {
+    beforeEach(async function () {
         // reset global data
         immutable.reset()
         ImmutableCoreModel.reset()
