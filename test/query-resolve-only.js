@@ -195,6 +195,39 @@ describe('immutable-core-model - query resolve only', function () {
 
     })
 
+    describe('with array of objects that contain id column', function () {
+
+        beforeEach(async function () {
+            // create foo record pointing to bam, bar records
+            foo = await fooModel.create({
+                bams: [
+                    {bamId: origBam1.id},
+                    {bamId: origBam2.id},
+                ],
+                bars: [
+                    {barOriginalId: bar1.originalId},
+                    {barOriginalId: bar2.originalId},
+                ],
+            })
+        })
+
+        it('should resolve all records with resolve:true', async function () {
+            var res = await fooModel.query({
+                limit: 1,
+                resolve: {
+                    bams: true,
+                },
+                where: {id: foo.id}
+            })
+            // check results
+            assert.isDefined(res.data.bams[0].data)
+            assert.strictEqual(res.data.bams[0].data.bam, 1);
+            assert.isDefined(res.data.bams[1].data)
+            assert.strictEqual(res.data.bams[1].data.bam, 2);
+        })
+
+    })
+
     describe('with an id object identified by property name for different model', function () {
 
         var bars

@@ -1609,6 +1609,11 @@ the resolved records will be set as values. If the value is an array if will
 be replaced with an array of the resolved objects. Ids that are not found will
 not be returned.
 
+Arrays of objects with an id column as a property will be resolved like arrays
+of ids except that the name of the id column (fooId, fooOriginalId) will be
+use to determine whether to query the specific id references or the current
+record.
+
 For string and array values they must be 32 char hex strings or they will not
 be resolved and the original values will be left in place.
 
