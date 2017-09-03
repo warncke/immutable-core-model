@@ -12,6 +12,11 @@ Immutable Core Model requires native async/await support.
 Version 3.0.0 of Immutable Core Model is a major release with significant
 new features and a few major breaking changes.
 
+## Immutable Core v2 and Immutable Core Model v3.1.0
+
+[Immutable Core](https://www.npmjs.com/package/immutable-core) introduced
+breaking changes that require Immutable Core Model v3.1.0 or greater.
+
 ### Breaking changes
 
 * support for actions eliminated

@@ -6,6 +6,7 @@ const ImmutableCoreModel = require('../lib/immutable-core-model')
 const ImmutableCoreModelView = require('immutable-core-model-view')
 const Promise = require('bluebird')
 const Redis = require('redis')
+const _ = require('lodash')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const immutable = require('immutable-core')
@@ -155,7 +156,7 @@ describe('immutable-core-model - views', function () {
         // create async record model view
         new ImmutableCoreModelView({
             each: function (args) {
-                var record  = args.record
+                var record = _.cloneDeep(args.record)
                 record.foo = record.foo+' foodAsync'
                 return record
             },

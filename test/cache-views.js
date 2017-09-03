@@ -153,7 +153,7 @@ describe('immutable-core-model - cache views', function () {
         // create async record model view
         new ImmutableCoreModelView({
             each: function (args) {
-                var record  = args.record
+                var record = _.cloneDeep(args.record)
                 record.foo = record.foo+' foodAsync'
                 return record
             },
