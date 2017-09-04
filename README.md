@@ -7,15 +7,19 @@ Elasticsearch.
 
 Immutable Core Model requires native async/await support.
 
+## Immutable Core v2 and Immutable Core Model v3.2.0
+
+[Immutable Core](https://www.npmjs.com/package/immutable-core) introduced
+breaking changes that require Immutable Core Model v3.2.0 or greater.
+
+As of Immutable Core Model v3.2.0 the `accessControl` property for
+ImmutableModel is deprecated and the global ImmutableAccessControl instance
+will always be used.
+
 ## Immutable Core Model v3
 
 Version 3.0.0 of Immutable Core Model is a major release with significant
 new features and a few major breaking changes.
-
-## Immutable Core v2 and Immutable Core Model v3.1.0
-
-[Immutable Core](https://www.npmjs.com/package/immutable-core) introduced
-breaking changes that require Immutable Core Model v3.1.0 or greater.
 
 ### Breaking changes
 

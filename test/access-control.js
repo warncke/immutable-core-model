@@ -63,45 +63,18 @@ describe('immutable-core-model - access control', function () {
         await database.query('DROP TABLE IF EXISTS foo')
     })
 
-    it('should create model with default access control provider', async function () {
-        // create model
-        var fooModel = new ImmutableCoreModel({
-            database: database,
-            name: 'foo',
-            redis: redis,
-        })
-        // check that access control provider set
-        assert.isObject(fooModel.accessControl)
-        // validate class
-        assert.isTrue(fooModel.accessControl.ImmutableAccessControl)
-    })
-
-    it('should accept custom access control provider', async function () {
+    it('setting custom access control provider deprecated', async function () {
         // create mock access control provider
         var accessControl = {
             ImmutableAccessControl: true,
         }
-        // create model
-        var fooModel = new ImmutableCoreModel({
+        // create model - should throw
+        assert.throws(() => new ImmutableCoreModel({
             accessControl: accessControl,
             database: database,
             name: 'foo',
             redis: redis,
-        })
-        // check that access control provider set
-        assert.deepEqual(fooModel.accessControl, accessControl)
-    })
-
-    it('should throw error on invalid access control provider', async function () {
-        // set access control object with class flag
-        assert.throws(function () {
-            var fooModel = new ImmutableCoreModel({
-                accessControl: {},
-                database: database,
-                name: 'foo',
-                redis: redis,
-            })
-        })
+        }))
     })
 
     it('should set access control rules with default all role', async function () {
@@ -114,8 +87,10 @@ describe('immutable-core-model - access control', function () {
             name: 'foo',
             redis: redis,
         })
+        // get global access control instance
+        var accessControl = ImmutableAccessControl.getGlobal()
         // check rules
-        assert.deepEqual(fooModel.accessControl.rules, {model: {model: {foo: {
+        assert.deepEqual(accessControl.rules, {model: {model: {foo: {
             allow: { all: 0 }, action: { create: { allow: { all: 1 } } }
         }}}})
     })
@@ -130,8 +105,10 @@ describe('immutable-core-model - access control', function () {
             name: 'foo',
             redis: redis,
         })
+        // get global access control instance
+        var accessControl = ImmutableAccessControl.getGlobal()
         // check rules
-        assert.deepEqual(fooModel.accessControl.rules, {model: {model: {foo: {
+        assert.deepEqual(accessControl.rules, {model: {model: {foo: {
             allow: { all: 0 }, action: { read: { any: { allow: { authenticated: 1 } } } }
         }}}})
     })
@@ -151,8 +128,10 @@ describe('immutable-core-model - access control', function () {
             name: 'foo',
             redis: redis,
         })
+        // get global access control instance
+        var accessControl = ImmutableAccessControl.getGlobal()
         // check that name set
-        assert.deepEqual(fooModel.accessControl.accessIdNames, {foo: 'barId'})
+        assert.deepEqual(accessControl.accessIdNames, {foo: 'barId'})
     })
 
     it('should throw error if column does not exist for access id name', async function () {
