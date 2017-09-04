@@ -7,18 +7,18 @@
     "debug": "3.0.1",
     "deep-extend": "0.5.0",
     "if-defined": "1.0.12",
-    "immutable-access-control": "0.5.2",
+    "immutable-access-control": "0.5.3",
     "immutable-ai": "0.5.6",
-    "immutable-app-http-error": "0.1.12",
-    "immutable-core": "2.0.0",
-    "immutable-core-model-view": "0.4.9",
-    "immutable-require-valid-optional-object": "0.1.11",
+    "immutable-app-http-error": "0.1.13",
+    "immutable-core": "2.0.2",
+    "immutable-core-model-view": "0.4.12",
+    "immutable-require-valid-optional-object": "0.1.12",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.25",
-    "null-function": "1.0.11",
+    "micro-timestamp": "0.1.26",
+    "null-function": "1.0.12",
     "snappy": "6.0.0",
-    "stable-id": "1.0.6"
+    "stable-id": "1.0.7"
   },
   "description": "Immutable model built on immutable-core",
   "devDependencies": {
@@ -26,7 +26,7 @@
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.5.0",
     "elasticsearch": "13.3.1",
-    "immutable-database-mariasql": "1.3.21",
+    "immutable-database-mariasql": "1.3.22",
     "mocha": "3.5.0",
     "redis": "2.8.0"
   },
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "3.3.2"
+  "version": "3.3.3"
 }
