@@ -10,7 +10,7 @@
     "immutable-access-control": "0.5.3",
     "immutable-ai": "0.5.6",
     "immutable-app-http-error": "0.1.13",
-    "immutable-core": "2.1.1",
+    "immutable-core": "2.1.2",
     "immutable-core-model-view": "0.4.12",
     "immutable-require-valid-optional-object": "0.1.12",
     "json-stable-stringify": "1.0.1",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "3.3.4"
+  "version": "3.3.5"
 }
