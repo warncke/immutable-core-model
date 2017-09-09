@@ -17,7 +17,7 @@
     "lodash": "4.17.4",
     "micro-timestamp": "0.1.26",
     "null-function": "1.0.12",
-    "snappy": "6.0.0",
+    "snappy": "6.0.1",
     "stable-id": "1.0.7"
   },
   "description": "Immutable model built on immutable-core",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "3.3.7"
+  "version": "3.3.8"
 }
