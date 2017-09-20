@@ -1109,6 +1109,19 @@ Calling either query or then will execute the query returning a promise.
 
 When await is used the then method is called implicitly.
 
+### Query with plain object result
+
+    foo = await fooModel.select.all.plain
+
+    foo = await fooModel.query({
+        all: true,
+        plain: true,
+    })
+
+When the plain option is set plain objects will be returned instead of
+ImmutableCoreModelRecord instances. The object returned is the same as the
+result of calling `toJSON` on a record instance.
+
 ### Query a record by id
 
 #### query

@@ -442,4 +442,41 @@ describe('immutable-core-model - query', function () {
         )
     })
 
+    it('should do query with plain object result', async function () {
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {
+                id: origFoo.id
+            },
+        })
+        var fooPlain = await fooModel.query({
+            limit: 1,
+            plain: true,
+            where: {
+                id: origFoo.id
+            },
+        })
+        // verify that objects match
+        assert.deepEqual(fooPlain, foo.toJSON())
+    })
+
+    it('should do query plain object from result set', async function () {
+        var foo = await fooModel.query({
+            limit: 1,
+            where: {
+                id: origFoo.id
+            },
+        })
+        var foos = await fooModel.query({
+            plain: true,
+            where: {
+                id: {in: [origBam.id, origBar.id, origFoo.id]}
+            },
+        })
+
+        foos = await foos.all()
+
+        // verify that objects match
+        assert.deepEqual(foos[2], foo.toJSON())
+    })
 })

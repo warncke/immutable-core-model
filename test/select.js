@@ -505,4 +505,11 @@ describe('immutable-core-model - select', function () {
         assert.isTrue(res.isCurrent)
     })
 
+    it('should select plain object', async function () {
+        var foo = await fooModel.select.by.id(origFoo.id)
+        var fooPlain = await fooModel.select.plain.by.id(origFoo.id)
+        // verify that objects match
+        assert.deepEqual(fooPlain, foo.toJSON())
+    })
+
 })
