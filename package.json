@@ -10,8 +10,8 @@
     "immutable-access-control": "0.5.7",
     "immutable-ai": "0.6.2",
     "immutable-app-http-error": "0.1.15",
-    "immutable-core": "2.2.4",
-    "immutable-core-model-view": "0.4.19",
+    "immutable-core": "2.2.5",
+    "immutable-core-model-view": "0.4.20",
     "immutable-require-valid-optional-object": "0.1.14",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "3.4.1"
+  "version": "3.4.2"
 }
