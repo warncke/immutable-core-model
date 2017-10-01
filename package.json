@@ -1,14 +1,14 @@
 {
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
-    "ajv": "5.2.2",
+    "ajv": "5.2.3",
     "bluebird": "3.5.0",
     "change-case": "3.0.1",
-    "debug": "3.0.1",
+    "debug": "3.1.0",
     "deep-extend": "0.5.0",
     "if-defined": "1.0.14",
-    "immutable-access-control": "0.5.7",
-    "immutable-ai": "0.6.2",
+    "immutable-access-control": "0.5.8",
+    "immutable-ai": "0.7.0",
     "immutable-app-http-error": "0.1.15",
     "immutable-core": "2.2.5",
     "immutable-core-model-view": "0.4.20",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha"
   },
-  "version": "3.4.2"
+  "version": "3.4.3"
 }
