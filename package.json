@@ -11,7 +11,7 @@
     "immutable-ai": "0.7.4",
     "immutable-app-http-error": "0.1.17",
     "immutable-core": "2.2.13",
-    "immutable-core-model-view": "0.4.28",
+    "immutable-core-model-view": "0.4.29",
     "immutable-require-valid-optional-object": "0.1.16",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "3.4.12"
+  "version": "3.4.13"
 }
