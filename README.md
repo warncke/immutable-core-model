@@ -370,6 +370,7 @@ Immutable Type | MySQL Type     |
 ---------------|----------------|
 boolean        | TINYINT(1)     |
 data           | MEDIUMBLOB     |
+date           | DATE           |
 id             | BINARY(16)     |
 int            | BIGINT(20)     |
 number         | DECIMAL(36,9)  |
