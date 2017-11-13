@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "3.5.10"
+  "version": "3.5.11"
 }

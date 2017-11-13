@@ -1672,6 +1672,24 @@ referenced record should be resolved.
 The `setProperty` option is used to specify a path that will be used with
 lodash _.set to store the resolved record.
 
+### Resolving related records with custom query args
+
+    foo = fooModel.query({
+        resolve: {
+            foo: {
+                queryArgs: {
+                    ...
+                },
+            },
+        },
+        where: {id: foo.id},
+    })
+
+The `queryArgs` parameter will be merged over the query args for the query that
+is used to get the record being resolved.
+
+Any argument that can be passed to a `query` can be set in `queryArgs`.
+
 ## Using Elasticsearch
 
 Immutable Core Model allows using
