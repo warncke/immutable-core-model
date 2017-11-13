@@ -15,7 +15,7 @@
     "immutable-require-valid-optional-object": "0.1.16",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.4",
-    "micro-timestamp": "0.1.32",
+    "micro-timestamp": "0.1.33",
     "null-function": "1.0.16",
     "snappy": "6.0.1",
     "stable-id": "1.0.11"
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "3.5.11"
+  "version": "3.5.12"
 }
