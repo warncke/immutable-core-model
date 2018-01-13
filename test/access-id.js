@@ -1,50 +1,16 @@
 'use strict'
 
-const ImmutableAccessControl = require('immutable-access-control')
-const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
+/* application modules */
 const ImmutableCoreModel = require('../lib/immutable-core-model')
-const Promise = require('bluebird')
-const Redis = require('redis')
-const _ = require('lodash')
-const chai = require('chai')
-const immutable = require('immutable-core')
-
-const assert = chai.assert
-
-const dbHost = process.env.DB_HOST || 'localhost'
-const dbName = process.env.DB_NAME || 'test'
-const dbPass = process.env.DB_PASS || ''
-const dbUser = process.env.DB_USER || 'root'
-
-const redisHost = process.env.REDIS_HOST || 'localhost'
-const redisPort = process.env.REDIS_PORT || '6379'
-
-const testCache = process.env.TEST_CACHE === '1' ? true : false
-
-// use the same params for all connections
-const connectionParams = {
-    charset: 'utf8',
-    db: dbName,
-    host: dbHost,
-    password: dbPass,
-    user: dbUser,
-}
+const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access id', function () {
 
-    // create database connection to use for testing
-    var database = new ImmutableDatabaseMariaSQL(connectionParams)
+    var database, redis, reset, session
 
-    // connect to redis if TEST_CACHE enabled
-    if (testCache) {
-        var redis = Redis.createClient({
-            host: redisHost,
-            port: redisPort,
-        })
-    }
-
-    // fake session to use for testing
-    var session
+    before(async function () {
+        [database, redis, reset, session] = await initTestEnv()
+    })
 
     beforeEach(async function () {
         // fake session to use for testing
@@ -55,16 +21,11 @@ describe('immutable-core-model - access id', function () {
             roles: ['all', 'authenticated', 'foo'],
             sessionId: '22222222222222222222222222222222',
         }
-        // reset global data
-        immutable.reset()
-        ImmutableCoreModel.reset()
-        ImmutableAccessControl.reset()
-        // flush redis
-        if (redis) {
-            await redis.flushdb()
-        }
-        // drop any test tables if they exist
-        await database.query('DROP TABLE IF EXISTS foo')
+        await reset(database, redis)
+    })
+
+    after(async function () {
+        await database.close()
     })
 
     it('should create instance with custom accessId', async function () {

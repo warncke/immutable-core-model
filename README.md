@@ -70,13 +70,48 @@ significant performance impacts with large tables in production envrionments.
 
 By default Immutable Core Model compresses data records using Google's snappy compression algorithm.
 
-To disable compression create your model with:
+### Disabling compression for an individual model
 
     new ImmutableCoreModel({compression: false})
 
-The same setting for compression must be used at all times. Uncompressed
-records cannot be read when compression is on and compressed records cannot
-be read when compression is off.
+### Setting the default compression setting for all models
+
+    ImmutableCoreModel.defaultCompression(false)
+
+### Setting compression from the env
+
+    DEFAULT_COMPRESSION=true node app
+    DEFAULT_COMPRESSION=false node app
+
+    DEFAULT_COMPRESSION=1 node app
+    DEFAULT_COMPRESSION=0 node app
+
+If the default compression setting is set in the environment this will
+override any values set either globally or at the model level in code.
+
+## Id column type
+
+By default Immutable Core Model uses binary columns for ids. This saves space
+but makes it more difficult to work with the database using other tools.
+
+### Disabling binaryIds for an individual model
+
+    new ImmutableCoreModel({binaryIds: false})
+
+### Setting the default binaryIds setting for all models
+
+    ImmutableCoreModel.defaultBinaryIds(false)
+
+### Setting id column type from the env
+
+    DEFAULT_BINARY_IDS=true node app
+    DEFAULT_BINARY_IDS=false node app
+
+    DEFAULT_BINARY_IDS=1 node app
+    DEFAULT_BINARY_IDS=0 node app
+
+If the default binary ids setting is set in the environment this will
+override any values set either globally or at the model level in code.
 
 ## Schema
 

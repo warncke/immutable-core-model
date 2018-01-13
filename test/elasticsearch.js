@@ -1,87 +1,37 @@
 'use strict'
 
-const ImmutableAccessControl = require('immutable-access-control')
-const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
+/* application modules */
 const ImmutableCoreModel = require('../lib/immutable-core-model')
-const Promise = require('bluebird')
-const Redis = require('redis')
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-const elasticsearch = require('elasticsearch')
-const immutable = require('immutable-core')
-
-chai.use(chaiAsPromised)
-const assert = chai.assert
-
-const dbHost = process.env.DB_HOST || 'localhost'
-const dbName = process.env.DB_NAME || 'test'
-const dbPass = process.env.DB_PASS || ''
-const dbUser = process.env.DB_USER || 'root'
-
-const redisHost = process.env.REDIS_HOST || 'localhost'
-const redisPort = process.env.REDIS_PORT || '6379'
-
-const testCache = process.env.TEST_CACHE === '1' ? true : false
-
-// use the same params for all connections
-const connectionParams = {
-    charset: 'utf8',
-    db: dbName,
-    host: dbHost,
-    password: dbPass,
-    user: dbUser,
-}
-
-const esHost = process.env.ES_HOST || 'localhost:9200'
+const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - elasticsearch', function () {
 
-    // create database connection to use for testing
-    var database = new ImmutableDatabaseMariaSQL(connectionParams)
+    var database, elasticsearch, redis, reset, session
 
-    // connect to redis if TEST_CACHE enabled
-    if (testCache) {
-        var redis = Redis.createClient({
-            host: redisHost,
-            port: redisPort,
-        })
-    }
-
-    // create elasticsearch connection for testing
-    const elasticsearchClient = new elasticsearch.Client({
-        host: esHost,
+    before(async function () {
+        [database, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
     })
 
-    // fake session to use for testing
-    var session = {
-        accountId: '11111111111111111111111111111111',
-        roles: ['all', 'authenticated'],
-        sessionId: '22222222222222222222222222222222',
-    }
+    beforeEach(async function () {
+        await reset()
+    })
+
+    after(async function () {
+        await database.close()
+    })
 
     // will be pouplated in before
     var foo1, foo2, foo3, globalFooModel, fooModel
 
-    beforeEach(async function () {
-        // reset global data
-        immutable.reset()
-        ImmutableCoreModel.reset()
-        ImmutableAccessControl.reset()
-        // flush redis
-        if (redis) {
-            await redis.flushdb()
-        }
-    })
-
     it('should create a new model with an elasticsearch client', function () {
         var fooModel = new ImmutableCoreModel({
             database: database,
-            elasticsearch: elasticsearchClient,
+            elasticsearch: elasticsearch,
             name: 'foo',
             redis: redis,
         })
         // get client
-        assert.deepEqual(fooModel.elasticsearch(), elasticsearchClient)
+        assert.deepEqual(fooModel.elasticsearch(), elasticsearch)
     })
 
     it('should get/set client on model', function () {
@@ -91,16 +41,16 @@ describe('immutable-core-model - elasticsearch', function () {
             redis: redis,
         })
         // set client - should return instance
-        assert.deepEqual(fooModel.elasticsearch(elasticsearchClient), fooModel)
+        assert.deepEqual(fooModel.elasticsearch(elasticsearch), fooModel)
         // get client
-        assert.deepEqual(fooModel.elasticsearch(), elasticsearchClient)
+        assert.deepEqual(fooModel.elasticsearch(), elasticsearch)
     })
 
     it('should get/set global client', function () {
          // set client - should return instance
-        assert.deepEqual(ImmutableCoreModel.elasticsearchGlobal(elasticsearchClient), ImmutableCoreModel)
+        assert.deepEqual(ImmutableCoreModel.elasticsearchGlobal(elasticsearch), ImmutableCoreModel)
         // get client
-        assert.deepEqual(ImmutableCoreModel.elasticsearchGlobal(), elasticsearchClient)
+        assert.deepEqual(ImmutableCoreModel.elasticsearchGlobal(), elasticsearch)
     })
 
     it('should use global client when elasticsearch true and setting after model creation', function () {
@@ -112,14 +62,14 @@ describe('immutable-core-model - elasticsearch', function () {
             redis: redis,
         })
         // set global elasticsearch client
-        ImmutableCoreModel.elasticsearchGlobal(elasticsearchClient)
+        ImmutableCoreModel.elasticsearchGlobal(elasticsearch)
         // model should have client
-        assert.deepEqual(fooModel.elasticsearch(), elasticsearchClient)
+        assert.deepEqual(fooModel.elasticsearch(), elasticsearch)
     })
 
     it('should use global client when elasticsearch true and setting before model creation', function () {
         // set global elasticsearch client
-        ImmutableCoreModel.elasticsearchGlobal(elasticsearchClient)
+        ImmutableCoreModel.elasticsearchGlobal(elasticsearch)
         // create model that requires elasticsearch client to be set
         var fooModel = new ImmutableCoreModel({
             database: database,
@@ -128,7 +78,7 @@ describe('immutable-core-model - elasticsearch', function () {
             redis: redis,
         })
         // model should have client
-        assert.deepEqual(fooModel.elasticsearch(), elasticsearchClient)
+        assert.deepEqual(fooModel.elasticsearch(), elasticsearch)
     })
 
     it('should not use global client when elasticsearch not true', function () {
@@ -139,7 +89,7 @@ describe('immutable-core-model - elasticsearch', function () {
             redis: redis,
         })
         // set global elasticsearch client
-        ImmutableCoreModel.elasticsearchGlobal(elasticsearchClient)
+        ImmutableCoreModel.elasticsearchGlobal(elasticsearch)
         // model should have client
         assert.deepEqual(fooModel.elasticsearch(), undefined)
     })

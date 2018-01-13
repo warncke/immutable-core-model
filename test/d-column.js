@@ -1,54 +1,28 @@
 'use strict'
 
+/* npm modules */
 const ImmutableAccessControl = require('immutable-access-control')
-const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
+const ImmutableCore = require('immutable-core')
+
+/* application modules */
 const ImmutableCoreModel = require('../lib/immutable-core-model')
-const Promise = require('bluebird')
-const Redis = require('redis')
-const _ = require('lodash')
-const chai = require('chai')
-const immutable = require('immutable-core')
-
-const assert = chai.assert
-
-const dbHost = process.env.DB_HOST || 'localhost'
-const dbName = process.env.DB_NAME || 'test'
-const dbPass = process.env.DB_PASS || ''
-const dbUser = process.env.DB_USER || 'root'
-
-const redisHost = process.env.REDIS_HOST || 'localhost'
-const redisPort = process.env.REDIS_PORT || '6379'
-
-const testCache = process.env.TEST_CACHE === '1' ? true : false
-
-// use the same params for all connections
-const connectionParams = {
-    charset: 'utf8',
-    db: dbName,
-    host: dbHost,
-    password: dbPass,
-    user: dbUser,
-}
+const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - d column', function () {
 
-    // create database connection to use for testing
-    var database = new ImmutableDatabaseMariaSQL(connectionParams)
+    var database, redis, reset, session
 
-    // connect to redis if TEST_CACHE enabled
-    if (testCache) {
-        var redis = Redis.createClient({
-            host: redisHost,
-            port: redisPort,
-        })
-    }
+    before(async function () {
+        [database, redis, reset, session] = await initTestEnv()
+    })
 
-    // fake session to use for testing
-    var session = {
-        accountId: '11111111111111111111111111111111',
-        roles: ['all', 'authenticated'],
-        sessionId: '22222222222222222222222222222222',
-    }
+    beforeEach(async function () {
+        await reset(database, redis)
+    })
+
+    after(async function () {
+        await database.close()
+    })
 
     var fooModel, fooDeleteModel
 
@@ -57,17 +31,6 @@ describe('immutable-core-model - d column', function () {
     describe('with delete table', function () {
 
         beforeEach(async function () {
-            // reset global data
-            immutable.reset()
-            ImmutableCoreModel.reset()
-            ImmutableAccessControl.reset()
-            // flush redis
-            if (redis) {
-                await redis.flushdb()
-            }
-            // drop test tables if they exist
-            await database.query('DROP TABLE IF EXISTS foo')
-            await database.query('DROP TABLE IF EXISTS fooDelete')
             // create foo model without d column
             var fooModel = new ImmutableCoreModel({
                 columns: {
@@ -111,7 +74,7 @@ describe('immutable-core-model - d column', function () {
             // create new revision of baz
             baz = await baz.update({foo: 'baz2'})
             // reset global data
-            immutable.reset()
+            ImmutableCore.reset()
             ImmutableCoreModel.reset()
             ImmutableAccessControl.reset()
         })
