@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - session model', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // will be pouplated in before
@@ -34,13 +34,13 @@ describe('immutable-core-model - session model', function () {
                 parentId: false,
                 sessionSessionId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'session',
             redis: redis,
         })
         // create local model with session
         sessionModel = globalSessionModel.session(session)
-        // sync with database
+        // sync with mysql
         await globalSessionModel.sync()
         // insert first record
         foo1 = await globalSessionModel.createMeta({

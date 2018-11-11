@@ -9,18 +9,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('setting custom access control provider deprecated', async function () {
@@ -31,7 +31,7 @@ describe('immutable-core-model - access control', function () {
         // create model - should throw
         assert.throws(() => new ImmutableCoreModel({
             accessControl: accessControl,
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         }))
@@ -43,7 +43,7 @@ describe('immutable-core-model - access control', function () {
                 '0',
                 'create:1',
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -61,7 +61,7 @@ describe('immutable-core-model - access control', function () {
                 '0',
                 ['authenticated', 'read:any:1']
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -84,7 +84,7 @@ describe('immutable-core-model - access control', function () {
                     type: 'id',
                 },
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -99,7 +99,7 @@ describe('immutable-core-model - access control', function () {
         assert.throws(function () {
             var fooModel = new ImmutableCoreModel({
                 accessIdName: 'barId',
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })
@@ -109,11 +109,11 @@ describe('immutable-core-model - access control', function () {
     it('should allow access to models by default', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create record
         var foo = await fooModel.createMeta({

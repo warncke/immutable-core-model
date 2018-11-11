@@ -9,18 +9,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create a new model instance', async function () {
@@ -119,7 +119,7 @@ describe('immutable-core-model', function () {
                 bar: 'string',
                 foo: 'number',
             },
-            database: database,
+            mysql: mysql,
             indexes: [
                 {
                     columns: ['bam', 'bar'],
@@ -133,7 +133,7 @@ describe('immutable-core-model', function () {
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
         // check default columns
         assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -170,13 +170,13 @@ describe('immutable-core-model', function () {
                 parentId: false,
                 sessionId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check default columns
         assert.deepEqual(fooModel.defaultColumns, expectedDefaultColumns)
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -213,11 +213,11 @@ describe('immutable-core-model', function () {
                 fooParentId: false,
                 fooSessionId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -236,13 +236,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -261,13 +261,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -286,13 +286,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -311,13 +311,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -336,13 +336,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -361,13 +361,13 @@ describe('immutable-core-model', function () {
             columns: {
                 foo: fooSchema
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // check that immutable module created
         assert.ok(ImmutableCore.hasModule('fooModel'), 'immutable module created')
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -378,11 +378,11 @@ describe('immutable-core-model', function () {
     it('should compress large data objects', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create big data object
         var big = {foo: []}
@@ -409,11 +409,11 @@ describe('immutable-core-model', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             compression: false,
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create big data object
         var big = {foo: []}
@@ -444,7 +444,7 @@ describe('immutable-core-model', function () {
                 bar: 'string',
                 foo: 'number',
             },
-            database: database,
+            mysql: mysql,
             indexes: [
                 {
                     columns: ['bam', 'bar'],
@@ -453,7 +453,7 @@ describe('immutable-core-model', function () {
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()

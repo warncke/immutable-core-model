@@ -6,10 +6,10 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access id', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
@@ -21,11 +21,11 @@ describe('immutable-core-model - access id', function () {
             roles: ['all', 'authenticated', 'foo'],
             sessionId: '22222222222222222222222222222222',
         }
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create instance with custom accessId', async function () {
@@ -35,7 +35,7 @@ describe('immutable-core-model - access id', function () {
             columns: {
                 barId: 'id',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -59,7 +59,7 @@ describe('immutable-core-model - access id', function () {
             columns: {
                 barId: 'id',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

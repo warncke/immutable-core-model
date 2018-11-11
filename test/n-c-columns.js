@@ -10,18 +10,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - n/c columns', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     var fooModel
@@ -37,7 +37,7 @@ describe('immutable-core-model - n/c columns', function () {
                 },
                 n: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -52,7 +52,7 @@ describe('immutable-core-model - n/c columns', function () {
     it('should convert id from primary to unique', async function () {
         // update foo model with n column
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -72,7 +72,7 @@ describe('immutable-core-model - n/c columns', function () {
             columns: {
                 n: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -91,7 +91,7 @@ describe('immutable-core-model - n/c columns', function () {
             columns: {
                 n: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -110,7 +110,7 @@ describe('immutable-core-model - n/c columns', function () {
                 n: false,
             },
             compression: false,
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -128,7 +128,7 @@ describe('immutable-core-model - n/c columns', function () {
             columns: {
                 c: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

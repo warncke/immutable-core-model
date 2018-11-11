@@ -9,24 +9,24 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - validate', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // variable to populate in before
     var fooModel, origBam, origBar, origFoo, origGrr
 
     before(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create foo with no columns
         fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -76,7 +76,7 @@ describe('immutable-core-model - validate', function () {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -95,7 +95,7 @@ describe('immutable-core-model - validate', function () {
         ImmutableCoreModel.reset()
         // create updated foo model with columns
         fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -123,7 +123,7 @@ describe('immutable-core-model - validate', function () {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -143,7 +143,7 @@ describe('immutable-core-model - validate', function () {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

@@ -6,24 +6,24 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - schema', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create a model with a schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -44,7 +44,7 @@ describe('immutable-core-model - schema', function () {
         try {
             // create model with schema
             var fooModel = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 properties: {
                     foo: {
@@ -64,7 +64,7 @@ describe('immutable-core-model - schema', function () {
     it('should create model instance that matches schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -73,7 +73,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -87,7 +87,7 @@ describe('immutable-core-model - schema', function () {
     it('should validate data schema', async function () {
         // create model with schema
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -107,7 +107,7 @@ describe('immutable-core-model - schema', function () {
     it('should coerce scalar values', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -116,7 +116,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -130,7 +130,7 @@ describe('immutable-core-model - schema', function () {
     it('should coerce arrays', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -139,7 +139,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -153,7 +153,7 @@ describe('immutable-core-model - schema', function () {
     it('should not remove extra properties', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -162,7 +162,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -176,7 +176,7 @@ describe('immutable-core-model - schema', function () {
     it('should remove extra properties when additionalProperties:false', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             additionalProperties: false,
             properties: {
@@ -186,7 +186,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -200,7 +200,7 @@ describe('immutable-core-model - schema', function () {
     it('should update a model instance that matches schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -209,7 +209,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -227,7 +227,7 @@ describe('immutable-core-model - schema', function () {
     it('should throw error when creating instance that does not match schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -238,7 +238,7 @@ describe('immutable-core-model - schema', function () {
             required: 'foo'
         })
         try {
-            // sync with database
+            // sync with mysql
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -256,7 +256,7 @@ describe('immutable-core-model - schema', function () {
     it('should not throw error when creating instance that does not match schema and validate:false on model', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -266,7 +266,7 @@ describe('immutable-core-model - schema', function () {
             redis: redis,
             validate: false,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -278,7 +278,7 @@ describe('immutable-core-model - schema', function () {
     it('should not throw error when creating instance that does not match schema and validate:false on create', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -287,7 +287,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -300,7 +300,7 @@ describe('immutable-core-model - schema', function () {
     it('should throw error when missing required (string) property', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -311,7 +311,7 @@ describe('immutable-core-model - schema', function () {
             required: 'foo',
         })
         try {
-            // sync with database
+            // sync with mysql
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -329,7 +329,7 @@ describe('immutable-core-model - schema', function () {
     it('should throw error when missing required (array) property', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -340,7 +340,7 @@ describe('immutable-core-model - schema', function () {
             required: 'foo',
         })
         try {
-            // sync with database
+            // sync with mysql
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -358,7 +358,7 @@ describe('immutable-core-model - schema', function () {
     it('should not throw error when missing non-required property', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -367,7 +367,7 @@ describe('immutable-core-model - schema', function () {
             },
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -379,7 +379,7 @@ describe('immutable-core-model - schema', function () {
     it('should throw error when updating an instance that does not match schema', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -390,7 +390,7 @@ describe('immutable-core-model - schema', function () {
             required: 'foo',
         })
         try {
-            // sync with database
+            // sync with mysql
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -412,7 +412,7 @@ describe('immutable-core-model - schema', function () {
     it('should not throw error when updating instance that does not match schema and validate:false', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -422,7 +422,7 @@ describe('immutable-core-model - schema', function () {
             redis: redis,
             required: ['foo'],
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -439,7 +439,7 @@ describe('immutable-core-model - schema', function () {
     it('should not throw error when missing required property that has default', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             properties: {
                 foo: {
@@ -450,7 +450,7 @@ describe('immutable-core-model - schema', function () {
             redis: redis,
             required: 'foo',
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -464,7 +464,7 @@ describe('immutable-core-model - schema', function () {
     it('should require not null default columns', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             required: 'foo',

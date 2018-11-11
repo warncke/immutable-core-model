@@ -6,14 +6,14 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - via relation to account table', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     // models to create
     var accountModelGlobal, accountModel, roleModelGlobal, roleModel, roleAccountModelGlobal, roleAccountModel
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
-        await reset(database, redis)
+        [mysql, redis, reset, session] = await initTestEnv()
+        await reset(mysql, redis)
         // create account model
         accountModelGlobal = new ImmutableCoreModel({
             // disable default columns
@@ -25,7 +25,7 @@ describe('immutable-core-model - via relation to account table', function () {
                 parentId: false,
                 sessionId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'account',
             redis: redis,
             relations: {
@@ -41,7 +41,7 @@ describe('immutable-core-model - via relation to account table', function () {
                     unique: true,
                 },
             },
-            database: database,
+            mysql: mysql,
             name: 'role',
             redis: redis,
         })
@@ -63,14 +63,14 @@ describe('immutable-core-model - via relation to account table', function () {
                     type: 'id',
                 }
             },
-            database: database,
+            mysql: mysql,
             name: 'roleAccount',
             redis: redis,
             relations: {
                 role: {},
             }
         })
-        // sync with database
+        // sync with mysql
         await accountModelGlobal.sync()
         await roleModelGlobal.sync()
         await roleAccountModelGlobal.sync()
@@ -81,7 +81,7 @@ describe('immutable-core-model - via relation to account table', function () {
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should query models related to account model', async function () {

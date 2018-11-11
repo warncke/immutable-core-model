@@ -10,18 +10,15 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - cache id', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv({redis: true})
-    })
-
-    beforeEach(async function () {
-        await reset(database, redis)
+        [mysql, redis, reset, session] = await initTestEnv({redis: true})
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
+        await redis.quit()
     })
 
     // models
@@ -30,31 +27,32 @@ describe('immutable-core-model - cache id', function () {
     var origBam, origBar, origFoo
 
     beforeEach(async function () {
+        await reset(mysql, redis)
         // create initial model
         fooModelGlobal = new ImmutableCoreModel({
             columns: {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         // create bar model related to foo
         barModelGlobal = new ImmutableCoreModel({
             columns: {
                 fooId: 'id',
             },
-            database: database,
+            mysql: mysql,
             name: 'bar',
             redis: redis,
             relations: {
                 foo: {},
             },
         })
-        // sync with database
+        // sync with mysql
         await barModelGlobal.sync()
         // get local models
         fooModel = fooModelGlobal.session(session)
@@ -408,11 +406,11 @@ describe('immutable-core-model - cache id', function () {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         // get local foo
         fooModel = fooModelGlobal.session(session)

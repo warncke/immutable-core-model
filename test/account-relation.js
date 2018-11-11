@@ -6,14 +6,14 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - relations to account table', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     // models to create
     var accountModelGlobal, accountModel, authModelGlobal, authModel
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
-        await reset(database, redis)
+        [mysql, redis, reset, session] = await initTestEnv()
+        await reset(mysql, redis)
         // create account model
         accountModelGlobal = new ImmutableCoreModel({
             // disable default columns
@@ -25,7 +25,7 @@ describe('immutable-core-model - relations to account table', function () {
                 parentId: false,
                 sessionId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'account',
             redis: redis,
             relations: {
@@ -43,7 +43,7 @@ describe('immutable-core-model - relations to account table', function () {
                     type: 'string',
                 },
             },
-            database: database,
+            mysql: mysql,
             indexes: [
                 {
                     columns: ['authProviderName', 'authProviderId'],
@@ -52,7 +52,7 @@ describe('immutable-core-model - relations to account table', function () {
             name: 'auth',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await accountModelGlobal.sync()
         await authModelGlobal.sync()
         // get local instances
@@ -61,7 +61,7 @@ describe('immutable-core-model - relations to account table', function () {
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should query models related to account model', async function () {

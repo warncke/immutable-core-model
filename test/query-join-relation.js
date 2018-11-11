@@ -6,14 +6,14 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - query join relations', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // models to create
@@ -26,10 +26,10 @@ describe('immutable-core-model - query join relations', function () {
     var bar1, bar2, bar3
 
     before(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create foo model
         fooModelGlobal = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             relations: {
@@ -54,7 +54,7 @@ describe('immutable-core-model - query join relations', function () {
                 originalId: false,
                 parentId: false,
             },
-            database: database,
+            mysql: mysql,
             name: 'bam',
             redis: redis,
             relations: {
@@ -67,11 +67,11 @@ describe('immutable-core-model - query join relations', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'bar',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         await bamModelGlobal.sync()
         await barModelGlobal.sync()
@@ -132,8 +132,8 @@ describe('immutable-core-model - query join relations', function () {
         // check result
         assert.deepEqual(res.raw, {
             n: '1',
-            c: '1',
-            d: '0',
+            c: 1,
+            d: 0,
             fooAccountId: foo1.accountId,
             fooCreateTime: foo1.createTime,
             fooData: { foo: 'foo1' },

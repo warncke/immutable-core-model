@@ -6,7 +6,7 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control states', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     // fake sessions to use for testing
     var session1 = {
@@ -30,9 +30,16 @@ describe('immutable-core-model - access control states', function () {
     // record instances
     var bam, bar, baz
 
+    before(async function () {
+        [mysql, redis, reset, session] = await initTestEnv()
+    })
+
+    after(async function () {
+        await mysql.close()
+    })
+
     beforeEach(async function () {
-        [database, redis, reset, session] = await initTestEnv()
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -45,7 +52,7 @@ describe('immutable-core-model - access control states', function () {
                 ['bar', 'read:deleted:any:1'],
                 ['foo', 'undelete:any:1']
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -78,6 +85,7 @@ describe('immutable-core-model - access control states', function () {
                 where: {id: baz.id, isDeleted: true},
                 session: session3,
             })
+            console.log(res)
         }
         catch (err) {
             error = err

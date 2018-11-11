@@ -4,7 +4,7 @@
 const defined = require('if-defined')
 
 /* application modules */
-const database = require('./database')
+const mysql = require('./mysql')
 const elasticsearch = require('./elasticsearch')
 const redis = require('./redis')
 const reset = require('./reset')
@@ -22,7 +22,7 @@ module.exports = initTestEnv
 /**
  * @function initTestEnv
  *
- * return database and redis clients and mock session
+ * return mysql and redis clients and mock session
  *
  * @returns {array}
  */
@@ -33,5 +33,5 @@ async function initTestEnv (args) {
     if (args.elasticsearch) {
         var elasticsearchClient = elasticsearch()
     }
-    return [database(), redis(args.redis), reset, session(), elasticsearchClient]
+    return [await mysql(), redis(args.redis), reset, session(), elasticsearchClient]
 }

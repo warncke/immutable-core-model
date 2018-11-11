@@ -6,25 +6,25 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control create', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.end()
     })
 
     it('should deny access to create', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             accessControlRules: ['0'],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -51,7 +51,7 @@ describe('immutable-core-model - access control create', function () {
                 '0',
                 ['foo', 'create:1'],
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

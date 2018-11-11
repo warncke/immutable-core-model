@@ -7,6 +7,20 @@ Elasticsearch.
 
 Immutable Core Model requires native async/await support.
 
+## Immutable Core Model v4.0.0
+
+Version 4.0.0 of Immutable Core Model switches to using
+[mysql2](https://www.npmjs.com/package/mysql2) instead of
+[immutable-database-mariasql](https://www.npmjs.com/package/immutable-database-mariasql)
+as a database driver. This change requires updating many modules that depend
+on Immutable Core Model as well as upating Immutable App app.js files.
+
+mysql2 has a number of differences from mariasql that may break code
+that interacts with raw database response data including:
+
+* c and d columns are returned as integers instead of strings
+* response from create/update commands is object instead of array.info
+
 ## Immutable Core v2 and Immutable Core Model v3.3.0
 
 [Immutable Core](https://www.npmjs.com/package/immutable-core) introduced
@@ -38,6 +52,32 @@ new features and a few major breaking changes.
 * c column to indicate if record is compressed
 * d column to indicate if record is deleted
 * int (64bit) and smallint (16bit) types
+
+## Creating a new database connection
+
+    const mysql = ImmutableCoreModel.createMysqlConnection({
+        database: 'database-name',
+        host: 'localhost',
+        password: 'db-password'
+        user: 'db-user'
+    })
+
+The connection parameters will have required defaults added and will then
+be passed to mysql2 to create a connection.
+
+If the `connectionLimit` param is set then a connection pool will be created
+instead of a single connection. This is recommended for production use.
+
+The default connection params are:
+
+    bigNumberStrings: true,
+    dateStrings: true,
+    namedPlaceholders: true,
+    rowsAsArray: false,
+    supportBigNumbers: true,
+
+These parameters are needed for Immutable Core Model process results correctly
+and so they cannot be changed.
 
 ## Creating a new model
 
@@ -831,8 +871,10 @@ argument but if one is passed it will override the existing session context.
 
 ### Creating a simple model with default options
 
+    const mysql = ImmutableCoreModel.createMysqlConnection({ ... })
+
     var fooModel = new ImmutableCoreModel({
-        database: database,
+        mysql: mysql,
         name: 'foo',
     })
 

@@ -6,7 +6,7 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control read', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     // fake sessions to use for testing
     var session1 = {
@@ -31,8 +31,8 @@ describe('immutable-core-model - access control read', function () {
     var bam, bar, baz
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
-        await reset(database, redis)
+        [mysql, redis, reset, session] = await initTestEnv()
+        await reset(mysql, redis)
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -41,7 +41,7 @@ describe('immutable-core-model - access control read', function () {
                 ['foo', 'read:own:1'],
                 ['bar', 'read:any:1'],
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

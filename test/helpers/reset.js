@@ -4,7 +4,6 @@
 const ImmutableAccessControl = require('immutable-access-control')
 const ImmutableCore = require('immutable-core')
 const ImmutableCoreModelView = require('immutable-core-model-view')
-const ImmutableDatabaseMariaSQL = require('immutable-database-mariasql')
 const _ = require('lodash')
 const nullFunction = require('null-function')
 
@@ -21,13 +20,13 @@ Object.freeze(env)
 /**
  * @function reset
  *
- * reset database, reset, and internal state
+ * reset mysql, reset, and internal state
  *
- * @param {object} database
+ * @param {object} mysql
  * @param {object} redis
  *
  */
-async function reset (database, redis, elasticsearch) {
+async function reset (mysql, redis, elasticsearch) {
     ImmutableAccessControl.reset()
     ImmutableCore.reset()
     ImmutableCoreModel.reset()
@@ -35,10 +34,10 @@ async function reset (database, redis, elasticsearch) {
 
     process.env = _.clone(env)
 
-    if (database) {
-        await database.query('DROP DATABASE test')
-        await database.query('CREATE DATABASE test')
-        await database.query('USE test')
+    if (mysql) {
+        await mysql.query('DROP DATABASE test')
+        await mysql.query('CREATE DATABASE test')
+        await mysql.query('USE test')
     }
 
     if (redis) {

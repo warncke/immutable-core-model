@@ -10,27 +10,27 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - views', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     var origBam, origBar, origFoo, origRecords
 
     before(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create initial model
         var fooModelGlobal = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         // flush redis
         if (redis) {
@@ -127,7 +127,7 @@ describe('immutable-core-model - views', function () {
     it('should create model with model view', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -143,7 +143,7 @@ describe('immutable-core-model - views', function () {
     it('should query all with record view', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -165,7 +165,7 @@ describe('immutable-core-model - views', function () {
     it('should apply record view to result set', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -186,7 +186,7 @@ describe('immutable-core-model - views', function () {
     it('should return collection view for single record', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -206,7 +206,7 @@ describe('immutable-core-model - views', function () {
     it('should return collection view for query all', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -232,7 +232,7 @@ describe('immutable-core-model - views', function () {
     it('should return collection view for result set', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             views: {
@@ -257,7 +257,7 @@ describe('immutable-core-model - views', function () {
     it('should apply multiple views with select', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -276,7 +276,7 @@ describe('immutable-core-model - views', function () {
     it('should apply multiple views with query', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -300,7 +300,7 @@ describe('immutable-core-model - views', function () {
     it('should apply sync and async record views', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -315,7 +315,7 @@ describe('immutable-core-model - views', function () {
     it('should apply sync and async collection views', async function () {
         // create foo model
         var glboalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

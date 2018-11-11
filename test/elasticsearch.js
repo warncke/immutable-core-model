@@ -6,10 +6,10 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - elasticsearch', function () {
 
-    var database, elasticsearch, redis, reset, session
+    var mysql, elasticsearch, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
+        [mysql, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
     })
 
     beforeEach(async function () {
@@ -17,7 +17,7 @@ describe('immutable-core-model - elasticsearch', function () {
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // will be pouplated in before
@@ -25,7 +25,7 @@ describe('immutable-core-model - elasticsearch', function () {
 
     it('should create a new model with an elasticsearch client', function () {
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             name: 'foo',
             redis: redis,
@@ -36,7 +36,7 @@ describe('immutable-core-model - elasticsearch', function () {
 
     it('should get/set client on model', function () {
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -56,7 +56,7 @@ describe('immutable-core-model - elasticsearch', function () {
     it('should use global client when elasticsearch true and setting after model creation', function () {
         // create model that requires elasticsearch client to be set
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: true,
             name: 'foo',
             redis: redis,
@@ -72,7 +72,7 @@ describe('immutable-core-model - elasticsearch', function () {
         ImmutableCoreModel.elasticsearchGlobal(elasticsearch)
         // create model that requires elasticsearch client to be set
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: true,
             name: 'foo',
             redis: redis,
@@ -84,21 +84,21 @@ describe('immutable-core-model - elasticsearch', function () {
     it('should not use global client when elasticsearch not true', function () {
         // create model that requires elasticsearch client to be set
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // set global elasticsearch client
         ImmutableCoreModel.elasticsearchGlobal(elasticsearch)
-        // model should have client
-        assert.deepEqual(fooModel.elasticsearch(), undefined)
+        // model should not have client
+        assert.strictEqual(fooModel.elasticsearch(), null)
     })
 
     it('should throw error on invalid elasticsearch on model creation', function () {
         assert.throws(function () {
             // create model with invalid client
             var fooModel = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 elasticsearch: {},
                 name: 'foo',
                 redis: redis,
@@ -109,7 +109,7 @@ describe('immutable-core-model - elasticsearch', function () {
     it('should throw error seting invalid elasticsearch on model', function () {
         assert.throws(function () {
             var fooModel = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })

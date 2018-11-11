@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - select by unique', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // models
@@ -34,11 +34,11 @@ describe('immutable-core-model - select by unique', function () {
                     unique: true,
                 },
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         // get local model
         fooModel = fooModelGlobal.session(session)

@@ -6,28 +6,28 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model-local', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // variables to populate
     var globalFooModel, origBar, origFoo
 
     before(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create global model instance
         globalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await globalFooModel.sync()
     })
 

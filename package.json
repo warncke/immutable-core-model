@@ -2,32 +2,32 @@
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
     "ajv": "5.5.2",
-    "bluebird": "3.5.1",
-    "change-case": "3.0.1",
-    "debug": "3.1.0",
-    "deep-extend": "0.5.0",
+    "bluebird": "3.5.3",
+    "change-case": "3.0.2",
+    "debug": "4.1.0",
+    "deep-extend": "0.6.0",
     "if-defined": "1.0.17",
     "immutable-access-control": "0.5.15",
     "immutable-ai": "0.8.1",
     "immutable-app-http-error": "0.1.18",
-    "immutable-core": "2.2.38",
-    "immutable-core-model-view": "0.4.53",
+    "immutable-core": "2.3.0",
+    "immutable-core-model-view": "0.5.0",
     "immutable-require-valid-optional-object": "0.1.17",
     "json-stable-stringify": "1.0.1",
-    "lodash": "4.17.4",
-    "micro-timestamp": "0.1.37",
+    "lodash": "4.17.11",
+    "micro-timestamp": "1.0.0",
+    "mysql2": "1.6.4",
     "null-function": "1.0.17",
-    "snappy": "6.0.1",
+    "snappy": "6.1.1",
     "stable-id": "1.0.12"
   },
   "description": "Immutable model built on immutable-core",
   "devDependencies": {
-    "chai": "4.1.2",
+    "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.6.0",
-    "elasticsearch": "14.0.0",
-    "immutable-database-mariasql": "1.3.47",
-    "mocha": "4.1.0",
+    "elasticsearch": "15.2.0",
+    "mocha": "5.2.0",
     "redis": "2.8.0"
   },
   "directories": {
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "3.6.2"
+  "version": "4.0.0"
 }

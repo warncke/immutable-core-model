@@ -6,24 +6,24 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - transform', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should transform value', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             transform: {
@@ -32,7 +32,7 @@ describe('immutable-core-model - transform', function () {
                 }
             },
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -46,7 +46,7 @@ describe('immutable-core-model - transform', function () {
     it('should call transform with model and args', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             transform: {
@@ -61,7 +61,7 @@ describe('immutable-core-model - transform', function () {
                 }
             },
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -75,7 +75,7 @@ describe('immutable-core-model - transform', function () {
     it('should transform nested property', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             transform: {
@@ -84,7 +84,7 @@ describe('immutable-core-model - transform', function () {
                 }
             },
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -98,7 +98,7 @@ describe('immutable-core-model - transform', function () {
     it('should not call transform for undefined value', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             transform: {
@@ -107,7 +107,7 @@ describe('immutable-core-model - transform', function () {
                 }
             },
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -121,7 +121,7 @@ describe('immutable-core-model - transform', function () {
     it('should transform value when updating record', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
             transform: {
@@ -130,7 +130,7 @@ describe('immutable-core-model - transform', function () {
                 }
             },
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({

@@ -10,14 +10,15 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - cache views', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv({redis: true})
+        [mysql, redis, reset, session] = await initTestEnv({redis: true})
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
+        await redis.quit()
     })
 
     var fooModel, fooModelGlobal
@@ -26,14 +27,14 @@ describe('immutable-core-model - cache views', function () {
 
     // reset models and re-create views for each test 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
         // create initial model
         fooModelGlobal = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModelGlobal.sync()
         // get local fooModel
         fooModel = fooModelGlobal.session(session)
@@ -133,7 +134,7 @@ describe('immutable-core-model - cache views', function () {
         beforeEach(function () {
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {
@@ -192,7 +193,7 @@ describe('immutable-core-model - cache views', function () {
         beforeEach(function () {
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {
@@ -251,7 +252,7 @@ describe('immutable-core-model - cache views', function () {
         beforeEach(function () {
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {
@@ -310,6 +311,8 @@ describe('immutable-core-model - cache views', function () {
             // check result
             assert.isUndefined(res._cached)
             assert.deepEqual(res, expected)
+            // wait to allow async cache to complete
+            await Promise.delay(50)
             // second query should be cached
             res = await fooModel.select.all
             // check result
@@ -324,7 +327,7 @@ describe('immutable-core-model - cache views', function () {
         beforeEach(function () {
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {
@@ -383,6 +386,8 @@ describe('immutable-core-model - cache views', function () {
             // check result
             assert.isUndefined(res._cached)
             assert.deepEqual(res, expected)
+            // wait to allow async cache to complete
+            await Promise.delay(50)
             // second query should be cached
             res = await fooModel.select.all
             // check result
@@ -397,7 +402,7 @@ describe('immutable-core-model - cache views', function () {
         beforeEach(function () {
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {
@@ -433,7 +438,7 @@ describe('immutable-core-model - cache views', function () {
             var fooModelView = FooModelView({cache: false})
             // create foo model
             fooModelGlobal = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
                 views: {

@@ -6,24 +6,24 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - elasticsearch create', function () {
 
-    var database, elasticsearch, redis, reset, session
+    var mysql, elasticsearch, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
+        [mysql, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
     })
 
     beforeEach(async function () {
-        await reset(database, redis, elasticsearch)
+        await reset(mysql, redis, elasticsearch)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create document when creating record', async function () {
         // create model with elasticsearch
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             name: 'foo',
             redis: redis,
@@ -51,7 +51,7 @@ describe('immutable-core-model - elasticsearch create', function () {
         assert.deepEqual(res._source, {
             accountId: session.accountId,
             createTime: foo.createTime,
-            d: '0',
+            d: 0,
             data: foo.data,
             id: foo.id,
             originalId: foo.originalId,
@@ -62,7 +62,7 @@ describe('immutable-core-model - elasticsearch create', function () {
     it('should update document when updating record', async function () {
         // create model with elasticsearch
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             name: 'foo',
             redis: redis,
@@ -92,7 +92,7 @@ describe('immutable-core-model - elasticsearch create', function () {
         assert.deepEqual(res._source, {
             accountId: session.accountId,
             createTime: newFoo.createTime,
-            d: '0',
+            d: 0,
             data: newFoo.data,
             id: newFoo.id,
             originalId: newFoo.originalId,
@@ -104,7 +104,7 @@ describe('immutable-core-model - elasticsearch create', function () {
     it('should set type from data', async function () {
         // create model with elasticsearch
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             esType: 'bar.bam',
             name: 'foo',
@@ -136,7 +136,7 @@ describe('immutable-core-model - elasticsearch create', function () {
     it('should default to name when type not in data', async function () {
         // create model with elasticsearch
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             esType: 'bar.bam',
             name: 'foo',

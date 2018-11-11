@@ -8,18 +8,18 @@ describe('immutable-core-model - elasticsearch search', function () {
     // extend timeout to allow elasticsearch time to index
     this.timeout(10000)
 
-    var database, elasticsearch, redis, reset, session
+    var mysql, elasticsearch, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
+        [mysql, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
     })
 
     beforeEach(async function () {
-        await reset(database, redis, elasticsearch)
+        await reset(mysql, redis, elasticsearch)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // will be pouplated in before
@@ -28,7 +28,7 @@ describe('immutable-core-model - elasticsearch search', function () {
     beforeEach(async function () {
         // create model with elasticsearch
         globalFooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             elasticsearch: elasticsearch,
             name: 'foo',
             redis: redis,

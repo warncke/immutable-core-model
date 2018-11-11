@@ -6,7 +6,7 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control list', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     // fake sessions to use for testing
     var session1 = {
@@ -31,8 +31,8 @@ describe('immutable-core-model - access control list', function () {
     var bam, bar, baz
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
-        await reset(database, redis)
+        [mysql, redis, reset, session] = await initTestEnv()
+        await reset(mysql, redis)
         // create model
         fooModel = new ImmutableCoreModel({
             accessControlRules: [
@@ -42,7 +42,7 @@ describe('immutable-core-model - access control list', function () {
                 ['foo', 'read:own:1'],
                 ['bar', 'list:any:1'],
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -64,7 +64,7 @@ describe('immutable-core-model - access control list', function () {
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should deny access to list', async function () {

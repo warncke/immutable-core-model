@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - disable binary ids', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     var fooModel, fooModelGlobal
@@ -37,7 +37,7 @@ describe('immutable-core-model - disable binary ids', function () {
                     },
                     n: false,
                 },
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })
@@ -51,7 +51,7 @@ describe('immutable-core-model - disable binary ids', function () {
             // create new record
             var foo = await fooModel.create({foo: 1})
             // get raw data by id
-            var raw = await fooModelGlobal.database().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
+            var [ raw ] = await fooModelGlobal.mysql().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
             // if id is hex it will find result
             assert.strictEqual(raw.length, 1)
         })
@@ -72,7 +72,7 @@ describe('immutable-core-model - disable binary ids', function () {
                     },
                     n: false,
                 },
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })
@@ -86,7 +86,7 @@ describe('immutable-core-model - disable binary ids', function () {
             // create new record
             var foo = await fooModel.create({foo: 1})
             // get raw data by id
-            var raw = await fooModelGlobal.database().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
+            var [ raw ] = await fooModelGlobal.mysql().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
             // if id is hex it will find result
             assert.strictEqual(raw.length, 1)
         })
@@ -109,7 +109,7 @@ describe('immutable-core-model - disable binary ids', function () {
                     },
                     n: false,
                 },
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })
@@ -127,7 +127,7 @@ describe('immutable-core-model - disable binary ids', function () {
             // create new record
             var foo = await fooModel.create({foo: 1})
             // get raw data by id
-            var raw = await fooModelGlobal.database().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
+            var [ raw ] = await fooModelGlobal.mysql().query('SELECT * FROM foo WHERE fooId = :fooId', {fooId: foo.id});
             // if id is hex it will find result
             assert.strictEqual(raw.length, 1)
         })

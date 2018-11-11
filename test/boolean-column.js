@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - boolean column', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // variable to populate in before
@@ -30,13 +30,13 @@ describe('immutable-core-model - boolean column', function () {
                 bar: 'boolean',
                 foo: 'boolean',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // drop any test tables if they exist
-        await database.query('DROP TABLE IF EXISTS foo')
-        // sync with database
+        await mysql.query('DROP TABLE IF EXISTS foo')
+        // sync with mysql
         await fooModelGlobal.sync()
         // get local foo model
         fooModel = fooModelGlobal.session(session)
@@ -50,20 +50,20 @@ describe('immutable-core-model - boolean column', function () {
     it('should store boolean column as 1/0', async function () {
         var bam = await fooModel.select.by.id(origBam.id)
         // check values
-        assert.strictEqual(bam.raw.bar, '1')
-        assert.strictEqual(bam.raw.foo, '0')
+        assert.strictEqual(bam.raw.bar, 1)
+        assert.strictEqual(bam.raw.foo, 0)
     })
 
     it('should correct incorrect value', async function () {
         // set column to incorrect value
-        await database.query('UPDATE foo SET bar = 0, foo = 1')
+        await mysql.query('UPDATE foo SET bar = 0, foo = 1')
         // run validate to correct values
         await fooModelGlobal.validate({session: session})
         // fetch value
         var bam = await fooModel.select.by.id(origBam.id)
         // check values
-        assert.strictEqual(bam.raw.bar, '1')
-        assert.strictEqual(bam.raw.foo, '0')
+        assert.strictEqual(bam.raw.bar, 1)
+        assert.strictEqual(bam.raw.foo, 0)
     })
 
 })

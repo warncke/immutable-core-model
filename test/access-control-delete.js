@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - access control delete', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should deny access to delete', async function () {
@@ -26,7 +26,7 @@ describe('immutable-core-model - access control delete', function () {
             accessControlRules: [
                 'delete:any:0'
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -58,7 +58,7 @@ describe('immutable-core-model - access control delete', function () {
                 'delete:any:0',
                 'delete:own:1',
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -86,7 +86,7 @@ describe('immutable-core-model - access control delete', function () {
             accessControlRules: [
                 'undelete:any:0'
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -120,7 +120,7 @@ describe('immutable-core-model - access control delete', function () {
                 'undelete:any:0',
                 'undelete:own:1',
             ],
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

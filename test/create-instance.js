@@ -9,18 +9,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - create instance', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create a new object instance', async function () {
@@ -29,11 +29,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -54,11 +54,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -76,11 +76,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -98,11 +98,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -121,7 +121,7 @@ describe('immutable-core-model - create instance', function () {
         // wait for insert promise to complete
         var res = await foo.promise
         // check result
-        assert.strictEqual(res.info.affectedRows, '1')
+        assert.strictEqual(res.affectedRows, 1)
     })
 
     it('should create a new object instance and not return response when flag set and not waiting', async function () {
@@ -130,11 +130,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -153,11 +153,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -177,11 +177,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -210,11 +210,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -242,11 +242,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -275,11 +275,11 @@ describe('immutable-core-model - create instance', function () {
             columns: {
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -316,13 +316,13 @@ describe('immutable-core-model - create instance', function () {
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             idDataOnly: true,
             name: 'foo',
             redis: redis,
         })
         try {
-            // sync with database
+            // sync with mysql
             await fooModel.sync()
             // create new foo instance
             var foo = await fooModel.createMeta({
@@ -357,12 +357,12 @@ describe('immutable-core-model - create instance', function () {
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             idDataOnly: true,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -393,12 +393,12 @@ describe('immutable-core-model - create instance', function () {
         }
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             idDataOnly: true,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({
@@ -420,11 +420,11 @@ describe('immutable-core-model - create instance', function () {
     it('should have class properties on instance', async function () {
         // create initial model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // create new foo instance
         var foo = await fooModel.createMeta({

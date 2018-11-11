@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model-local - persist', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     var glboalFooModel, fooModel
@@ -31,14 +31,14 @@ describe('immutable-core-model-local - persist', function () {
                 originalId: false,
                 parentId: false,
             },
-            database: database,
+            mysql: mysql,
             idDataOnly: true,
             name: 'foo',
             redis: redis,
         })
         // create local foo model with session for select queries
         fooModel = glboalFooModel.session(session)
-        // sync with database
+        // sync with mysql
         await glboalFooModel.sync()
     })
 

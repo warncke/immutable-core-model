@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - update', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should create model with immutable property', async function () {
@@ -29,7 +29,7 @@ describe('immutable-core-model - update', function () {
                     type: 'string',
                 }
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -57,7 +57,7 @@ describe('immutable-core-model - update', function () {
     it('should throw error when updating old instance', async function () {
         // create foo model with immutable property
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -82,13 +82,13 @@ describe('immutable-core-model - update', function () {
         assert.deepEqual(updateFoo.data, {foo: 'bam'})
         // check that error thrown on second update
         assert.isDefined(threw)
-        assert.strictEqual(threw.code, 1062)
+        assert.strictEqual(threw.errno, 1062)
     })
 
     it('should force update old instance', async function () {
         // create foo model with immutable property
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -113,7 +113,7 @@ describe('immutable-core-model - update', function () {
     it('should merge data by default', async function () {
         // create foo model with immutable property
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
@@ -135,7 +135,7 @@ describe('immutable-core-model - update', function () {
     it('should overwrite instead of merging with merge:false', async function () {
         // create foo model with immutable property
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })

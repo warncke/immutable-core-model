@@ -6,28 +6,28 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - engine and charset', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     it('should use default engine and charset', async function () {
         // create model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -43,11 +43,11 @@ describe('immutable-core-model - engine and charset', function () {
             .defaultEngine('MyISAM')
         // create model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -60,12 +60,12 @@ describe('immutable-core-model - engine and charset', function () {
         // create model
         var fooModel = new ImmutableCoreModel({
             charset: 'latin1',
-            database: database,
+            mysql: mysql,
             engine: 'MyISAM',
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()
@@ -80,11 +80,11 @@ describe('immutable-core-model - engine and charset', function () {
         process.env.DEFAULT_ENGINE = 'MyISAM'
         // create model
         var fooModel = new ImmutableCoreModel({
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
-        // sync with database
+        // sync with mysql
         await fooModel.sync()
         // get schema
         var schema = await fooModel.schema()

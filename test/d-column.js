@@ -10,18 +10,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - d column', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     var fooModel, fooDeleteModel
@@ -36,7 +36,7 @@ describe('immutable-core-model - d column', function () {
                 columns: {
                     d: false,
                 },
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })
@@ -52,7 +52,7 @@ describe('immutable-core-model - d column', function () {
                     parentId: false,
                     fooId: 'id',
                 },
-                database: database,
+                mysql: mysql,
                 name: 'fooDelete',
                 redis: redis,
             })
@@ -82,7 +82,7 @@ describe('immutable-core-model - d column', function () {
         it('should delete records when adding d column', async function () {
             // update foo model with n column
             var fooModel = new ImmutableCoreModel({
-                database: database,
+                mysql: mysql,
                 name: 'foo',
                 redis: redis,
             })

@@ -6,18 +6,18 @@ const initTestEnv = require('./helpers/init-test-env')
 
 describe('immutable-core-model - delete instance', function () {
 
-    var database, redis, reset, session
+    var mysql, redis, reset, session
 
     before(async function () {
-        [database, redis, reset, session] = await initTestEnv()
+        [mysql, redis, reset, session] = await initTestEnv()
     })
 
     beforeEach(async function () {
-        await reset(database, redis)
+        await reset(mysql, redis)
     })
 
     after(async function () {
-        await database.close()
+        await mysql.close()
     })
 
     // variable to populate in before
@@ -35,13 +35,13 @@ describe('immutable-core-model - delete instance', function () {
                 bar: 'number',
                 foo: 'string',
             },
-            database: database,
+            mysql: mysql,
             name: 'foo',
             redis: redis,
         })
         // drop any test tables if they exist
-        await database.query('DROP TABLE IF EXISTS foo')
-        // sync with database
+        await mysql.query('DROP TABLE IF EXISTS foo')
+        // sync with mysql
         await fooModelGlobal.sync()
         // get local foo model
         fooModel = fooModelGlobal.session(session)
