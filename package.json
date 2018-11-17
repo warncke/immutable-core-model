@@ -9,9 +9,9 @@
     "if-defined": "1.0.18",
     "immutable-access-control": "0.5.17",
     "immutable-ai": "0.8.3",
-    "immutable-app-http-error": "0.1.18",
+    "immutable-app-http-error": "0.1.19",
     "immutable-core": "2.3.2",
-    "immutable-core-model-view": "0.5.0",
+    "immutable-core-model-view": "0.5.1",
     "immutable-require-valid-optional-object": "0.1.17",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.11",
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "4.0.1"
+  "version": "4.0.2"
 }
