@@ -7,19 +7,19 @@
     "debug": "4.1.0",
     "deep-extend": "0.6.0",
     "if-defined": "1.0.18",
-    "immutable-access-control": "0.5.17",
+    "immutable-access-control": "0.5.18",
     "immutable-ai": "0.8.3",
     "immutable-app-http-error": "0.1.19",
-    "immutable-core": "2.3.2",
-    "immutable-core-model-view": "0.5.1",
-    "immutable-require-valid-optional-object": "0.1.17",
+    "immutable-core": "2.3.3",
+    "immutable-core-model-view": "0.5.2",
+    "immutable-require-valid-optional-object": "0.1.18",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.11",
     "micro-timestamp": "1.0.0",
     "mysql2": "1.6.4",
-    "null-function": "1.0.17",
+    "null-function": "1.0.18",
     "snappy": "6.1.1",
-    "stable-id": "1.0.12"
+    "stable-id": "1.0.13"
   },
   "description": "Immutable model built on immutable-core",
   "devDependencies": {
@@ -43,5 +43,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "4.0.2"
+  "version": "4.0.3"
 }
