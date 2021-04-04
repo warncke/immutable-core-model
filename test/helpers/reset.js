@@ -17,6 +17,8 @@ module.exports = reset
 const env = _.clone(process.env)
 Object.freeze(env)
 
+const dbName = process.env.DB_NAME || 'test'
+
 /**
  * @function reset
  *
@@ -35,9 +37,9 @@ async function reset (mysql, redis, elasticsearch) {
     process.env = _.clone(env)
 
     if (mysql) {
-        await mysql.query('DROP DATABASE test')
-        await mysql.query('CREATE DATABASE test')
-        await mysql.query('USE test')
+        await mysql.query(`DROP DATABASE IF EXISTS ${dbName}`)
+        await mysql.query(`CREATE DATABASE ${dbName}`)
+        await mysql.query(`USE ${dbName}`)
     }
 
     if (redis) {

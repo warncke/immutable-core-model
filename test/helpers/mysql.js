@@ -12,7 +12,6 @@ const dbPass = process.env.DB_PASS || ''
 const dbUser = process.env.DB_USER || 'root'
 
 const connectionParams = {
-    database: dbName,
     host: dbHost,
     password: dbPass,
     user: dbUser,
@@ -26,5 +25,9 @@ const connectionParams = {
  * @returns {Promise<Connection>}
  */
 async function mysql () {
-    return ImmutableCoreModel.createMysqlConnection(connectionParams)
+    const mysql = await ImmutableCoreModel.createMysqlConnection(connectionParams)
+    await mysql.query(`DROP DATABASE IF EXISTS ${dbName}`)
+    await mysql.query(`CREATE DATABASE ${dbName}`)
+    await mysql.query(`USE ${dbName}`)
+    return mysql
 }
