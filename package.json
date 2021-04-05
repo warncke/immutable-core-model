@@ -2,6 +2,7 @@
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
     "ajv": "8.0.5",
+    "ajv-errors": "^3.0.0",
     "bluebird": "3.7.2",
     "change-case": "4.1.2",
     "debug": "4.3.1",
@@ -43,5 +44,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "5.0.0"
+  "version": "5.1.0"
 }

@@ -288,6 +288,11 @@ so that global configuration methods can be chained.
 
     var fooModel = new ImmutableCoreModel({
         additionalProperties: false,
+        errorMessage: {
+            required: {
+                foo: 'please enter foo'
+            },
+        },
         name: 'foo',
         properties: {
             foo: {
@@ -321,6 +326,9 @@ following options to perform JSON schema validation:
     removeAdditional: true
     useDefaults: true
     v5: true
+
+[ajv-errors](https://www.npmjs.com/package/ajv-errors) is used to provide custom
+error messages.
 
 ## Disabling schema validation at the model level
 

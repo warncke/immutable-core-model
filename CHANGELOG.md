@@ -1,3 +1,8 @@
+# v5.1.0
+
+Add [ajv-errors](https://www.npmjs.com/package/ajv-errors) to replace
+custom error message functionality that was previously a part of ajv.
+
 # v5.0.0
 
 Upgrade supporting packages to support Node 14. Fix breaking changes

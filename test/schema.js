@@ -1,5 +1,6 @@
 'use strict'
 
+const { assert } = require('chai')
 /* application modules */
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const initTestEnv = require('./helpers/init-test-env')
@@ -475,6 +476,150 @@ describe('immutable-core-model - schema', function () {
         assert.isFalse(validator.validate(fooModel.schemaId, {}))
         // there should be 5 missing required coluns
         assert.strictEqual(validator.errors.length, 5)
+    })
+
+    it('should handle schema with errorMessage', async function () {
+        const businessModel = new ImmutableCoreModel({
+            errorMessage: {
+                required: {
+                    businessName: 'must provide business name',
+                }
+            },
+            mysql: mysql,
+            name: 'business',
+            properties: {
+                businessName: {
+                    type: 'string',
+                },
+                hoursOfOperation: {
+                    items: {
+                        properties: {
+                            fromDay: {
+                                enum: [
+                                    'Sunday',
+                                    'Monday',
+                                    'Tuesday',
+                                    'Wednesday',
+                                    'Thursday',
+                                    'Friday',
+                                    'Saturday',
+                                ],
+                                type: 'string',
+                            },
+                            toDay: {
+                                enum: [
+                                    'Sunday',
+                                    'Monday',
+                                    'Tuesday',
+                                    'Wednesday',
+                                    'Thursday',
+                                    'Friday',
+                                    'Saturday',
+                                ],
+                                type: 'string',
+                            },
+                            fromHourOne: {
+                                errorMessage: {
+                                    pattern: 'Enter time as HH:MM like 09:30',
+                                },
+                                pattern: '^\\d{2}:\\d{2}$',
+                                type: 'string',
+                            },
+                            toHourOne: {
+                                errorMessage: {
+                                    pattern: 'Enter time as HH:MM like 09:30',
+                                },
+                                pattern: '^\\d{2}:\\d{2}$',
+                                type: 'string',
+                            },
+                            fromHourTwo: {
+                                errorMessage: {
+                                    pattern: 'Enter time as HH:MM like 09:30',
+                                },
+                                pattern: '^(\\d{2}:\\d{2})?$',
+                                type: 'string',
+                            },
+                            toHourTwo: {
+                                errorMessage: {
+                                    pattern: 'Enter time as HH:MM like 09:30',
+                                },
+                                pattern: '^(\\d{2}:\\d{2})?$',
+                                type: 'string',
+                            },
+                        },
+                        required: [
+                            'fromDay',
+                            'toDay',
+                            'fromHourOne',
+                            'toHourOne',
+                        ],
+                        type: 'object',
+                    },
+                    maxItems: 7,
+                    minItems: 0,
+                    type: 'array',
+                },
+            },
+            required: [
+                'businessName',
+            ],
+        })
+        // create table
+        await businessModel.sync()
+        // test with valid data
+        await businessModel.createMeta({
+            data: {
+                businessName: 'test',
+                hoursOfOperation: [
+                    {
+                        fromDay: 'Sunday',
+                        toDay: 'Thursday',
+                        fromHourOne: '11:00',
+                        toHourOne: '14:00',
+                        fromHourTwo: '16:30',
+                        toHourTwo: '21:00',
+                    },
+                    {
+                        fromDay: 'Friday',
+                        toDay: 'Saturday',
+                        fromHourOne: '11:00',
+                        toHourOne: '23:00',
+                    },
+                ],
+            },
+            session
+        })
+        // test with invalid data
+        let error
+        try {
+            await businessModel.createMeta({
+                data: {
+                    hoursOfOperation: [
+                        {
+                            fromDay: 'Sunday',
+                            toDay: 'Thursday',
+                            fromHourOne: 'foo',
+                            toHourOne: '14:00',
+                            fromHourTwo: '16:30',
+                            toHourTwo: '21:00',
+                        },
+                        {
+                            fromDay: 'Friday',
+                            toDay: 'Saturday',
+                            fromHourOne: '11:00',
+                            toHourOne: '23:00',
+                        },
+                    ],
+                },
+                session
+            })
+        } catch (err) {
+            error = err
+        }
+        const businessNameError = error.data.find(e => e.instancePath === '/businessData')
+        assert.strictEqual(businessNameError.message, 'must provide business name')
+        const hourError = error.data.find(e => e.instancePath === '/businessData/hoursOfOperation/0/fromHourOne')
+        assert.strictEqual(hourError.message, 'Enter time as HH:MM like 09:30')
     })
 
 })
