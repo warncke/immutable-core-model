@@ -17,7 +17,7 @@ describe('immutable-core-model-local - persist', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     var glboalFooModel, fooModel

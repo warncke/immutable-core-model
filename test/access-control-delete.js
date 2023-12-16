@@ -17,7 +17,7 @@ describe('immutable-core-model - access control delete', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should deny access to delete', async function () {

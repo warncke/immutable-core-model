@@ -28,7 +28,7 @@ const dbName = process.env.DB_NAME || 'test'
  * @param {object} redis
  *
  */
-async function reset (mysql, redis, elasticsearch) {
+async function reset (mysql, redis, opensearch) {
     ImmutableAccessControl.reset()
     ImmutableCore.reset()
     ImmutableCoreModel.reset()
@@ -43,14 +43,14 @@ async function reset (mysql, redis, elasticsearch) {
     }
 
     if (redis) {
-        await redis.flushdb()
+        await redis.flushDb()
     }
 
-    if (elasticsearch) {
-        await elasticsearch.indices.delete({
+    if (opensearch) {
+        await opensearch.indices.delete({
             index: 'foo'
         }).catch(nullFunction)
-        await elasticsearch.indices.delete({
+        await opensearch.indices.delete({
             index: 'not-foo'
         }).catch(nullFunction)
     }

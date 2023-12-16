@@ -17,7 +17,7 @@ describe('immutable-core-model - relations via unlink', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // models to create

@@ -13,7 +13,7 @@ describe('immutable-core-model - query join relations', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // models to create

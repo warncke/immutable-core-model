@@ -64,7 +64,7 @@ describe('immutable-core-model - access control list', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should deny access to list', async function () {

@@ -17,7 +17,7 @@ describe('immutable-core-model - update', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create model with immutable property', async function () {

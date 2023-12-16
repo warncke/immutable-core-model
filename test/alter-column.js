@@ -20,7 +20,7 @@ describe('immutable-core-model - alter column', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should add non-unique index with no previous index', async function () {

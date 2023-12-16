@@ -17,7 +17,7 @@ describe('immutable-core-model - views', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     var origBam, origBar, origFoo, origRecords

@@ -8,8 +8,8 @@ module.exports = mysql
 
 const dbHost = process.env.DB_HOST || 'localhost'
 const dbName = process.env.DB_NAME || 'test'
-const dbPass = process.env.DB_PASS || ''
-const dbUser = process.env.DB_USER || 'root'
+const dbPass = process.env.DB_PASS || 'test'
+const dbUser = process.env.DB_USER || 'test'
 
 const connectionParams = {
     host: dbHost,

@@ -1,3 +1,8 @@
+# v6.0.0
+
+Update dependencies to address vulns. Switch search backend from
+elasticsearch to opensearch.
+
 # v5.1.0
 
 Add [ajv-errors](https://www.npmjs.com/package/ajv-errors) to replace

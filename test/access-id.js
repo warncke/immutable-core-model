@@ -25,7 +25,7 @@ describe('immutable-core-model - access id', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create instance with custom accessId', async function () {

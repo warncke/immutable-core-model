@@ -20,7 +20,7 @@ describe('immutable-core-model - create instance', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create a new object instance', async function () {

@@ -5,7 +5,7 @@ const defined = require('if-defined')
 
 /* application modules */
 const mysql = require('./mysql')
-const elasticsearch = require('./elasticsearch')
+const opensearch = require('./opensearch')
 const redis = require('./redis')
 const reset = require('./reset')
 const session = require('./session')
@@ -30,8 +30,8 @@ async function initTestEnv (args) {
     if (!defined(args)) {
         args = {}
     }
-    if (args.elasticsearch) {
-        var elasticsearchClient = elasticsearch()
+    if (args.opensearch) {
+        var opensearchClient = opensearch()
     }
-    return [await mysql(), redis(args.redis), reset, session(), elasticsearchClient]
+    return [await mysql(), await redis(args.redis), reset, session(), opensearchClient]
 }

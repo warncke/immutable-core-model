@@ -17,7 +17,7 @@ describe('immutable-core-model - select by unique', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // models

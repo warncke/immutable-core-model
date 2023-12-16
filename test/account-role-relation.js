@@ -81,7 +81,7 @@ describe('immutable-core-model - via relation to account table', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should query models related to account model', async function () {

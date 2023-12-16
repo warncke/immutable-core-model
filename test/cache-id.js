@@ -17,7 +17,7 @@ describe('immutable-core-model - cache id', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
         await redis.quit()
     })
 

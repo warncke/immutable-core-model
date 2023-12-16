@@ -4,61 +4,61 @@
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const initTestEnv = require('./helpers/init-test-env')
 
-describe('immutable-core-model - elasticsearch index', function () {
+describe('immutable-core-model - opensearch index', function () {
 
-    var mysql, elasticsearch, redis, reset, session
+    var mysql, opensearch, redis, reset, session
 
     before(async function () {
-        [mysql, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
+        [mysql, redis, reset, session, opensearch] = await initTestEnv({opensearch: true})
     })
 
     beforeEach(async function () {
-        await reset(mysql, redis, elasticsearch)
+        await reset(mysql, redis, opensearch)
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create index on model sync', async function () {
-        // create model with elasticsearch
+        // create model with opensearch
         var fooModel = new ImmutableCoreModel({
             mysql: mysql,
-            elasticsearch: elasticsearch,
+            opensearch: opensearch,
             name: 'foo',
             redis: redis,
         })
         // sync model
-        fooModel.sync()
+        await fooModel.sync()
         // wait a second for index to be created
         await Promise.delay(1000)
         // check if index exists
-        var exists = await elasticsearch.indices.exists({
+        var res = await opensearch.indices.exists({
             index: 'foo'
         })
         // check that index exists
-        assert.isTrue(exists)
+        assert.isTrue(res.body)
     })
 
     it('should create index with custom name', async function () {
-        // create model with elasticsearch
+        // create model with opensearch
         var fooModel = new ImmutableCoreModel({
             mysql: mysql,
-            elasticsearch: elasticsearch,
-            esIndex: 'not-foo',
+            opensearch: opensearch,
+            osIndex: 'not-foo',
             name: 'foo',
             redis: redis,
         })
         // sync model
-        fooModel.sync()
+        await fooModel.sync()
         // wait a second for index to be created
         await Promise.delay(1000)
         // check if index exists
-        var exists = await elasticsearch.indices.exists({
+        var res = await opensearch.indices.exists({
             index: 'not-foo'
         })
         // check that index exists
-        assert.isTrue(exists)
+        assert.isTrue(res.body)
     })
 
 })

@@ -3,7 +3,7 @@
 Immutable Core Model integrates with the
 [Immutable App](https://www.npmjs.com/package/immutable-app) ecosystem and
 provides persistence of immutable data objects using MySQL, Redis and
-Elasticsearch.
+Opensearch.
 
 Immutable Core Model requires native async/await support.
 
@@ -1729,112 +1729,111 @@ is used to get the record being resolved.
 
 Any argument that can be passed to a `query` can be set in `queryArgs`.
 
-## Using Elasticsearch
+## Using Opensearch
 
 Immutable Core Model allows using
-[Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html)
+[Opensearch](https://opensearch.org/)
 in addition to MySQL.
 
-When the elasticsearch parameter is set for a model then the current revision
-of each record will be stored in Elasticsearch as well as MySQL.
+When the opensearch parameter is set for a model then the current revision
+of each record will be stored in Opensearch as well as MySQL.
 
-Immutable Core Model updates the document in Elasticsearch whenever updates to
+Immutable Core Model updates the document in Opensearch whenever updates to
 a record are made.
 
-Elasticsearch storage is asynchronous and unreliable in the sense that if an
-insert or update to Elasticsearch fails this is not treated as a fatal error.
+Opensearch storage is asynchronous and unreliable in the sense that if an
+insert or update to Opensearch fails this is not treated as a fatal error.
 
-The Elasticsearch index for a model will be created when model sync is called.
+The Opensearch index for a model will be created when model sync is called.
 
-For an intro to Elasticsearch terminology used here see
-[Elasticsearch Basic Concepts](https://www.elastic.co/guide/en/elasticsearch/reference/current/_basic_concepts.html)
+For an intro to Opensearch terminology used here see
+[About Opensearch](https://opensearch.org/docs/latest/about/)
 
-## Adding Elasticsearch support to a model
+## Adding Opensearch support to a model
 
-    const elasticsearch = require('elasticsearch')
+    const opensearch = require('@opensearch-project/opensearch')
 
-    const elasticsearchClient = new elistasticsearch.Client({
-        host: 'localhost:9200',
+    const opensearchClient = new opensearch.Client({
+        ...
     })
 
-    // create model with elasticsearch client set as parameter
+    // create model with opensearch client set as parameter
     var fooModel = new ImmutableCoreModel({
-        elasticsearch: elasticsearchClient,
+        opensearch: opensearchClient,
         name: 'foo',
     })
 
-Passing an elasticsearch client at model creation will enable elasticsearch
+Passing an opensearch client at model creation will enable opensearch
 
-    // create a model with elasticsearch enabled to set client later
+    // create a model with opensearch enabled to set client later
     var barModel = new ImmutableCoreModel({
-        elasticsearch: true,
+        opensearch: true,
         name: 'foo',
     })
 
     // set elastic search client
-    barModel.elasticsearch(elasticsearchClient)
+    barModel.opensearch(opensearchClient)
 
-If elasticsearch is set to true and a sync is attempted without a client set
+If opensearch is set to true and a sync is attempted without a client set
 this will result in an exception.
 
-All elasticsearch errors, including a missing client, are ignored for record
+All opensearch errors, including a missing client, are ignored for record
 create.
 
-## Setting the Elasticsearch client globally
+## Setting the Opensearch client globally
 
     var barModel = new ImmutableCoreModel({
-        elasticsearch: true,
+        opensearch: true,
         name: 'foo',
     })
 
-    ImmutableCoreModel.elasticsearch(elasticsearchClient)
+    ImmutableCoreModel.opensearch(opensearchClient)
 
-When the the elasticsearch client is set globally it will be used for all models
-where the elasticsearch property is set to true. It will not be used for models
-where an elasticsearch client instance has been set.
+When the the opensearch client is set globally it will be used for all models
+where the opensearch property is set to true. It will not be used for models
+where an opensearch client instance has been set.
 
 If a model is created after the client is set globally then the global
-elasticsearch client will be set on the model when it is created.
+opensearch client will be set on the model when it is created.
 
-If the global elasticsearch client is set after the model is created then it will
-be set on the model the first time the model needs to use the elasticsearch
+If the global opensearch client is set after the model is created then it will
+be set on the model the first time the model needs to use the opensearch
 client.
 
-## Adding an optional Elasticsearch client to a model
+## Adding an optional Opensearch client to a model
 
     var barModel = new ImmutableCoreModel({
         name: 'foo',
     })
 
     // set elastic search client
-    barModel.elasticsearch(elasticsearchClient)
+    barModel.opensearch(opensearchClient)
 
-An elasticsearch client can be added to any model even if the model does not
-require elasticsearch.
+An opensearch client can be added to any model even if the model does not
+require opensearch.
 
-## Setting the Elasticsearch index name
+## Setting the Opensearch index name
 
     var fooModel = new ImmutableCoreModel({
-        elasticsearch: client,
-        esIndex: 'not-foo',
+        opensearch: client,
+        osIndex: 'not-foo',
         name: 'foo',
     })
 
 By default the model path (name converted to foo-bar-bam style) will be used as
-the Elasticsearch index name. The esIndex property can be used to set a custom
+the Opensearch index name. The osIndex property can be used to set a custom
 name.
 
-Elasticsearch does not allow capital letters in index names.
+Opensearch does not allow capital letters in index names.
 
-## Setting the Elasticsearch document type
+## Setting the Opensearch document type
 
     var fooModel = new ImmutableCoreModel({
-        elasticsearch: client,
-        esType: 'bar.bam',
+        opensearch: client,
         name: 'foo',
     })
 
-    // 'baz' will become the elasticsearch document type
+    // 'baz' will become the opensearch document type
     fooModel.createMeta({
         data: {
             bar: { bam: 'baz' }
@@ -1842,19 +1841,10 @@ Elasticsearch does not allow capital letters in index names.
         session: session,
     })
 
-The value of the esType property is used with lodash _.get to retrieve a value
-from the record data which is used as the document type.
-
-If no esType property is set or the data is missing the property then the model
-name will be used as the default type.
-
-A JSON schema can be used to make the esType property required and define
-allowed values for it.
-
 ## Performing a search
 
     var barModel = new ImmutableCoreModel({
-        elasticsearch: true,
+        opensearch: true,
         name: 'foo',
     })
 
@@ -1865,20 +1855,20 @@ allowed values for it.
     })
 
 The search method args are passed directly to the
-[elasticsearch](https://www.npmjs.com/package/elasticsearch) 
-[search](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/api-reference.html#api-search)
+[opensearch](https://www.npmjs.com/package/opensearch)
+[search](https://github.com/opensearch-project/opensearch-js/blob/503336495d347441786a92e24428541021ed6699/guides/search.md)
 method so any params accepted by that method can be passed to the model search
 method.
 
 The index for the search will be set to the index for the model by default.
 
-When the raw property is set the raw results of the elasticsearch api query are
+When the raw property is set the raw results of the opensearch api query are
 returned. Only raw mode is currently supported.
 
 ## Handling deleted records
 
-If a model is deleted it will be deleted from Elasticsearch and if it is
-un-deleted it will be inserted back into Elasticsearch.
+If a model is deleted it will be deleted from Opensearch and if it is
+un-deleted it will be inserted back into Opensearch.
 
 ## ImmutableCoreModel properties
 

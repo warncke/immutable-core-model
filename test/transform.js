@@ -17,7 +17,7 @@ describe('immutable-core-model - transform', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should transform value', async function () {

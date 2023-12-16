@@ -2,40 +2,37 @@
   "author": "Ersun Warncke <ersun.warncke@gmail.com>",
   "dependencies": {
     "ajv": "8.0.5",
-    "ajv-errors": "^3.0.0",
+    "ajv-errors": "3.0.0",
     "bluebird": "3.7.2",
     "change-case": "4.1.2",
     "debug": "4.3.1",
     "deep-extend": "0.6.0",
     "if-defined": "1.0.18",
-    "immutable-access-control": "0.5.18",
-    "immutable-ai": "0.8.3",
+    "immutable-access-control": "0.6.0",
+    "immutable-ai": "0.9.0",
     "immutable-app-http-error": "0.1.19",
-    "immutable-core": "3.0.0",
-    "immutable-core-model-view": "0.6.0",
+    "immutable-core": "3.1.0",
+    "immutable-core-model-view": "0.7.0",
     "immutable-require-valid-optional-object": "0.1.18",
     "json-stable-stringify": "1.0.1",
     "lodash": "4.17.21",
-    "micro-timestamp": "^2.0.0",
+    "micro-timestamp": "2.1.0",
     "mysql2": "2.2.5",
     "null-function": "1.0.18",
-    "snappy": "6.3.5",
+    "snappy": "7.2.2",
     "stable-id": "1.0.13"
   },
   "description": "Immutable model built on immutable-core",
   "devDependencies": {
-    "chai": "4.3.4",
+    "@opensearch-project/opensearch": "2.4.0",
+    "chai": "4.3.10",
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.6.0",
-    "elasticsearch": "16.7.2",
-    "mocha": "8.3.2",
-    "redis": "3.1.0"
+    "mocha": "10.2.0",
+    "redis": "4.6.11"
   },
   "directories": {
     "test": "test"
-  },
-  "engines": {
-    "node": ">=7.6.0"
   },
   "license": "MIT",
   "main": "lib/immutable-core-model.js",
@@ -44,5 +41,5 @@
   "scripts": {
     "test": "mocha --exit"
   },
-  "version": "5.1.0"
+  "version": "6.0.0"
 }

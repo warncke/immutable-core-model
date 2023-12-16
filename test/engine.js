@@ -17,7 +17,7 @@ describe('immutable-core-model - engine and charset', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should use default engine and charset', async function () {
@@ -33,7 +33,7 @@ describe('immutable-core-model - engine and charset', function () {
         var schema = await fooModel.schema()
         // test that schema matches spec
         assert.strictEqual(schema.engine, 'InnoDB')
-        assert.strictEqual(schema.charset, 'utf8')
+        assert.strictEqual(schema.charset, 'utf8mb3')
     })
 
     it('should set engine and charset globally', async function () {

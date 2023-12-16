@@ -17,7 +17,7 @@ describe('immutable-core-model - boolean column', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // variable to populate in before

@@ -17,7 +17,7 @@ describe('immutable-core-model - disable binary ids', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     var fooModel, fooModelGlobal

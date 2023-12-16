@@ -20,7 +20,7 @@ describe('immutable-core-model - access control', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('setting custom access control provider deprecated', async function () {

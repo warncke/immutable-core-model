@@ -35,7 +35,7 @@ describe('immutable-core-model - access control states', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     beforeEach(async function () {
@@ -85,7 +85,6 @@ describe('immutable-core-model - access control states', function () {
                 where: {id: baz.id, isDeleted: true},
                 session: session3,
             })
-            console.log(res)
         }
         catch (err) {
             error = err

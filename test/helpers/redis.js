@@ -1,32 +1,30 @@
 'use strict'
 
 /* npm modules */
-const Promise = require('bluebird')
 const Redis = require('redis')
 
 /* exports */
 module.exports = redis
 
-const redisHost = process.env.REDIS_HOST || 'localhost'
+const redisHost = process.env.REDIS_HOST || '127.0.0.1'
 const redisPort = process.env.REDIS_PORT || '6379'
 
 const testCache = process.env.TEST_CACHE === '1' ? true : false
-
-// promisify redis client
-Promise.promisifyAll(Redis.RedisClient.prototype)
-Promise.promisifyAll(Redis.Multi.prototype)
 
 /**
  * @function redis
  *
  * return new redis client if cache testing enabled
  */
-function redis (force) {
+async function redis (force) {
     if (!testCache && !force) {
         return
     }
-    return Redis.createClient({
-        host: redisHost,
-        port: redisPort,
-    })
+    const client = await Redis.createClient({
+        url: `redis://${redisHost}:${redisPort}`
+    }).on('error', err => {
+        console.error('Redis Client Error', err)
+        process.exit()
+    }).connect()
+    return client
 }

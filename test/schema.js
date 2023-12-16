@@ -18,7 +18,7 @@ describe('immutable-core-model - schema', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create a model with a schema', async function () {

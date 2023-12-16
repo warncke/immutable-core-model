@@ -20,13 +20,13 @@ describe('immutable-core-model - add column', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should add new columns', async function () {
         // full table schema including all default columns
         var expectedSchema = {
-            charset: 'utf8',
+            charset: 'utf8mb3',
             columns: {
                 n: {
                     null: false,

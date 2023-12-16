@@ -20,7 +20,7 @@ describe('immutable-core-model', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     it('should create a new model instance', async function () {
@@ -96,7 +96,7 @@ describe('immutable-core-model', function () {
                     'unique': true
                 }
             ],
-            charset: 'utf8',
+            charset: 'utf8mb3',
             engine: 'InnoDB',
         }
         // default columns

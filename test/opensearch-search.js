@@ -4,32 +4,32 @@
 const ImmutableCoreModel = require('../lib/immutable-core-model')
 const initTestEnv = require('./helpers/init-test-env')
 
-describe('immutable-core-model - elasticsearch search', function () {
-    // extend timeout to allow elasticsearch time to index
+describe.only('immutable-core-model - opensearch search', function () {
+    // extend timeout to allow opensearch time to index
     this.timeout(10000)
 
-    var mysql, elasticsearch, redis, reset, session
+    var mysql, opensearch, redis, reset, session
 
     before(async function () {
-        [mysql, redis, reset, session, elasticsearch] = await initTestEnv({elasticsearch: true})
+        [mysql, redis, reset, session, opensearch] = await initTestEnv({opensearch: true})
     })
 
     beforeEach(async function () {
-        await reset(mysql, redis, elasticsearch)
+        await reset(mysql, redis, opensearch)
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // will be pouplated in before
     var foo1, foo2, foo3, globalFooModel, fooModel
 
     beforeEach(async function () {
-        // create model with elasticsearch
+        // create model with opensearch
         globalFooModel = new ImmutableCoreModel({
             mysql: mysql,
-            elasticsearch: elasticsearch,
+            opensearch: opensearch,
             name: 'foo',
             redis: redis,
         })
@@ -41,7 +41,7 @@ describe('immutable-core-model - elasticsearch search', function () {
         foo1 = await fooModel.create({foo: 'bam'})
         foo2 = await fooModel.create({foo: 'bar'})
         foo3 = await fooModel.create({foo: 'bar'})
-        // wait a second for elasticsearch
+        // wait a second for opensearch
         await Promise.delay(1000)
     })
 
@@ -50,6 +50,7 @@ describe('immutable-core-model - elasticsearch search', function () {
             index: 'foo',
             raw: true,
         })
+        res = res.body
         // validate response
         assert.isObject(res)
         assert.isObject(res.hits)

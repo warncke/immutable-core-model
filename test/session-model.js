@@ -17,7 +17,7 @@ describe('immutable-core-model - session model', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     // will be pouplated in before

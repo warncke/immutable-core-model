@@ -21,7 +21,7 @@ describe('immutable-core-model - d column', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     var fooModel, fooDeleteModel

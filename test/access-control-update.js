@@ -35,7 +35,7 @@ describe('immutable-core-model - access control update', function () {
     })
 
     after(async function () {
-        await mysql.close()
+        await mysql.end()
     })
 
     beforeEach(async function () {
